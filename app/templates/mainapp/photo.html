@@ -5,13 +5,15 @@
 {% block title %}{{ photo.title }} - Lucid Nonsense Photography{% endblock %}
 
 {% block body %}
-<div class="row-fluid">
+<div class="row-fluid" xmlns="http://www.w3.org/1999/html">
 
     <div class="span1" style="text-align: left;">
     </div>
 
     <div class="span2 span-prev">
-        <a href="/photo/{{ photo.hash }}/prev">&lt; prev.</a>
+        {% if prev %}
+        <a href="/photo/{{ prev.hash }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}">&lt; prev.</a>
+        {% endif %}
     </div>
 
     <div class="span6" style="text-align: center;">
@@ -19,7 +21,9 @@
     </div>
 
     <div class="span2 span-next" style="text-align: right;">
-        <a href="/photo/{{ photo.hash }}/next">next &gt;</a>
+        {% if next %}
+        <a href="/photo/{{ next.hash }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}">next &gt;</a>
+        {% endif %}
     </div>
     <div class="span1" style="text-align: left;">
     </div>
@@ -28,13 +32,16 @@
 <div class="row-fluid">
     <div class="span12" style="text-align: center;">
 
-    <img src="{{ photo.external_url }}" id="photo-main">
+        <img src="{{ photo.external_url }}" id="photo-main">
 
         <div id="photo-main-license">
-            This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/2.5/in/">Creative Commons Attribution-Noncommercial-Share Alike License</a>.
-            You can also <br>get a commercial license here.
+            This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons BY-NC-SA</a>.
+            <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license here.</a>
         </div>
 
+        <div id="photo-main-meta-tags">
+            {% for tag in photo.tags.all %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span> &nbsp;{% endfor %}
+        </div>
 
     </div>
 </div>

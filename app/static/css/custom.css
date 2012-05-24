@@ -95,6 +95,7 @@ img#photo-main {
     padding-top: 10px;
     font-size: 11px;
     color:#666;
+    margin-bottom: 10px;
 }
 
 #photo-main-license a {
@@ -140,4 +141,13 @@ img#photo-main {
 }
 .tag-depth-3 {
     padding-left:40px;
+}
+
+.caption {
+    font-size: 18px;
+    margin-bottom:20px;
+}
+
+#photo-main-meta-tags, #photo-main-meta-tags a {
+    color:#bbb;
 }

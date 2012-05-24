@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^photo/(?P<photo_hash>\w+)/$', 'mainapp.views.photo'),
 
     url(r'^tags/$', 'mainapp.views.tags'),
+    url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

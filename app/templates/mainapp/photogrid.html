@@ -1,0 +1,18 @@
+{% load thumbnail %}
+
+{% for photo in photos %}
+{% thumbnail photo.external_url "280x280" crop="center" as im %}
+<div class="photo-container">
+    <div class="photo-square">
+        <a href="/photo/{{ photo.hash }}{% if tag %}?tag={{ tag.slug }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}">
+            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+            <div class="photo-caption">
+                <div class="title">
+                    {{ photo.title }}
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endthumbnail %}
+{% endfor %}

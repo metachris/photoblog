@@ -8,15 +8,14 @@
 <div class="row-fluid">
 
     {% for tag in tags %}
-        <div class="span2">
+        <div class="span2" id="taglist">
             {% for t2 in tag.rootlist %}
-                <div class="tag-depth-{{ t2.tag.depth }}">
+                <div class="tag tag-depth-{{ t2.tag.depth }}">
                     <a href="/tag/{{ t2.tag.slug }}">{{ t2.tag.name }} &middot; {{ t2.model_count }}</a>
                 </div>
             {% endfor %}
         </div>
     {% endfor %}
-    </div>
 
 </div>
 {% endblock %}
