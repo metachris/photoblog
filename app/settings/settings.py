@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # Django admin interface
+    "sorl.thumbnail",
     'django.contrib.admin',
 
     # Uncomment the next line to enable admin documentation:

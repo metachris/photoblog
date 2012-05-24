@@ -29,6 +29,15 @@ class Tag(MP_Node):
         return 'Tag: %s' % self.name
 
 
+class Set(caching.base.CachingMixin, models.Model):
+    objects = caching.base.CachingManager()
+
+    user = models.ForeignKey(User)
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+
+    title = models.CharField(max_length=512)
+
+
 class Photo(caching.base.CachingMixin, models.Model):
     """
     Ideas: exif info, related photos
@@ -44,18 +53,19 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     # Custom id
     hash = models.CharField(max_length=32)
+    set = models.ForeignKey(Set, blank=True, null=True)
 
     # Image info
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
     views = models.IntegerField(default=0)
 
     title = models.CharField(max_length=100)
     slug = models.CharField(max_length=100)
 
-    description_md = models.CharField(max_length=10240)  # markdown
-    description_html = models.CharField(max_length=10240)  # converted to html
+    description_md = models.CharField(max_length=10240, blank=True)  # markdown
+    description_html = models.CharField(max_length=10240, blank=True)  # converted to html
 
-    date_captured = models.DateTimeField('date created')  # from exif
+    date_captured = models.DateTimeField('captured', blank=True, null=True)  # from exif
 
     def __unicode__(self):
-        return "<Photo(%s)>" % self.hash
+        return "<Photo(%s)>" % self.pk
