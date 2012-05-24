@@ -1,0 +1,143 @@
+body {
+    background: #131313;
+    color: #EFEFEF;
+}
+
+a {
+    color: #f89406;
+}
+
+.page-header {
+    border-bottom-color: #555;
+}
+
+.page-header a:hover {
+    text-decoration: none;
+}
+
+.page-header h1 a {
+    color: #f89406;
+}
+
+.page-header #topnav {
+    float:right;
+    padding-top: 12px;
+}
+
+.page-header #topnav a {
+    padding-left:20px;
+    color: #999;
+}
+.page-header #topnav a:hover {
+    color: #CCC;
+}
+
+hr {
+    border-bottom: 0px #fff;
+    border-top-color: #777;
+}
+
+.photo-container {
+    float:left;
+    width:280px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+.photo-square {
+    width: 280px;
+    height: 280px;
+    overflow: hidden;
+    position: relative;
+}
+
+.photo-caption {
+    position: absolute;
+    overflow: hidden;
+    white-space: nowrap;
+    bottom: 0px;
+    background:
+        rgba(0, 0, 0, 0.65);
+    width: 100%;
+    height: 40px;
+    display: none;
+}
+
+.photo-caption .title {
+    width: 260px;
+    font-size: 18px;
+    line-height: 20px;
+    height: 23px;
+    font-weight: 300;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color:white;
+}
+
+
+/** PHOTO DETAIL PAGE **/
+
+img#photo-main {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+    margin-top: 12px;
+    z-index: 20;
+    position: relative;
+}
+
+#photo-main-license {
+    text-align: center;
+    padding-top: 10px;
+    font-size: 11px;
+    color:#666;
+}
+
+#photo-main-license a {
+    color:#666;
+}
+
+#photo-main-license a:hover {
+    color:#999;
+}
+
+#photo-main-caption {
+    font-size:18px;
+    color: #f89406;
+}
+
+
+.span-prev, .span-next {
+}
+
+.span-prev a, .span-next a {
+    color: #666;
+}
+.span-prev a:hover, .span-next a:hover {
+    color: #888;
+    text-decoration: none;
+}
+
+#overlay {
+    background:rgba(0, 0, 0, 0.8);
+    width:100%;
+    height:100%;
+    position: absolute;
+    top:0px;
+    left:0px;
+    z-index: 10;
+    display: none;
+}
+
+
+/** TAGS */
+.tag-depth-2 {
+    padding-left:20px;
+}
+.tag-depth-3 {
+    padding-left:40px;
+}

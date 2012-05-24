@@ -6,7 +6,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
-    url(r'^project/(?P<project_id>\d+)/$', 'mainapp.views.project'),
+    url(r'^photo/(?P<photo_hash>\w+)/$', 'mainapp.views.photo'),
+
+    url(r'^tags/$', 'mainapp.views.tags'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

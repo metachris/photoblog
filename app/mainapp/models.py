@@ -22,6 +22,7 @@ class UserProfile(caching.base.CachingMixin, models.Model):
 
 class Tag(MP_Node):
     name = models.CharField(max_length=50)
+    slug = models.CharField(max_length=256)
 
     node_order_by = ['name']
 
@@ -36,7 +37,11 @@ class Set(caching.base.CachingMixin, models.Model):
     date_created = models.DateTimeField('date created', auto_now_add=True)
 
     title = models.CharField(max_length=512)
+    slug = models.CharField(max_length=512)
 
+
+    def __unicode__(self):
+        return 'Set: %s' % self.title
 
 class Photo(caching.base.CachingMixin, models.Model):
     """

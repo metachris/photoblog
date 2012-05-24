@@ -8,3 +8,4 @@ class MP_Tag_Admin(treebeard.admin.TreeAdmin):
 admin.site.register(models.UserProfile)
 admin.site.register(models.Tag, MP_Tag_Admin)
 admin.site.register(models.Photo)
+admin.site.register(models.Set)

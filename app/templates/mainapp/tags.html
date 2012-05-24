@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title %}{{ photo.title }} - Lucid Nonsense Photography{% endblock %}
+
+{% block body %}
+<div class="row-fluid">
+
+    {% for tag in tags %}
+        <div class="span2">
+            {% for t2 in tag.rootlist %}
+                <div class="tag-depth-{{ t2.tag.depth }}">
+                    <a href="/tag/{{ t2.tag.slug }}">{{ t2.tag.name }} &middot; {{ t2.model_count }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+    <script src="{{ STATIC_URL }}js/photo.js"></script>
+{% endblock %}
