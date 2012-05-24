@@ -2,20 +2,11 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from treebeard.mp_tree import MP_Node
 
 import caching.base
 
 
-HASH_CHOICES = (
-    (0, "MD5"),
-    (1, "SHA1"),
-    (2, "SHA256"),
-    (3, "Git Tag"),
-    )
-
-
-"""
 class UserProfile(caching.base.CachingMixin, models.Model):
     objects = caching.base.CachingManager()
 
@@ -29,20 +20,38 @@ class UserProfile(caching.base.CachingMixin, models.Model):
         return "<UserProfile(%s)>" % self.user
 
 
-class Project(caching.base.CachingMixin, models.Model):
-    objects = caching.base.CachingManager()
+class Tag(MP_Node):
+    name = models.CharField(max_length=50)
 
-    user = models.OneToOneField(User)
-    date_created = models.DateTimeField('date created', auto_now_add=True)
-
-    name = models.CharField(max_length=100, )
-    url = models.URLField(max_length=500)
-    hash_type = models.CharField(max_length=10, choices=HASH_CHOICES)
+    node_order_by = ['name']
 
     def __unicode__(self):
-        return "<Project(%s)>" % self.name
+        return 'Tag: %s' % self.name
 
-    def is_today(self):
-        return self.date_created.date() == datetime.date.today()
-"""
 
+class Photo(caching.base.CachingMixin, models.Model):
+    """
+    Ideas: exif info, related photos
+    """
+    objects = caching.base.CachingManager()
+
+    user = models.ForeignKey(User)
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+
+    # Custom id
+    hash = models.CharField(max_length=32)
+
+    # Image info
+    tags = models.ManyToManyField(Tag, blank=True)
+    views = models.IntegerField(default=0)
+
+    title = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100)
+
+    description_md = models.CharField(max_length=10240)  # markdown
+    description_html = models.CharField(max_length=10240)  # converted to html
+
+    date_captured = models.DateTimeField('date created')  # from exif
+
+    def __unicode__(self):
+        return "<Photo(%s)>" % self.hash
