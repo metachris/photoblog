@@ -38,6 +38,10 @@ class Photo(caching.base.CachingMixin, models.Model):
     user = models.ForeignKey(User)
     date_created = models.DateTimeField('date created', auto_now_add=True)
 
+    #
+    filename = models.CharField(max_length=512, blank=True)
+    external_url = models.CharField(max_length=2048, blank=True)  # for photos on flickr, 500px, etc
+
     # Custom id
     hash = models.CharField(max_length=32)
 

@@ -108,7 +108,19 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     "/Users/chris/Projects/private/django/photosite/app/templates",
+    "/Users/chris/Projects/private/django/photosite/env/lib/python2.7/site-packages/treebeard/templates",
     )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.request"
+    )
+
 
 INSTALLED_APPS = (
     # Commonly required django internal apps
@@ -127,6 +139,8 @@ INSTALLED_APPS = (
 
     # South is a tool to document and simplify database schema updates
     'south',
+
+    'treebeard',
 
     # Redis status info for the admin interface
     #'redis_status',
