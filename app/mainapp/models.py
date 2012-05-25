@@ -9,6 +9,7 @@ from treebeard.mp_tree import MP_Node
 
 import caching.base
 import tools
+import markdown
 
 
 class UserProfile(caching.base.CachingMixin, models.Model):
@@ -43,6 +44,9 @@ class Set(caching.base.CachingMixin, models.Model):
     title = models.CharField(max_length=512)
     slug = models.CharField(max_length=512, null=True)
 
+    description_md = models.TextField(blank=True, null=True)  # markdown
+    description_html = models.TextField(blank=True, null=True)  # converted to html
+
     cover_photo = models.ForeignKey("Photo", blank=True, null=True, related_name="set_cover")
 
     def __unicode__(self):
@@ -73,14 +77,17 @@ class Photo(caching.base.CachingMixin, models.Model):
     title = models.CharField(max_length=100)
     slug = models.CharField(max_length=100)
 
-    description_md = models.CharField(max_length=10240, blank=True)  # markdown
-    description_html = models.CharField(max_length=10240, blank=True)  # converted to html
+    description_md = models.TextField(blank=True, null=True)  # markdown
+    description_html = models.TextField(blank=True, null=True)  # converted to html
 
-    date_captured = models.DateTimeField('captured', blank=True, null=True)  # from exif
+    date_captured = models.DateField('captured', blank=True, null=True)  # from exif
+
+    # Whether this photo should be featured on the front page, etc.
+    featured = models.BooleanField(default=True)
 
     @staticmethod
     def _mk_hash():
-        hash = "daee3a"
+        hash = None
         while not hash or Photo.objects.filter(hash=hash).count():
             hash = tools.id_generator(size=6, chars="abcdef0123456789")
         return hash
@@ -88,6 +95,8 @@ class Photo(caching.base.CachingMixin, models.Model):
     @staticmethod
     def _mk_slug(title):
         slug = slug_orig = tools.slugify(title)
+        if not slug:
+            return
         count = 1
         while not slug or Photo.objects.filter(slug=slug).count():
             count += 1
@@ -101,8 +110,18 @@ class Photo(caching.base.CachingMixin, models.Model):
 @receiver(pre_save, sender=Photo)
 def photo_save_handler(sender, **kwargs):
     photo = kwargs["instance"]
-    photo.slug = Photo._mk_slug(photo.title)
-    print "new slug: %s" % photo.slug
+
     if not photo.hash:
         photo.hash = Photo._mk_hash()
         print "new hash: %s" % photo.hash
+
+    if not photo.slug:
+        photo.slug = Photo._mk_slug(photo.title)
+        if not photo.slug:
+            # Title not sluggable
+            photo.slug = photo.hash
+        print "new slug: %s" % photo.slug
+
+    if photo.description_md:
+        md = markdown.Markdown(safe_mode="escape")
+        photo.description_html = md.convert(photo.description_md)

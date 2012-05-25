@@ -12,17 +12,17 @@
 
     <div class="span2 span-prev">
         {% if prev %}
-        <a href="/photo/{{ prev.hash }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}">&lt; prev.</a>
+        <a href="/photo/{{ prev.slug }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}" title="{{ prev.title }}">&lt; prev.</a>
         {% endif %}
     </div>
 
     <div class="span6" style="text-align: center;">
-        <div id="photo-main-caption">{{ photo.title }}</div>
+        <div id="photo-main-caption"><a href="/photo/{{ photo.slug }}">{{ photo.title }}</a></div>
     </div>
 
     <div class="span2 span-next" style="text-align: right;">
         {% if next %}
-        <a href="/photo/{{ next.hash }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}">next &gt;</a>
+        <a href="/photo/{{ next.slug }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}" title="{{ next.title }}">next &gt;</a>
         {% endif %}
     </div>
     <div class="span1" style="text-align: left;">
@@ -32,16 +32,42 @@
 <div class="row-fluid">
     <div class="span12" style="text-align: center;">
 
-        <img src="{{ photo.external_url }}" id="photo-main">
+        {% if photo.external_url|is_portrait %}
+            {% thumbnail photo.external_url "600" upscale=False as im %}
+                <img src="{{ im.url }}" id="photo-main">
+                <div class="photo-meta-portrait">
+            {% endthumbnail %}
+        {% else %}
+            {% thumbnail photo.external_url "900" upscale=False as im %}
+                <img src="{{ im.url }}" id="photo-main">
+                <div class="photo-meta-landscape">
+            {% endthumbnail %}
+        {% endif %}
 
         <div id="photo-main-license">
             This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons BY-NC-SA</a>.
-            <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license here.</a>
+            <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license</a>.
         </div>
 
+        <div id="photo-main-meta-right">
         <div id="photo-main-meta-tags">
-            {% for tag in photo.tags.all %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span> &nbsp;{% endfor %}
+            {% for tag in photo.tags.all %}{% if forloop.first %}Tags: {% else %} &middot; {% endif %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span>{% endfor %}
         </div>
+
+        <div id="photo-main-meta-set">
+            {% if photo.set %}Set: <a href="/set/{{ photo.set.slug }}">{{ photo.set.title }}</a>{% endif %}
+        </div>
+        </div>
+
+        {% if photo.description_html %}
+            {{ photo.description_html|safe }}
+        {% endif %}
+
+        {% if photo.date_captured %}
+            <div id="photo-main-date">
+                {{ photo.date_captured }}
+            </div>
+        {% endif %}
 
     </div>
 </div>

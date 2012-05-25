@@ -6,7 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
-    url(r'^photo/(?P<photo_hash>\w+)/$', 'mainapp.views.photo'),
+    url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
+    url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 
     url(r'^tags/$', 'mainapp.views.tags'),
     url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag'),

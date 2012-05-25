@@ -1,9 +1,16 @@
 import models
 from django.contrib import admin
+from django import forms
 import treebeard.admin
 
 class MP_Tag_Admin(treebeard.admin.TreeAdmin):
     pass
+
+
+class PhotoModelForm( forms.ModelForm ):
+    descr = forms.CharField( widget=forms.Textarea )
+    class Meta:
+        model = models.Photo
 
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ["title", "id", "slug", "hash"]

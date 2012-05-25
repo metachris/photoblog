@@ -1,4 +1,5 @@
 import datetime
+import json
 from pprint import pprint
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -8,6 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core import exceptions
+from django.template.loader import get_template
+from django.template import Context, Template
 
 import models
 import forms
@@ -17,12 +20,13 @@ import tools
 def home(request):
     #return HttpResponse("Hello, world. You're at the poll index.")
     # raise Http404
-    photos = models.Photo.objects.all().order_by("-id")[:10]
-    return render(request, 'index.html', {'photos': photos})
+    photos_per_page = 10
+    photos = models.Photo.objects.filter(featured=True).order_by("-id")[:photos_per_page]
+    return render(request, 'index.html', {'photos': photos, "count": photos_per_page})
 
 
-def photo(request, photo_hash):
-    photo = models.Photo.objects.get(hash=photo_hash)
+def photo(request, photo_slug):
+    photo = models.Photo.objects.get(slug=photo_slug)
     tag_slug = request.GET.get("tag")
     set_slug = request.GET.get("set")
 
@@ -108,13 +112,43 @@ def tags(request):
         tags.append(CountAwareTagTree(tag))
     return render(request, 'mainapp/tags.html', {'tags': tags})
 
+
 def tag(request, tag_slug):
     """ Show a list of tags """
     tag = models.Tag.objects.get(slug=tag_slug)
     tags = [tag]
     tags += tag.get_descendants()
-    photos = models.Photo.objects.filter(tags__in=tags)[:10]
+    photos = models.Photo.objects.filter(tags__in=tags).order_by("-id")[:10]
     if len(photos) == 1:
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
+
+
+def ajax_photo_more(request):
+    last_hash = request.GET.get("last")
+    photos_per_page = int(request.GET.get("n"))
+    featured = request.GET.get("featured")
+    tag_slug = request.GET.get("tag")
+    set_slug = request.GET.get("set")
+
+    photo_last = models.Photo.objects.get(hash=last_hash)
+    photos = models.Photo.objects.filter(id__lt=photo_last.id)
+    if featured: photos = photos.filter(featured=True)
+    if tag_slug: photos = photos.filter(tags__slug=tag_slug)
+    if set_slug: photos = photos.filter(set__slug=set_slug)
+    photos = photos.order_by("-id")
+
+    ret = {
+        "photos": [],
+        "has_more": photos.count() - photos_per_page > 0
+    }
+
+    griditem_template = get_template('mainapp/photogrid_renderitem.html')
+    for photo in photos[:photos_per_page]:
+        ret["photos"].append(griditem_template.render(Context({ "photo": photo })));
+
+    ret["last"] = photo.hash
+    print ret
+
+    return HttpResponse(json.dumps(ret))
