@@ -11,6 +11,7 @@ urlpatterns = patterns('',
 
     url(r'^tags/$', 'mainapp.views.tags'),
     url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag'),
+    url(r'^set/(?P<set_slug>.*)/$', 'mainapp.views.set_photos'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

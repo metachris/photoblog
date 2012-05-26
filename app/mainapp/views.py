@@ -114,7 +114,7 @@ def tags(request):
 
 
 def tag(request, tag_slug):
-    """ Show a list of tags """
+    """ Show photos with a specific tag """
     tag = models.Tag.objects.get(slug=tag_slug)
     tags = [tag]
     tags += tag.get_descendants()
@@ -123,6 +123,16 @@ def tag(request, tag_slug):
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
+
+
+def set_photos(request, set_slug):
+    """ Show photos in a set """
+    set = models.Set.objects.get(slug=set_slug)
+    photos = models.Photo.objects.filter(set=set).order_by("-id")[:10]
+    if len(photos) == 1:
+        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
+
+    return render(request, 'mainapp/set_photos.html', {'set': set, 'photos': photos})
 
 
 def ajax_photo_more(request):
