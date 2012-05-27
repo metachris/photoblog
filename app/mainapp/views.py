@@ -226,3 +226,17 @@ def ajax_photo_more(request):
     print ret
 
     return HttpResponse(json.dumps(ret))
+
+
+def ajax_contact(request):
+    print request.POST
+    if request.method == 'POST': # If the form has been submitted...
+        form = forms.ContactForm(request.POST) # A form bound to the POST data
+        if form.is_valid():
+            # All validation rules pass
+            # send email now (TODO)
+            return HttpResponse('1')
+        else:
+            return HttpResponse(str(form.errors))
+    else:
+        return HttpResponse("wrong turn?")

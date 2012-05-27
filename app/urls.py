@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
-    url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
+
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 
     url(r'^locations/$', 'mainapp.views.locations_list'),
@@ -17,6 +17,9 @@ urlpatterns = patterns('',
 
     url(r'^sets/$', 'mainapp.views.sets_list'),
     url(r'^set/(?P<set_slug>.*)/$', 'mainapp.views.set_photos'),
+
+    url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
+    url(r'^ajax/contact/$', 'mainapp.views.ajax_contact'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

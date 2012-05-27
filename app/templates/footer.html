@@ -11,27 +11,34 @@
     <div class="modal-body">
         <p>I'm available for custom shootings, and feedback is appreciated. You can contact
         me by phone (+43 680 2425352) or leave a message right here.</p>
-
         <br />
-        <form action="/contact/" method="post" class="form-horizontal">
+
+        <div id="contactModal-loading" style="text-align: center; display: none; margin-top: 120px; margin-bottom: 120px;">
+            <img src="{{ STATIC_URL }}img/ajax-loader.gif" />
+        </div>
+
+        <div id="contactModal-success" style="text-align: center; display: none; margin-top: 120px; margin-bottom: 120px;">
+            Thanks. Your message has been delivered.
+        </div>
+
+        <form action="/contact/" method="post" class="form-horizontal" id="contactModal-form">
             {% csrf_token %}
 
-
             <fieldset>
-                <div class="control-group">
+                <div class="control-group" id="ctrlgrp-name">
                     <label class="control-label" for="id_name">Your Name:</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="id_name" name="name">
                     </div>
                 </div>
-                <div class="control-group">
+                <div class="control-group" id="ctrlgrp-email">
                     <label class="control-label" for="id_email">Your Email:</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="id_email" name="email">
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="id_messagel">Message:</label>
+                <div class="control-group" id="ctrlgrp-message">
+                    <label class="control-label" for="id_message">Message:</label>
                     <div class="controls">
                         <textarea class="input-xlarge" id="id_message" rows="10" cols="40" name="message"></textarea>
                     </div>
@@ -48,6 +55,6 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:hide_contact_modal()" class="btn">Close</a>
-        <a href="javascript:send_message()" class="btn btn-primary">Send Message</a>
+        <a href="javascript:send_message()" class="btn btn-primary" id="contactModal-btn-submit">Send Message</a>
     </div>
 </div>
