@@ -15,6 +15,7 @@ from django.template import Context, Template
 import models
 import forms
 import tools
+import tools.sendmail
 
 
 def home(request):
@@ -235,6 +236,9 @@ def ajax_contact(request):
         if form.is_valid():
             # All validation rules pass
             # send email now (TODO)
+            email_template = get_template('mainapp/email/contact.html')
+            msg = email_template.render(Context({ "form": form.cleaned_data}))
+            tools.sendmail.gmail("chris@metachris.org", "Photoblog Contact", msg)
             return HttpResponse('1')
         else:
             return HttpResponse(str(form.errors))

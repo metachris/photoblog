@@ -12,6 +12,10 @@ MANAGERS = ADMINS
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'MAKE_THIS_UNIQUE'
 
+# To send email via GMail with tools.sendmail.gmail(), set the credentials here
+SENDMAIL_GMAIL_USER = ""
+SENDMAIL_GMAIL_PASS = ""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
