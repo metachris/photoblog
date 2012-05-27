@@ -6,17 +6,13 @@
 
 {% block body %}
 <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
-
-    <div class="span1" style="text-align: left;">
-    </div>
-
     <div class="span2 span-prev">
         {% if prev %}
         <a href="/photo/{{ prev.slug }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}" title="{{ prev.title }}">&lt; prev.</a>
         {% endif %}
     </div>
 
-    <div class="span6" style="text-align: center;">
+    <div class="span8" style="text-align: center;">
         <div id="photo-main-caption"><a href="/photo/{{ photo.slug }}">{{ photo.title }}</a></div>
     </div>
 
@@ -25,49 +21,48 @@
         <a href="/photo/{{ next.slug }}{% if tag %}?tag={{ tag }}{% if set %}&set={{ set }}{% endif %}{% else %}{% if set %}?set={{ set }}{% endif %}{% endif %}" title="{{ next.title }}">next &gt;</a>
         {% endif %}
     </div>
-    <div class="span1" style="text-align: left;">
-    </div>
-
 </div>
+
 <div class="row-fluid">
     <div class="span12" style="text-align: center;">
 
-        {% if photo.external_url|is_portrait %}
-            {% thumbnail photo.external_url "600" upscale=False as im %}
-                <img src="{{ im.url }}" id="photo-main">
-                <div class="photo-meta-portrait">
-            {% endthumbnail %}
-        {% else %}
-            {% thumbnail photo.external_url "900" upscale=False as im %}
-                <img src="{{ im.url }}" id="photo-main">
-                <div class="photo-meta-landscape">
-            {% endthumbnail %}
-        {% endif %}
+        <div id="photo-main-container">
+            {% if photo.external_url|is_portrait %}
+                {% thumbnail photo.external_url "600" upscale=False as im %}
+                        <img src="{{ im.url }}" id="photo-main">
+                {% endthumbnail %}
+            {% else %}
+                {% thumbnail photo.external_url "900" upscale=False as im %}
+                        <img src="{{ im.url }}" id="photo-main">
+                {% endthumbnail %}
+            {% endif %}
 
-        <div id="photo-main-license">
-            This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons BY-NC-SA</a>.
-            <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license</a>.
-        </div>
+            <div class="photo-meta">
 
-        <div id="photo-main-meta-right">
-        <div id="photo-main-meta-tags">
-            {% for tag in photo.tags.all %}{% if forloop.first %}Tags: {% else %} &middot; {% endif %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span>{% endfor %}
-        </div>
+                <div id="photo-main-license">
+                    This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons BY-NC-SA</a>.
+                    <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license</a>.
+                </div>
 
-        <div id="photo-main-meta-set">
-            {% if photo.set %}Set: <a href="/set/{{ photo.set.slug }}">{{ photo.set.title }}</a>{% endif %}
-        </div>
-        </div>
+                <div id="photo-main-meta-right">
+                    <a name="fb_share"></a>
+<!--                    <div class="fb-like" data-href="http://testx.com" data-send="true" data-layout="box_count" data-show-faces="false" data-colorscheme="dark"></div>
+-->                </div>
 
-        {% if photo.description_html %}
-            {{ photo.description_html|safe }}
-        {% endif %}
+                {% if photo.description_html %}
+                    {{ photo.description_html|safe }}
+                {% endif %}
 
-        {% if photo.date_captured %}
-            <div id="photo-main-date">
-                {{ photo.date_captured }}
+                <div id="photo-main-meta-set">
+                    {% for set in photo.sets.all %}{% if forloop.first %}Sets: {% else %}, {% endif %}<a href="/set/{{ set.slug }}">{{ set.title }}</a>{% endfor %}
+                </div>
+
+                <div id="photo-main-meta-tags">
+                    {% for tag in photo.tags.all %}{% if forloop.first %}Tags: {% else %}, {% endif %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span>{% endfor %}
+                </div>
+
             </div>
-        {% endif %}
+        </div>
 
     </div>
 </div>
@@ -77,4 +72,20 @@
 
 {% block js_bottom %}
     <script src="{{ STATIC_URL }}js/photo.js"></script>
+
+<script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"
+        type="text/javascript">
+</script>
+
+        <!--
+    <script src="//connect.facebook.net/en_US/all.js"></script>
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=286341974796062";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+    -->
 {% endblock %}

@@ -35,6 +35,19 @@ class Tag(MP_Node):
         return 'Tag: %s %s' % ("-" * (self.get_depth()-1), self.name)
 
 
+class Location(MP_Node):
+    name = models.CharField(max_length=50)
+    slug = models.CharField(max_length=256, null=True)
+
+    node_order_by = ['name']
+
+    lat = models.FloatField(blank=True, null=True)
+    lng = models.FloatField(blank=True, null=True)
+
+    def __unicode__(self):
+        return 'Location: %s %s' % ("-" * (self.get_depth()-1), self.name)
+
+
 class Set(caching.base.CachingMixin, models.Model):
     objects = caching.base.CachingManager()
 
@@ -68,11 +81,12 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     # Custom id
     hash = models.CharField(max_length=32)
-    set = models.ForeignKey(Set, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
 
     # Image info
+    sets = models.ManyToManyField(Set, blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
-    views = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)  # not yet implemented
 
     title = models.CharField(max_length=100)
     slug = models.CharField(max_length=100)

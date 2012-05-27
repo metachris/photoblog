@@ -30,7 +30,7 @@ def photo(request, photo_slug):
     tag_slug = request.GET.get("tag")
     set_slug = request.GET.get("set")
 
-    # Get next photo
+    # Get next and previous photo, based on current browsing
     q_next = models.Photo.objects.filter(id__gt=photo.id).order_by("id")
     q_prev = models.Photo.objects.filter(id__lt=photo.id).order_by("-id")
     if tag_slug:
@@ -39,6 +39,10 @@ def photo(request, photo_slug):
         tags += tag.get_descendants()
         q_next = q_next.filter(tags__in=tags)
         q_prev = q_prev.filter(tags__in=tags)
+    elif set_slug:
+        cur_set = models.Set.objects.get(slug=set_slug)
+        q_next = q_next.filter(sets=cur_set)
+        q_prev = q_prev.filter(sets=cur_set)
 
     next = q_next[0] if q_next.count() else None
     prev = q_prev[0] if q_prev.count() else None
@@ -128,7 +132,7 @@ def tag(request, tag_slug):
 def set_photos(request, set_slug):
     """ Show photos in a set """
     set = models.Set.objects.get(slug=set_slug)
-    photos = models.Photo.objects.filter(set=set).order_by("-id")[:10]
+    photos = models.Photo.objects.filter(sets=set).order_by("-id")[:10]
     if len(photos) == 1:
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
@@ -146,7 +150,7 @@ def ajax_photo_more(request):
     photos = models.Photo.objects.filter(id__lt=photo_last.id)
     if featured: photos = photos.filter(featured=True)
     if tag_slug: photos = photos.filter(tags__slug=tag_slug)
-    if set_slug: photos = photos.filter(set__slug=set_slug)
+    if set_slug: photos = photos.filter(sets__slug=set_slug)
     photos = photos.order_by("-id")
 
     ret = {

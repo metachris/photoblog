@@ -3,6 +3,10 @@ body {
     color: #EFEFEF;
 }
 
+.container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+    max-width: 902px;
+}
+
 a {
     color: #f89406;
 }
@@ -10,6 +14,10 @@ a {
 
 a:hover {
     color: #f8de06;
+}
+
+.page-header h1 {
+    font-weight: normal;
 }
 
 .page-header {
@@ -45,8 +53,8 @@ hr {
 .photo-container {
     float:left;
     width:280px;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin-right: 18px;
+    margin-bottom: 18px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 2px;
 }
@@ -90,13 +98,47 @@ hr {
 
 /** PHOTO DETAIL PAGE **/
 
+#photo-main-caption {
+    font-size:18px;
+    color: #f89406;
+}
+
+.span-prev a, .span-next a {
+    color: #666;
+}
+.span-prev a:hover, .span-next a:hover {
+    color: #999;
+    text-decoration: none;
+}
+
 img#photo-main {
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 2px;
-    margin-top: 12px;
     z-index: 20;
     position: relative;
     cursor: pointer;
+}
+
+#photo-main-container {
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    margin: auto;
+    margin-top: 12px;
+}
+
+.photo-caption .title {
+    width: 260px;
+    font-size: 18px;
+    line-height: 20px;
+    height: 23px;
+    font-weight: 300;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color:white;
 }
 
 #photo-main-license {
@@ -107,51 +149,27 @@ img#photo-main {
     margin-bottom: 16px;
 }
 
-#photo-main-date {
-    color: #666;
-    font-size: 11px;
-}
-
 #photo-main-license a { color:#666; }
 #photo-main-license a:hover { color:#999; }
 
-.photo-meta-portrait, .photo-meta-landscape {
+.photo-meta {
     /* border:1px solid green; */
     text-align: left;
 }
 
-.photo-meta-portrait {
-    width:602px;
-    margin:auto;
-}
-
-.photo-meta-landscape {
-    width:902px;
-    margin:auto;
-}
-
-#photo-main-caption {
-    font-size:18px;
-    color: #f89406;
-}
-
 #photo-main-meta-right {
     float:right;
-    padding-right: 4px;
-    padding-left: 20px;
+    padding-left:30px;
+    padding-right:4px;
+}
+
+#photo-main-meta-tags, #photo-main-meta-set {
     font-size: 11px;
     color:#666;
 }
+
 #photo-main-meta-right a { color:#666; }
 #photo-main-meta-right a:hover { color:#999; }
-
-.span-prev a, .span-next a {
-    color: #666;
-}
-.span-prev a:hover, .span-next a:hover {
-    color: #999;
-    text-decoration: none;
-}
 
 #overlay {
     background:rgba(0, 0, 0, 0.8);
