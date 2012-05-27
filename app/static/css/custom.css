@@ -11,9 +11,12 @@ a {
     color: #f89406;
 }
 
-
 a:hover {
     color: #f8de06;
+}
+
+p {
+    font-size: inherit;
 }
 
 .page-header h1 {
@@ -167,6 +170,8 @@ img#photo-main {
     float:right;
     padding-left:30px;
     padding-right:4px;
+    font-size: 11px;
+    text-align: center;
 }
 
 #photo-main-meta-description {
@@ -200,6 +205,12 @@ img#photo-main {
 }
 .tag-depth-3 {
     padding-left:40px;
+}
+.tag-depth-4 {
+    padding-left:60px;
+}
+.tag-depth-5 {
+    padding-left:80px;
 }
 
 .caption {

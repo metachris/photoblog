@@ -75,7 +75,7 @@ def logout(request):
     return HttpResponseRedirect("/")
 
 
-def tags(request):
+def tags_list(request):
     """ Show a list of tags """
     class CountAwareTagTree(object):
         """ Tree based on one root node with model counts """
@@ -117,7 +117,55 @@ def tags(request):
     return render(request, 'mainapp/tags.html', {'tags': tags})
 
 
-def tag(request, tag_slug):
+def locations_list(request):
+    """ Show a list of locations """
+    class CountAwareLocationTree(object):
+        """ Tree based on one root node with model counts """
+        location = None
+        model_count = 0
+        children = []
+
+        callback = None
+        rootlist = None
+
+        def __init__(self, location, callback=None, rootlist=[]):
+            self.location = location
+            self.callback = callback
+
+            self.count()
+
+
+            self.rootlist = rootlist or []
+            self.rootlist.append(self)
+
+            # Build children tags
+            for location in self.location.get_children():
+                awareTag = CountAwareLocationTree(location, callback=self._signal_count, rootlist=self.rootlist)
+
+        def count(self):
+            count = models.Photo.objects.filter(location=self.location).count()
+            self._signal_count(count)
+
+        def _signal_count(self, v):
+            """Pass the model-count increase through all parents"""
+            self.model_count += v
+            if self.callback:
+                self.callback(v)
+
+    locations = []
+    root_locations = models.Location.get_root_nodes()
+    for location in root_locations:
+        locations.append(CountAwareLocationTree(location))
+    return render(request, 'mainapp/locations.html', {'locations': locations})
+
+
+def sets_list(request):
+    """ Show a sets of tags """
+    sets = models.Set.objects.all()
+    return render(request, 'mainapp/sets.html', {'sets': sets})
+
+
+def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
     tag = models.Tag.objects.get(slug=tag_slug)
     tags = [tag]
@@ -127,6 +175,18 @@ def tag(request, tag_slug):
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
+
+
+def location_photos(request, location_slug):
+    """ Show photos with a specific tag """
+    location = models.Location.objects.get(slug=location_slug)
+    locations = [location]
+    locations  += location.get_descendants()
+    photos = models.Photo.objects.filter(location__in=locations).order_by("-id")[:10]
+    if len(photos) == 1:
+        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
+
+    return render(request, 'mainapp/location_photos.html', {'location': location, 'photos': photos})
 
 
 def set_photos(request, set_slug):

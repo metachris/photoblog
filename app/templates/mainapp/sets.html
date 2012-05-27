@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title-left %}All Collections - {% endblock %}
+
+{% block body %}
+<div class="caption">Collections</div>
+
+<div class="row-fluid">
+
+    {% for set in sets %}
+        <div class="span2">
+            <div class="set-list-item">
+                <a href="/set/{{ set.slug }}">{{ set.title }} &middot; {{ set.photo_set.count }}</a>
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+    <script src="{{ STATIC_URL }}js/photo.js"></script>
+{% endblock %}

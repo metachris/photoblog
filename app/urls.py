@@ -9,8 +9,13 @@ urlpatterns = patterns('',
     url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 
-    url(r'^tags/$', 'mainapp.views.tags'),
-    url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag'),
+    url(r'^locations/$', 'mainapp.views.locations_list'),
+    url(r'^location/(?P<location_slug>.*)/$', 'mainapp.views.location_photos'),
+
+    url(r'^tags/$', 'mainapp.views.tags_list'),
+    url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag_photos'),
+
+    url(r'^sets/$', 'mainapp.views.sets_list'),
     url(r'^set/(?P<set_slug>.*)/$', 'mainapp.views.set_photos'),
 
     # Login and logout url's

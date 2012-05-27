@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title-left %}Photos taken in '{{ location.name }}' - {% endblock %}
+
+{% block body %}
+<div class="row-fluid">
+    <div class="span12">
+
+        <div class="caption">Photos taken in '{% for l in location.get_ancestors %}<a href="/location/{{ l.slug }}">{{ l.name }}</a> / {% endfor %}<a href="/location/{{ location.slug }}">{{ location.name }}</a>'</div>
+        {% include "mainapp/photogrid.html" %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+<script src="{{ STATIC_URL }}js/photogrid.js"></script>
+{% endblock %}

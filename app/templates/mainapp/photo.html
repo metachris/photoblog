@@ -45,9 +45,23 @@
                 </div>
 
                 <div id="photo-main-meta-right">
-                    <a name="fb_share"></a>
-<!--                    <div class="fb-like" data-href="http://testx.com" data-send="true" data-layout="box_count" data-show-faces="false" data-colorscheme="dark"></div>
--->                </div>
+                    <p><a name="fb_share"></a></p>
+
+                    <p>
+                        {% if photo.external_url|is_portrait %}
+                            {% thumbnail photo.external_url "600" upscale=False as im %}
+                                <a href="{{ im.url }}">Download</a>
+                            {% endthumbnail %}
+                        {% else %}
+                            {% thumbnail photo.external_url "900" upscale=False as im %}
+                                <a href="{{ im.url }}">Download</a>
+                            {% endthumbnail %}
+                        {% endif %}
+                    </p>
+
+                    <!--                    <div class="fb-like" data-href="http://testx.com" data-send="true" data-layout="box_count" data-show-faces="false" data-colorscheme="dark"></div>
+                    -->
+                </div>
 
                 {% if photo.description_html %}
                     <div id="photo-main-meta-description">
