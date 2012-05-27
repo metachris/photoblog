@@ -28,3 +28,11 @@ class RegisterForm(forms.Form):
             pass
 
         return cleaned_data
+
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=80, min_length=3)
+    email = forms.EmailField()
+    message = forms.CharField(widget=forms.Textarea)
+    add_to_list = forms.BooleanField(initial=True)

@@ -1,6 +1,8 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 
+import mainapp.forms
+
 register = template.Library()
 
 
@@ -13,3 +15,14 @@ def split(val, separator=" "):
 @stringfilter
 def custom_upper(value):
     return value.upper()
+
+
+@register.tag
+def get_contact_form(parser, token):
+    class ContactFormRenderer(template.Node):
+        def render(self, context):
+            # Get the contact form
+            contact_form = mainapp.forms.ContactForm()
+            return contact_form.as_p()
+    return ContactFormRenderer()
+

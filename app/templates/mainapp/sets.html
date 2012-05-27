@@ -10,9 +10,9 @@
 <div class="row-fluid">
 
     {% for set in sets %}
-        <div class="span2">
+        <div class="span3">
             <div class="set-list-item">
-                <a href="/set/{{ set.slug }}">{{ set.title }} &middot; {{ set.photo_set.count }}</a>
+                <a href="/set/{{ set.slug }}">{{ set.title }} ({{ set.photo_set.count }} photo{{ set.photo_set.count|pluralize }})</a>
             </div>
         </div>
     {% endfor %}

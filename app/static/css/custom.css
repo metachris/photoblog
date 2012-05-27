@@ -19,6 +19,9 @@ p {
     font-size: inherit;
 }
 
+.modal {
+    color:#131313;
+}
 .page-header h1 {
     font-weight: normal;
 }
