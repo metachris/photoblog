@@ -155,15 +155,26 @@ img#photo-main {
 .photo-meta {
     /* border:1px solid green; */
     text-align: left;
+    color: #999;
 }
 
+.photo-meta a {
+    color: #999;
+
+
+}
 #photo-main-meta-right {
     float:right;
     padding-left:30px;
     padding-right:4px;
 }
 
-#photo-main-meta-tags, #photo-main-meta-set {
+#photo-main-meta-description {
+    padding-bottom: 8px;
+    color: #efefef;
+}
+
+#photo-main-meta-tags, #photo-main-meta-set, #photo-main-meta-location {
     font-size: 11px;
     color:#666;
 }

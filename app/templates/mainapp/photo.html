@@ -2,7 +2,7 @@
 
 {% load thumbnail %}
 
-{% block title %}{{ photo.title }} - Lucid Nonsense Photography{% endblock %}
+{% block title-left %}{{ photo.title }} - {% endblock %}
 
 {% block body %}
 <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
@@ -50,15 +50,22 @@
 -->                </div>
 
                 {% if photo.description_html %}
-                    {{ photo.description_html|safe }}
+                    <div id="photo-main-meta-description">
+                        {{ photo.description_html|safe }}
+                    </div>
                 {% endif %}
+
+                <div id="photo-main-meta-tags">
+                    {% for tag in photo.tags.all %}{% if forloop.first %}Tags: {% else %}, {% endif %}{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a>{% endfor %}
+                </div>
+
+                <div id="photo-main-meta-location">
+                    {% comment %}{% if photo.location %}Location: {% for l in photo.location.get_ancestors %}<a href="/location/{{ l.slug }}">{{ l.name }}</a> / {% endfor %}<a href="/location/{{ photo.location.slug }}">{{ photo.location.name }}</a>{% endif %}{% endcomment %}
+                    {% if photo.location %}Location: <a href="/location/{{ photo.location.slug }}">{{ photo.location.name }}</a></span>{% endif %}
+                </div>
 
                 <div id="photo-main-meta-set">
                     {% for set in photo.sets.all %}{% if forloop.first %}Sets: {% else %}, {% endif %}<a href="/set/{{ set.slug }}">{{ set.title }}</a>{% endfor %}
-                </div>
-
-                <div id="photo-main-meta-tags">
-                    {% for tag in photo.tags.all %}{% if forloop.first %}Tags: {% else %}, {% endif %}<span class="">{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a></span>{% endfor %}
                 </div>
 
             </div>
