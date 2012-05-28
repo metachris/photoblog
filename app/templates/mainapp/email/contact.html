@@ -1,5 +1,12 @@
 From: {{ form.name }} <{{ form.email }}>
 
+{% if photo %}Via photo: {{ photo.title }} (http://www.chrishager.at/photo/{{ photo.slug }}/)
+{% endif %}
+
+Message:
+
 {{ form.message }}
 
+
+--------
 Add to Email List: {{ form.add_to_list }}

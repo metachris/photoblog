@@ -13,7 +13,7 @@ function send_message() {
     $("#contactModal-btn-submit").addClass("disabled");
 
     // Collect data
-    var input_names = new Array("csrfmiddlewaretoken", "name", "email", "message");
+    var input_names = new Array("csrfmiddlewaretoken", "name", "email", "message", "photo_ref");
     var checkbox_names = new Array("add_to_list");
     var vars = {}
     for (el in input_names) {

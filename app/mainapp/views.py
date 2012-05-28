@@ -236,20 +236,26 @@ def ajax_photo_more(request):
         ret["photos"].append(griditem_template.render(Context({ "photo": photo })));
 
     ret["last"] = photo.hash
-    print ret
+    #print ret
 
     return HttpResponse(json.dumps(ret))
 
 
 def ajax_contact(request):
-    print request.POST
     if request.method == 'POST': # If the form has been submitted...
         form = forms.ContactForm(request.POST) # A form bound to the POST data
         if form.is_valid():
             # All validation rules pass
-            # send email now (TODO)
+            photo = None
+            photo_ref = request.POST.get("photo_ref")
+            if photo_ref:
+                photo = models.Photo.objects.get(hash=photo_ref)
+
             email_template = get_template('mainapp/email/contact.html')
-            msg = email_template.render(Context({ "form": form.cleaned_data}))
+            msg = email_template.render(Context({
+                    "form": form.cleaned_data,
+                    "photo": photo
+            }))
             tools.sendmail.gmail("chris@metachris.org", "Photoblog Contact", msg)
             return HttpResponse('1')
         else:
