@@ -4,6 +4,10 @@
 
 {% block title-left %}{{ photo.title }} - {% endblock %}
 
+{% block meta %}
+<meta name="description" content="Photo '{{ photo.title }}', captured by Chris Hager{% if photo.date_captured %} on {{ photo.date_captured|date }}{% endif %}{% if photo.location %} in {{ photo.location.name }}{% endif %}.">
+{% endblock %}
+
 {% block body %}
 <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="span2 span-prev">

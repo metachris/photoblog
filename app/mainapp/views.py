@@ -115,7 +115,11 @@ def tags_list(request):
     root_tags = models.Tag.get_root_nodes()
     for tag in root_tags:
         tags.append(CountAwareTagTree(tag))
-    return render(request, 'mainapp/tags.html', {'tags': tags})
+
+    photo_count = models.Photo.objects.all().count()
+    tag_count = models.Tag.objects.all().count()
+
+    return render(request, 'mainapp/tags.html', {'tags': tags, "photo_count": photo_count, "tag_count": tag_count})
 
 
 def locations_list(request):
@@ -134,7 +138,6 @@ def locations_list(request):
             self.callback = callback
 
             self.count()
-
 
             self.rootlist = rootlist or []
             self.rootlist.append(self)
@@ -156,14 +159,23 @@ def locations_list(request):
     locations = []
     root_locations = models.Location.get_root_nodes()
     for location in root_locations:
-        locations.append(CountAwareLocationTree(location))
-    return render(request, 'mainapp/locations.html', {'locations': locations})
+        tree = CountAwareLocationTree(location)
+        locations.append(tree)
+
+    photo_count = models.Photo.objects.all().count()
+    location_count = models.Location.objects.all().count()
+
+    return render(request, 'mainapp/locations.html', {'locations': locations, "photo_count": photo_count, "location_count": location_count})
 
 
 def sets_list(request):
     """ Show a sets of tags """
     sets = models.Set.objects.all()
-    return render(request, 'mainapp/sets.html', {'sets': sets})
+
+    photo_count = models.Photo.objects.all().count()
+    sets_count = models.Set.objects.all().count()
+
+    return render(request, 'mainapp/sets.html', {'sets': sets, "photo_count": photo_count, "sets_count": sets_count})
 
 
 def tag_photos(request, tag_slug):
