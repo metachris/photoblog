@@ -10,8 +10,10 @@
     </div>
     <div class="modal-body">
         <p>
-            I'm currently available for custom shootings{% if photo %}, and this photo is called '{{ photo.title }}' ({{ photo.hash }}){% endif %}.
-            You can leave a message right here or call me at +43 680 2425352.
+            You can leave me a message right here or call at +43 680 2425352.
+            I'm available for custom shootings.
+            {% if photo %}The current photo is called <i>{{ photo.title }}</i>.{% endif %}
+
         </p>
         <br />
 

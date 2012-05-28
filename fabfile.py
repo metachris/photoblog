@@ -1,6 +1,7 @@
+import re
+import os.path
 import tempfile
 import datetime
-import re
 import commands
 
 from fabric.api import run, local, cd, lcd, put, env, hosts
@@ -8,9 +9,6 @@ from fabric.api import run, local, cd, lcd, put, env, hosts
 from app.settings import settings_dev
 from app.settings import settings_production
 
-
-# List of production hosts
-import os.path
 
 # List of production hosts (specified in ssh config file)
 HOSTS_PROD = ["hetzner1"]
