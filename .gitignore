@@ -6,3 +6,4 @@
 env
 settings_dev.py
 settings_production.py
+footer_private.html

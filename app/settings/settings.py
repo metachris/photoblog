@@ -10,11 +10,12 @@
 import platform
 import hosts
 
-# Grab the current machine's network name
-host_local = platform.node()
 
-# Import machine/environment specific settings
-if host_local in hosts.HOSTS_PRODUCTION:
+APP_VERSION = "0.1"
+
+# Import machine/environment specific settings based on the hostname
+# (current machine's network name). Specified in settings/hosts.py
+if platform.node() in hosts.HOSTS_PRODUCTION:
     print "Loading production settings"
     from settings_production import *
 else:
@@ -25,7 +26,7 @@ else:
 # ----------------------------
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Vienna'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -46,7 +47,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     #     'django.template.loaders.eggs.Loader',
-    )
+)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-    )
+)
 
 if DEBUG:
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
@@ -70,8 +71,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
     "django.core.context_processors.request"
-    )
-
+)
 
 INSTALLED_APPS = (
     # Commonly required django internal apps
@@ -99,7 +99,7 @@ INSTALLED_APPS = (
 
     # Main app from the diary project
     'app.mainapp',
-    )
+)
 
 if DEBUG:
     INSTALLED_APPS += ('debug_toolbar',)
@@ -123,8 +123,8 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
-            },
-        }
+        },
+    }
 }
 
 # Step 3: Custom settings

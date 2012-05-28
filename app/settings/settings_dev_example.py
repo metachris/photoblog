@@ -5,7 +5,7 @@ IS_TESTENV = True
 
 ADMINS = (
     # ('Your Name', 'name@example.com'),
-    )
+)
 
 MANAGERS = ADMINS
 
@@ -24,7 +24,7 @@ DATABASES = {
         'PASSWORD': '<DB_PASS>',
         'HOST': '<DB_IP>',
         'PORT': '<DB_PORT>',
-        }
+    }
 }
 
 CACHES = {
@@ -37,13 +37,15 @@ CACHES = {
             'PASSWORD': 'yadayada',
             'PARSER_CLASS': 'redis.connection.HiredisParser'
         },
-        },
-    }
-
+    },
+}
 
 DEBUG_TOOLBAR_CONFIG = {
     "INTERCEPT_REDIRECTS": False,
-    }
+}
+
+# Directory with app/ and env/ subdirectories
+APP_ROOT = "/Users/chris/Projects/private/django/photosite"
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -71,26 +73,27 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
-# Additional locations of static files
+# Additional locations of static files [dev only; prod serves with nginx]
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     "/Users/chris/Projects/private/django/photosite/app/static/",
-    )
+)
 
 # List of finder classes that know how to find static files in
-# various locations.
+# various locations. Only for dev; prod serves static files with
+# another nginx directive.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    )
+)
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/Users/chris/Projects/private/django/photosite/app/templates",
-    "/Users/chris/Projects/private/django/photosite/env/lib/python2.7/site-packages/treebeard/templates",
-    )
+    "%s/app/templates" % APP_ROOT,
+    "%s/env/lib/python2.7/site-packages/treebeard/templates" % APP_ROOT,
+)
