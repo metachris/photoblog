@@ -2,7 +2,7 @@
 {% thumbnail photo.external_url "280x280" crop="center" as im %}
 <div class="photo-container">
     <div class="photo-square">
-        <a href="/photo/{{ photo.slug }}{% if tag %}?tag={{ tag.slug }}{% if set %}&set={{ set.slug }}{% endif %}{% else %}{% if set %}?set={{ set.slug }}{% endif %}{% endif %}">
+        <a href="/photo/{{ photo.slug }}{% if tag %}?tag={{ tag.slug }}{% if set %}&set={{ set.slug }}{% endif %}{% else %}{% if set %}?set={{ set.slug }}{% endif %}{% endif %}" class="a-no-underline">
             <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
             <div class="photo-caption">
                 <div class="title">

@@ -39,24 +39,34 @@ a, a:hover {
     color: @orange;
 }
 
+a.a-no-underline, a.a-no-underline:hover {
+    text-decoration: none;
+}
+
 p {
     font-size: inherit;
+}
+
+hr {
+    border-bottom-width: 0px;
+    border-top-color: @gray;
 }
 
 .modal {
     color:@black;
 }
 
-.page-header h1 {
-    font-weight: normal;
-}
-
 .page-header {
     border-bottom-color: @gray;
+    margin-top: 20px;
 }
 
 .page-header a:hover {
     text-decoration: none;
+}
+
+.page-header h1 {
+    font-weight: normal;
 }
 
 .page-header h1 a {
@@ -70,17 +80,18 @@ p {
 
 .page-header #topnav a {
     padding-left:20px;
-    color: @grayLight;
+    color: @gray;
 }
 
 .page-header #topnav a:hover {
     color: @grayLight;
 }
 
-hr {
-    border-bottom-width: 0px;
-    border-top-color: @gray;
+.caption {
+    font-size: 18px;
+    margin-bottom:20px;
 }
+
 
 // Photo grid containers
 // ---------------------
@@ -230,9 +241,3 @@ img#photo-main {
 .tag-depth-5 {
     padding-left:80px;
 }
-
-.caption {
-    font-size: 18px;
-    margin-bottom:20px;
-}
-
