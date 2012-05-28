@@ -1,18 +1,42 @@
+// Grays
+// -------------------------
+@black:                 #131313;
+@grayDarker:            #222;
+@grayDark:              #333;
+@gray:                  #666;
+@grayLight:             #999;
+@grayLighter:           #eee;
+@white:                 #efefef;
+
+
+// Accent colors
+// -------------------------
+@blue:                  #049cdb;
+@blueDark:              #0064cd;
+@green:                 #46a546;
+@red:                   #9d261d;
+@yellow:                #ffc40d;
+@orange:                #f89406;
+@pink:                  #c3325f;
+@purple:                #7a43b6;
+
+.rounded-corners(@radius:4px) {
+    border-radius: @radius;
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+}
+
 body {
-    background: #131313;
-    color: #EFEFEF;
+    background: @black;
+    color: @white;
 }
 
 .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
     max-width: 902px;
 }
 
-a {
-    color: #f89406;
-}
-
-a:hover {
-    color: #f8de06;
+a, a:hover {
+    color: @orange;
 }
 
 p {
@@ -20,14 +44,15 @@ p {
 }
 
 .modal {
-    color:#131313;
+    color:@black;
 }
+
 .page-header h1 {
     font-weight: normal;
 }
 
 .page-header {
-    border-bottom-color: #555;
+    border-bottom-color: @gray;
 }
 
 .page-header a:hover {
@@ -35,7 +60,7 @@ p {
 }
 
 .page-header h1 a {
-    color: #f89406;
+    color: @orange;
 }
 
 .page-header #topnav {
@@ -45,24 +70,27 @@ p {
 
 .page-header #topnav a {
     padding-left:20px;
-    color: #999;
+    color: @grayLight;
 }
+
 .page-header #topnav a:hover {
-    color: #CCC;
+    color: @grayLight;
 }
 
 hr {
-    border-bottom: 0px #fff;
-    border-top-color: #777;
+    border-bottom-width: 0px;
+    border-top-color: @gray;
 }
 
+// Photo grid containers
+// ---------------------
 .photo-container {
     float:left;
     width:280px;
     margin-right: 18px;
     margin-bottom: 18px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
+    .rounded-corners(2px);
 }
 
 .photo-square {
@@ -103,23 +131,22 @@ hr {
 }
 
 /** PHOTO DETAIL PAGE **/
-
 #photo-main-caption {
     font-size:18px;
-    color: #f89406;
+    color: @orange;
 }
 
 .span-prev a, .span-next a {
-    color: #666;
+    color: @gray;
 }
 .span-prev a:hover, .span-next a:hover {
-    color: #999;
+    color: @grayLight;
     text-decoration: none;
 }
 
 img#photo-main {
     border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 2px;
+    .rounded-corners(2px);
     z-index: 20;
     position: relative;
     cursor: pointer;
@@ -133,39 +160,27 @@ img#photo-main {
     margin-top: 12px;
 }
 
-.photo-caption .title {
-    width: 260px;
-    font-size: 18px;
-    line-height: 20px;
-    height: 23px;
-    font-weight: 300;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color:white;
-}
-
 #photo-main-license {
     text-align: center;
     padding-top: 10px;
     font-size: 11px;
-    color:#666;
+    color:@gray;
     margin-bottom: 16px;
 }
 
-#photo-main-license a { color:#666; }
-#photo-main-license a:hover { color:#999; }
+
+
+#photo-main-license a { color:@gray; }
+#photo-main-license a:hover { color:@grayLight; }
 
 .photo-meta {
-    /* border:1px solid green; */
+/* border:1px solid green; */
     text-align: left;
-    color: #999;
+    color: @grayLight;
 }
 
 .photo-meta a {
-    color: #999;
+    color: @grayLight;
 
 
 }
@@ -179,16 +194,16 @@ img#photo-main {
 
 #photo-main-meta-description {
     padding-bottom: 8px;
-    color: #efefef;
+    color: @white;
 }
 
 #photo-main-meta-tags, #photo-main-meta-set, #photo-main-meta-location {
     font-size: 11px;
-    color:#666;
+    color:@gray;
 }
 
-#photo-main-meta-right a { color:#666; }
-#photo-main-meta-right a:hover { color:#999; }
+#photo-main-meta-right a { color:@gray; }
+#photo-main-meta-right a:hover { color:@grayLight; }
 
 #overlay {
     background:rgba(0, 0, 0, 0.8);
