@@ -150,8 +150,8 @@ def make_static():
 
 
 def reload_uwsgi():
-    run("kill -TERM `/tmp/uwsgi-chrishager_at.pid`")
-
+    print "Reloading uwsgi..."
+    run("kill -TERM `cat /tmp/uwsgi-chrishager_at.pid`")
 
 
 def _get_cur_hash():
