@@ -1,26 +1,37 @@
 """
 Fabric deployment script.
 
+
 Usage:
 
     fab <target> <command1> <command2> ...
+
 
 Targets:
 
     production ... Production target
 
+
 Commands:
 
     init_server ....... Creates the project directory, checks out the git repo and submodules,
-                        Finally runs `upload_settings` and `init_virtualenv`.
+                        Finally runs `upload_files_notingit` and `init_virtualenv`.
 
     init_virtualenv ... Sets up virtualenv with dependencies.
+
+    upload_files_notingit ... upload files from local machine that are not in git (besides
+                              settings). Also runs `upload_settings`.
 
     upload_settings ... Uploads the target specific setting file from the current machine.
 
     make bootstrap .... Builds twitter bootstrap.
 
     make_static ....... Converts /static/css/*.less files to css, and pre-gzips certain files
+
+
+Example Server Setup:
+
+    $ fab production init_server make_bootstrap make_static
 
 """
 import os.path
@@ -75,8 +86,8 @@ def init_server():
         run("mkdir logs")
         run("mkdir media")
 
-    # Upload target-specific settings file
-    upload_settings()
+    # Upload target-specific settings file and other files not in git
+    upload_files_notingit()
 
     # Setup virtualenv
     try:
@@ -97,6 +108,16 @@ def upload_settings():
     """Upload the respective settings file"""
     settings_fn = os.path.join(env.dir_local, env.file_settings)
     put(settings_fn, os.path.join(env.dir_remote, env.file_settings))
+
+
+def upload_files_notingit():
+    """Upload files not in git"""
+    upload_settings()
+    files = ["app/templates/footer_private.html"]
+    for fn in files:
+        fn_from = os.path.join(env.dir_local, fn)
+        fn_to = os.path.join(env.dir_remote, fn)
+        put(fn_from, fn_to)
 
 
 def init_virtualenv():
@@ -126,3 +147,23 @@ def make_static():
     # 3. collect final static files into separate dir outside of project
     with cd(env.dir_remote):
         run("source env/bin/activate && cd app && python manage.py collectstatic --noinput")
+
+
+def reload_uwsgi():
+    run("kill -TERM `/tmp/uwsgi-chrishager_at.pid`")
+
+
+def deploy():
+
+
+    pass
+
+def rollback(hash):
+    """
+    Rollback git repositories to specified hash.
+    Usage:
+    fab rollback:hash=etcetc123
+    """
+    print "Rolling back to %s" % hash
+    with cd(env.dir_remote):
+        run("git reset --hard %(hash)s" % env)

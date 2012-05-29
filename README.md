@@ -10,3 +10,5 @@ Server:
 *** PIL and sorl need libjpeg-dev installed on the system to work with jpegs!
 
 (I needed Python 2.7 to compile hiredis)
+
+run fastcgi: `php5-cgi -b localhost:9000
