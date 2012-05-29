@@ -20,6 +20,6 @@ for EXT in ${FILETYPES[@]}; do
     # Process files
     for file in $FILES $FILES2; do
         echo "$file > $file.gz"
-        #gzip -c $file > $file.gz
+        gzip -c $file > $file.gz
     done
 done
