@@ -1,37 +1,42 @@
 """
 Fabric deployment script.
 
-
 Usage:
 
     fab <target> <command1> <command2> ...
-
 
 Targets:
 
     production ... Production target
 
-
 Commands:
 
+    init_virtualenv ... Sets up virtualenv with dependencies.
     init_server ....... Creates the project directory, checks out the git repo and submodules,
                         Finally runs `upload_files_notingit` and `init_virtualenv`.
 
-    init_virtualenv ... Sets up virtualenv with dependencies.
 
+    upload_settings ... Uploads the target specific setting file from the current machine.
     upload_files_notingit ... upload files from local machine that are not in git (besides
                               settings). Also runs `upload_settings`.
 
-    upload_settings ... Uploads the target specific setting file from the current machine.
 
-    make bootstrap .... Builds twitter bootstrap.
-
-    make_static ....... Converts /static/css/*.less files to css, and pre-gzips certain files
+    make_bootstrap .... Builds twitter bootstrap.
+    make_static ....... Converts /static/css/*.less files to css, and pre-gzips certain files.
 
 
-Example Server Setup:
+    reload_uwsgi ..... Reload uwsgi for this app by sending TERM signal to uwsgi master process.
+    deploy ........... Updates the server to git master HEAD and run `reload_uwsgi`.
+    rollback:<hash> .. Sets server git repo to commit identified by <hash> and runs `reload_uwsgi`.
 
+Examples:
+
+    # Server setup
     $ fab production init_server make_bootstrap make_static
+
+    # Deployment & Rollback
+    $ fab production deploy
+    $ fab production rollback:abcacb12
 
 """
 import os.path
@@ -50,9 +55,8 @@ HOSTS_PROD = ["hetzner1"]
 # Use the user@host syntax
 GIT_ORIGIN = "git://github.com/metachris/photoblog.git"
 
-# Deployment history file
-DEPLOYMENTS_HISTFILE = "deployments.log"
 
+# Environments
 
 def production():
     "Setup production settings"
@@ -155,6 +159,7 @@ def reload_uwsgi():
 
 
 def _get_cur_hash():
+    """Gets current git commit's hash and shortmsg on remote machine"""
     with cd(env.dir_remote):
         with hide('running', 'stdout', 'stderr'):
             return run('git log --pretty=format:"%h - %s [%an]" -n 1')
@@ -165,11 +170,14 @@ def deploy():
     with cd(env.dir_remote):
         run("git pull")
     upload_files_notingit()
+    make_static()
     hash_after = _get_cur_hash()
+
     print "Deployment summary:"
     print
     print "  from: %s" % hash_before
     print "    to: %s" % hash_after
+
     reload_uwsgi()
 
 
@@ -180,5 +188,15 @@ def rollback(hash):
     fab rollback:hash=etcetc123
     """
     print "Rolling back to %s" % hash
+    hash_before = _get_cur_hash()
     with cd(env.dir_remote):
-        run("git reset --hard %(hash)s" % env)
+        run("git reset --hard %s" % hash)
+    make_static()
+    hash_after = _get_cur_hash()
+
+    print "Rollback summary:"
+    print
+    print "  from: %s" % hash_before
+    print "    to: %s" % hash_after
+
+    reload_uwsgi()
