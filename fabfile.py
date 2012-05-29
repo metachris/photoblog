@@ -36,7 +36,7 @@ Example Server Setup:
 """
 import os.path
 
-from fabric.api import run, local, cd, lcd, put, env, hosts
+from fabric.api import run, local, cd, lcd, put, env, hosts, hide
 from fabric.contrib.files import exists
 
 from app.settings import settings_dev
@@ -153,10 +153,25 @@ def reload_uwsgi():
     run("kill -TERM `/tmp/uwsgi-chrishager_at.pid`")
 
 
+
+def _get_cur_hash():
+    with cd(env.dir_remote):
+        with hide('running', 'stdout', 'stderr'):
+            return run('git log --pretty=format:"%h - %s [%an]" -n 1')
+
+
 def deploy():
+    hash_before = _get_cur_hash()
+    with cd(env.dir_remote):
+        run("git pull")
+    upload_files_notingit()
+    hash_after = _get_cur_hash()
+    print "Deployment summary:"
+    print
+    print "  from: %s" % hash_before
+    print "    to: %s" % hash_after
+    reload_uwsgi()
 
-
-    pass
 
 def rollback(hash):
     """
