@@ -6,7 +6,7 @@
 env
 settings_dev.py
 settings_production.py
-footer_private.html
+app/templates/analytics_snippet.html
 
 media/
 static/

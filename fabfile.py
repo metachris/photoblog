@@ -121,7 +121,7 @@ def upload_settings():
 def upload_files_notingit():
     """Upload files not in git"""
     upload_settings()
-    files = ["app/templates/footer_private.html"]
+    files = ["app/templates/analytics_snippet.html"]
     for fn in files:
         fn_from = os.path.join(env.dir_local, fn)
         fn_to = os.path.join(env.dir_remote, fn)

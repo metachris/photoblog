@@ -24,6 +24,7 @@
     <link rel="apple-touch-icon" sizes="72x72" href="{{ STATIC_URL }}img/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="{{ STATIC_URL }}img/apple-touch-icon-114x114.png">
 -->
+    {% include "analytics_snippet.html" %}
 </head>
 
 <body>
@@ -33,7 +34,6 @@
     </div>
 
     {% include "footer.html" %}
-    {% include "footer_private.html" %}
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
