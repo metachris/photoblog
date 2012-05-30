@@ -56,8 +56,8 @@ HOSTS_PROD = ["hetzner1"]
 # Use the user@host syntax
 GIT_ORIGIN = "git://github.com/metachris/photoblog.git"
 
-# Deployments log file
-HISTFILE = "deployments.log"
+# Deployments log file (in same path as fabfile)
+HISTFILE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "deployments.log")
 
 
 # Environments
