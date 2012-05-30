@@ -63,7 +63,7 @@ HISTFILE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "deployments
 # Environments
 
 def production():
-    "Setup production settings"
+    "Set production target"
     env.use_ssh_config = True
     env.hosts = HOSTS_PROD
     env.git_origin = GIT_ORIGIN
@@ -75,7 +75,7 @@ def production():
 # Tasks
 
 def init_server():
-    """Setup project directory and clone repo"""
+    """Setup project directory, clone repo, init virtualenv"""
     if exists(env.dir_remote):
         print
         print "Remote directory %s already exists. Please delete and then re-run." % env.dir_remote
@@ -97,6 +97,12 @@ def init_server():
     # Upload target-specific settings file and other files not in git
     upload_files_notingit()
 
+    # Build customized twitter bootstrap for the first time
+    _update_bootstrap()
+
+    # Collect the static directory
+    _make_static()
+
     # Setup virtualenv
     try:
         init_virtualenv()
@@ -112,6 +118,13 @@ def init_server():
     print "Now you just need to setup uwsgi and your webserver"
 
 
+def init_virtualenv():
+    """Setup virtualenv in /env and install dependencies"""
+    with cd(env.dir_remote):
+        run("virtualenv env")
+        run("source env/bin/activate && pip install -r dependencies.txt")
+
+
 def upload_settings():
     """Upload the respective settings file"""
     settings_fn = os.path.join(env.dir_local, env.file_settings)
@@ -119,7 +132,7 @@ def upload_settings():
 
 
 def upload_files_notingit():
-    """Upload files not in git"""
+    """Upload files not in git (from list in code)"""
     upload_settings()
     files = ["app/templates/analytics_snippet.html"]
     for fn in files:
@@ -128,21 +141,7 @@ def upload_files_notingit():
         put(fn_from, fn_to)
 
 
-def init_virtualenv():
-    """Creates the virtualenv directory and installs all dependencies"""
-    with cd(env.dir_remote):
-        run("virtualenv env")
-        run("source env/bin/activate && pip install -r dependencies.txt")
-
-
-def make_bootstrap():
-    """Build Twitter Bootstrap with 'make bootstrap'"""
-    with cd(os.path.join(env.dir_remote, "app/static/twitter-bootstrap/")):
-        run("rm -rf bootstrap")
-        run("make bootstrap")
-
-
-def make_static():
+def _make_static():
     """Prepare static dir for collection for deployment"""
     # 1. convert static/css/*.less files to css files
     with cd(os.path.join(env.dir_remote, "app/static/css/")):
@@ -171,28 +170,25 @@ def _get_cur_hash():
             return b
 
 
-def git_pull():
-    """Updates the remotes git repo to current master HEAD"""
-    with cd(env.dir_remote):
-        run("git pull")
-
-
-def migrate_db():
-    """Updates db schema with south if a new migration file is found"""
-    with cd(env.dir_remote):
-        run("git pull")
-        run("source env/bin/activate && cd app && python manage.py migrate mainapp")
-
-
 def deploy():
+    """Initiate full deployment (server update to git master HEAD)"""
     # Save remote git hash
     hash_before = _get_cur_hash()
 
     # Perform deployment
-    git_pull()
-    migrate_db()
+    with cd(env.dir_remote):
+        # Update repo to current master HEAD
+        run("git pull")
+
+        # Update db schema if needed
+        run("source env/bin/activate && cd app && python manage.py migrate mainapp")
+
+    # Upload stuff and build all the statics
     upload_files_notingit()
-    make_static()
+    _update_bootstrap()
+    _make_static()
+
+    # Finally reload uwsgi
     reload_uwsgi()
 
     # Save git hash and add entry to deployments logfile
@@ -216,7 +212,8 @@ def rollback(hash):
     hash_before = _get_cur_hash()
     with cd(env.dir_remote):
         run("git reset --hard %s" % hash)
-    make_static()
+    _update_bootstrap()
+    _make_static()
     hash_after = _get_cur_hash()
 
     print "Rollback summary:"
@@ -234,16 +231,12 @@ def _log(info, id="deployment"):
     f.write("%s | %s | %s\n" % (id, datetime.datetime.now(), info))
 
 
-def build_bootstrap_patch():
-    # Create a patch of the local twitter bootstrap setup to apply on deployment
-    dir_bootstrap = os.path.join(env.dir_local, "app/static/twitter-bootstrap")
-    fn_bootstrap_patch = os.path.join(env.dir_local, "app/static/twitter-bootstrap.patch")
-    with lcd(dir_bootstrap):
-        local("git diff --no-prefix > %s" % fn_bootstrap_patch)
-
-def apply_bootstrap_patch():
-    # Apply latest local bootstrap patch on remote machine
-    dir_bootstrap = os.path.join(env.dir_remote, "app/static/twitter-bootstrap")
+def _update_bootstrap():
+    """Requires a previous up-to-date deployment for the current bootstrap patch file"""
     fn_bootstrap_patch = os.path.join(env.dir_remote, "app/static/twitter-bootstrap.patch")
+    dir_bootstrap = os.path.join(env.dir_local, "app/static/twitter-bootstrap")
     with cd(dir_bootstrap):
+        run("git reset --hard")
         run("patch -f -p0 < %s" % fn_bootstrap_patch)
+        run("rm -rf bootstrap")
+        run("make bootstrap")
