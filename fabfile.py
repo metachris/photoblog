@@ -166,7 +166,9 @@ def _get_cur_hash():
     """Gets current git commit's hash and shortmsg on remote machine"""
     with cd(env.dir_remote):
         with hide('running', 'stdout', 'stderr'):
-            return run('git log --pretty=format:"%h - %s [%an]" -n 1')
+            a = run('git log --pretty=format:"|%h - %s [%an]|" -n 1', shell=True)
+            b = "|".join(a.split("|")[1:-1]) # remove vt100 escaping
+            return b
 
 
 def deploy():
