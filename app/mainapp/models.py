@@ -103,7 +103,7 @@ class Photo(caching.base.CachingMixin, models.Model):
     def _mk_hash():
         hash = None
         while not hash or Photo.objects.filter(hash=hash).count():
-            hash = tools.id_generator(size=6, chars="abcdef0123456789")
+            hash = tools.id_generator(size=6)
         return hash
 
     @staticmethod

@@ -25,6 +25,12 @@ def home(request):
     photos = models.Photo.objects.filter(featured=True).order_by("-id")[:photos_per_page]
     return render(request, 'index.html', {'photos': photos, "count": photos_per_page})
 
+def sitemap(request):
+    sets = models.Set.objects.all().order_by("-id")
+    tags = models.Tag.objects.all().order_by("-id")
+    locations = models.Location .objects.all().order_by("-id")
+    photos = models.Photo.objects.all().order_by("-id")
+    return render(request, 'sitemap.xml', {'photos': photos, "sets": sets, "locations": locations, "tags": tags})
 
 def photo(request, photo_slug):
     photo = models.Photo.objects.get(slug=photo_slug)

@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
+    url(r'^sitemap.xml$', 'mainapp.views.sitemap'),
 
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 

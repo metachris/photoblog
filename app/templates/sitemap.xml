@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>http://www.chrishager.at/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>http://www.chrishager.at/tags</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>http://www.chrishager.at/sets</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>http://www.chrishager.at/locations</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+{% for photo in photos %}    <url>
+        <loc>http://www.chrishager.at/photo/{{ photo.slug }}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+{% endfor %}{% for tag in tags %}    <url>
+        <loc>http://www.chrishager.at/tag/{{ tag.slug }}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+{% endfor %}{% for set in sets %}    <url>
+        <loc>http://www.chrishager.at/set/{{ set.slug }}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+{% endfor %}{% for location in locations %}    <url>
+        <loc>http://www.chrishager.at/location/{{ location.slug }}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+{% endfor %}
+</urlset>
