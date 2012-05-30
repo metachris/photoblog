@@ -172,6 +172,10 @@ def _get_cur_hash():
 
 def deploy():
     """Initiate full deployment (server update to git master HEAD)"""
+    if not getattr(env, "dir_local", None):
+        print "Error: No target. Run $ fab production deploy"
+        return
+    
     # Save remote git hash
     hash_before = _get_cur_hash()
 
