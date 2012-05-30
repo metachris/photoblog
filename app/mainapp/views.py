@@ -310,7 +310,7 @@ def get_handout(request, handout_hash=None):
         # Poor mans validation
         if not name or (not email and not phone) or (email and (not "." in email or not "@" in email)):
             return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash,
-                    "error": "Please add a name and phone/email.", "name": name, "email": email,
+                    "error": "Please add your name and email/phone.", "name": name, "email": email,
                     "phone": phone, "msg": msg, "add_to_list": add_to_list
             })
         log.debug("Handout: contact validation passed (%s)" % name)
@@ -348,7 +348,10 @@ def get_handout(request, handout_hash=None):
     # See if the handout is already  published
     try:
         handout = models.Handout.objects.get(hash=handout_hash, is_published=True)
-        return render(request, 'mainapp/handout.html', {"id": handout_hash, "contact": contact_subscribed, "handout": handout})
+        handout.views += 1
+        handout.save()
+        return render(request, 'mainapp/handout.html', {"id": handout_hash,
+                "contact": contact_subscribed, "handout": handout})
 
     except exceptions.ObjectDoesNotExist:
         return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})

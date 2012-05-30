@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title-left %}Get Your Photos - {% endblock %}
+
+{% block body %}
+<div class="caption">Found {{ handout.photos.count }} photo{{ handout.photos.count|pluralize }} for id <b>{{ id }}</b>.</div>
+
+{% with handout.photos.all as photos %}
+    {% include "mainapp/photogrid.html" %}
+{% endwith %}
+
+{% endblock %}
+
+{% block js_bottom %}
+    <script src="{{ STATIC_URL }}js/photogrid.js"></script>
+{% endblock %}

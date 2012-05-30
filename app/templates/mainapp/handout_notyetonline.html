@@ -23,7 +23,7 @@
 
 {% if error %}<p><span class="label label-important">{{ error }}</span></p>{% endif %}
 
-<form action="/get/{{ id }}/" method="post" class="form-horizontal form-bg-dark" id="contactModal-form">
+<form action="/p/{{ id }}/" method="post" class="form-horizontal form-bg-dark" id="contactModal-form">
     {% csrf_token %}
 
     <br />
