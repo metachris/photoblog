@@ -171,21 +171,39 @@ def _get_cur_hash():
             return b
 
 
-def deploy():
-    hash_before = _get_cur_hash()
+def git_pull():
+    """Updates the remotes git repo to current master HEAD"""
     with cd(env.dir_remote):
         run("git pull")
+
+
+def migrate_db():
+    """Updates db schema with south if a new migration file is found"""
+    with cd(env.dir_remote):
+        run("git pull")
+        run("source env/bin/activate && cd app && python manage.py migrate mainapp")
+
+
+def deploy():
+    # Save remote git hash
+    hash_before = _get_cur_hash()
+
+    # Perform deployment
+    git_pull()
+    migrate_db()
     upload_files_notingit()
     make_static()
-    hash_after = _get_cur_hash()
+    reload_uwsgi()
 
+    # Save git hash and add entry to deployments logfile
+    hash_after = _get_cur_hash()
+    _log(hash_after)
+
+    # Show summary
     print "Deployment summary:"
     print
     print "  from: %s" % hash_before
     print "    to: %s" % hash_after
-    _log(hash_after)
-
-    reload_uwsgi()
 
 
 def rollback(hash):

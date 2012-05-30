@@ -7,6 +7,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
     url(r'^sitemap.xml$', 'mainapp.views.sitemap'),
+    url(r'^get/$', 'mainapp.views.get_handout'),
+    url(r'^get/(?P<handout_hash>.*)/$', 'mainapp.views.get_handout'),
 
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 

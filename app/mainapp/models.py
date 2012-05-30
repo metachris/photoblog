@@ -139,3 +139,79 @@ def photo_save_handler(sender, **kwargs):
     if photo.description_md:
         md = markdown.Markdown(safe_mode="escape")
         photo.description_html = md.convert(photo.description_md)
+
+
+
+"""
+    Models for hand-outs (id's handed to people, who can use it to get their photos
+"""
+class HandoutContact(models.Model):
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+    hash = models.CharField(max_length=32)
+
+    name = models.CharField(max_length=512, blank=False)
+
+    email = models.EmailField(blank=True, null=True)
+    tel = models.CharField(max_length=50, blank=True, null=True)
+
+    subscribed_to_mail_list = models.BooleanField(default=False)
+
+    @staticmethod
+    def _mk_hash():
+        hash = None
+        while not hash or HandoutContact.objects.filter(hash=hash).count():
+            hash = tools.id_generator(size=6)
+        return hash
+
+    def __unicode__(self):
+        return "Contact: %s" % (self.name)
+
+
+class Handout(models.Model):
+    """
+    Reference for other people which have got an id and want to see their photos
+
+    References a number of photos and sets
+    """
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+    contacts = models.ManyToManyField(HandoutContact, blank=True, null=True)
+    views = models.IntegerField(default=0)
+    hash = models.CharField(max_length=32)
+    is_published = models.BooleanField(default=False)
+
+    # Info for the viewer
+    description_md = models.TextField(blank=True, null=True)  # markdown
+    description_html = models.TextField(blank=True, null=True)  # converted to html
+
+    # Data
+    photos = models.ManyToManyField(Photo, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
+
+    @staticmethod
+    def _mk_hash():
+        hash = None
+        while not hash or Handout.objects.filter(hash=hash).count():
+            hash = tools.id_generator(size=6)
+        return hash
+
+    def __unicode__(self):
+        return "Handout: %s" % (self.hash)
+
+
+class HandoutMessage(models.Model):
+    """
+    Message thread for handout
+    """
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+    handout = models.ForeignKey(Handout)
+
+    # Either from user of contact
+    from_user = models.ForeignKey(User, blank=True, null=True)
+    from_contact = models.ForeignKey(HandoutContact, blank=True, null=True)
+
+    # Content
+    description_md = models.TextField(blank=True, null=True)  # markdown
+    description_html = models.TextField(blank=True, null=True)  # auto-converted to html
+
+    def __unicode__(self):
+        return "HandoutMessage: %s" % (self.id)

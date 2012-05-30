@@ -25,7 +25,7 @@ def mailchimp_subscribe(email, list_id=None, double_optin=True):
     list_id = list_id or settings.MAILCHIMP_LIST_ID
     res = ms.listSubscribe(id=list_id, email_address=email,\
         double_optin=double_optin)
-    logging.info("MailChimp: Subscribed user %s to list %s. Result: %s", email,
+    log.info("MailChimp: Subscribed user %s to list %s. Result: %s", email,
         list_id, res)
 
 
@@ -46,7 +46,7 @@ def mailchimp_unsubscribe(email, list_id=None, delete_member=False,
         delete_member=delete_member, send_goodbye=send_goodbye,
         send_notify=send_notify)
 
-    logging.info("MailChimp: Unsubscribed user %s from list %s. Result: %s",
+    log.info("MailChimp: Unsubscribed user %s from list %s. Result: %s",
         email, list_id, res)
 
 

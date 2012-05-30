@@ -27,3 +27,6 @@ admin.site.register(models.Tag, MP_Tag_Admin)
 admin.site.register(models.Photo, PhotoAdmin)
 admin.site.register(models.Set)
 admin.site.register(models.Location, MP_Location_Admin)
+
+admin.site.register(models.Handout)
+admin.site.register(models.HandoutContact)

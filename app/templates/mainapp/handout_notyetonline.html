@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title-left %}Get Your Photos - {% endblock %}
+
+{% block body %}
+<div class="caption">Your Photos via id <b>{{ id }}</b></div>
+
+
+{% if contact %}
+<p>
+    Your contact has been saved ({{ contact.name }}{% if email %}, email: {{ contact.email }}{% endif %}{% if contact.tel %}, tel: {{ contact.tel }}{% endif %}), and you'll get notified as soon as the photos are ready!
+</p>
+<br />
+<a href="/">Visit the homepage</a>
+        &middot;
+<a href="/get/{{ id }}/?n=1">Add another contact</a>
+{% else %}
+<p>
+    The photos are not yet online! Please leave your email and/or phone number and you'll get  notified when they are available.
+</p>
+
+{% if error %}<p><span class="label label-important">{{ error }}</span></p>{% endif %}
+
+<form action="/get/{{ id }}/" method="post" class="form-horizontal form-bg-dark" id="contactModal-form">
+    {% csrf_token %}
+
+    <br />
+    <br />
+
+    <fieldset>
+        <div class="control-group" id="ctrlgrp-name">
+            <label class="control-label" for="id_name">Your Name:</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" id="id_name" name="name" value="{{ name }}">
+            </div>
+        </div>
+        <div class="control-group" id="ctrlgrp-email">
+            <label class="control-label" for="id_email">Email:</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" id="id_email" name="email" value="{{ email }}"> &nbsp;<span class="help-after">(optional)</span>
+            </div>
+        </div>
+        <div class="control-group" id="ctrlgrp-email">
+            <label class="control-label" for="id_phone">Phone Number:</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" id="id_phone" name="phone" value="{{ phone }}"> &nbsp;<span class="help-after">(optional)</span>
+            </div>
+        </div>
+        <div class="control-group" id="ctrlgrp-message">
+            <label class="control-label" for="id_message">Message:</label>
+            <div class="controls">
+                <textarea class="input-xlarge" id="id_message" rows="10" cols="40" name="message">{{ msg }}</textarea>
+                &nbsp;<span class="help-after">(optional)</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="id_add_to_list">Add to Email List:</label>
+            <div class="controls">
+                <input class="input-xlarge" type="checkbox" {% if add_to_list %}checked="checked" {% endif %}name="add_to_list" id="id_add_to_list">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="id_add_to_list"></label>
+            <div class="controls">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </fieldset>
+
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block js_bottom %}
+{% endblock %}

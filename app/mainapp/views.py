@@ -255,8 +255,8 @@ def ajax_photo_more(request):
 
 
 def ajax_contact(request):
-    if request.method == 'POST': # If the form has been submitted...
-        form = forms.ContactForm(request.POST) # A form bound to the POST data
+    if request.method == 'POST':
+        form = forms.ContactForm(request.POST)
         if form.is_valid():
             # All validation rules pass
             photo = None
@@ -283,3 +283,72 @@ def ajax_contact(request):
             return HttpResponse(str(form.errors))
     else:
         return HttpResponse("wrong turn?")
+
+
+def get_handout(request, handout_hash=None):
+    """Handout URL"""
+    if not handout_hash:
+        return render(request, 'mainapp/handout_search.html')
+
+    SESSION_KEY_HAS_SUBSCRIBED = "has_subscribed_to_handout_%s" % handout_hash
+    contact_subscribed = request.session.get(SESSION_KEY_HAS_SUBSCRIBED)
+
+    # Users can force-remove the info that they already have subscribed
+    if request.GET.get("n") == "1":
+        contact_subscribed = request.session[SESSION_KEY_HAS_SUBSCRIBED] = None
+        log.debug("Handout: Force-removed session key %s" % SESSION_KEY_HAS_SUBSCRIBED)
+
+    # Handle new subscription
+    if request.method == 'POST':
+        # Extract data
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        msg = request.POST.get("message")
+        add_to_list = request.POST.get("add_to_list") == "on"  # boolean: True or False
+
+        # Poor mans validation
+        if not name or (not email and not phone) or (email and (not "." in email or not "@" in email)):
+            return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash,
+                    "error": "Please add a name and phone/email.", "name": name, "email": email,
+                    "phone": phone, "msg": msg, "add_to_list": add_to_list
+            })
+        log.debug("Handout: contact validation passed (%s)" % name)
+
+        # Create Handout Contact
+        handout_contact = models.HandoutContact(
+            name=name, email=email, tel=phone, subscribed_to_mail_list=add_to_list, hash=models.Handout._mk_hash()
+        )
+        handout_contact.save()
+
+        # Create Handout if not exists, else add contact
+        try:
+            handout = models.Handout.objects.get(hash=handout_hash)
+        except exceptions.ObjectDoesNotExist:
+            handout = models.Handout(hash=handout_hash)
+            handout.save()
+        handout.contacts.add(handout_contact)
+
+        # All done. Now save the contact to session, send email, etc.
+        log.debug("Handout: added contact %s to handout %s" % (handout_contact, handout))
+        contact_subscribed = request.session[SESSION_KEY_HAS_SUBSCRIBED] = handout_contact
+
+        # Send email
+        email_template = get_template('mainapp/email/contact_handout.html')
+        msg = email_template.render(Context({
+            "id": handout_hash, "name": name, "email": email, "phone": phone,
+            "msg": msg, "add_to_list": add_to_list
+        }))
+        tools.sendmail.gmail("chris@metachris.org", "Photoblog Handout Contact", msg)
+
+        # If requested, subscribe to newsletter
+        if add_to_list and email:
+            tools.mailchimp.mailchimp_subscribe(email)
+
+    # See if the handout is already  published
+    try:
+        handout = models.Handout.objects.get(hash=handout_hash, is_published=True)
+        return render(request, 'mainapp/handout.html', {"id": handout_hash, "contact": contact_subscribed, "handout": handout})
+
+    except exceptions.ObjectDoesNotExist:
+        return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})

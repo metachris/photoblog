@@ -1,10 +1,15 @@
+import logging
 import smtplib
 from email.MIMEText import MIMEText
 from email.mime.multipart import MIMEMultipart
 from django.conf import settings
 
 
+log = logging.getLogger(__name__)
+
+
 def gmail(to, subject, text):
+    log.debug("Sending Email via Gmail to %s" % to)
     msg = MIMEMultipart()
 
     sender = "%s <%s>" % (settings.SENDMAIL_SENDER_NAME, settings.SENDMAIL_GMAIL_USER)
