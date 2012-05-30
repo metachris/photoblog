@@ -22,10 +22,10 @@ def gmail(to, subject, text, html=None):
     msg['Subject'] = subject
 
     if html:
-        msg.attach(MIMEText(text, "plain"))
-        msg.attach(MIMEText(html, "html"))
+        msg.attach(MIMEText(text.encode("utf-8"), "plain", _charset="utf-8"))
+        msg.attach(MIMEText(html.encode("utf-8"), "html", _charset="utf-8"))
     else:
-        msg.attach(MIMEText(text))
+        msg.attach(MIMEText(text.encode("utf-8"), _charset="utf-8"))
 
     # Send email
     mailServer = smtplib.SMTP("smtp.gmail.com", 587)
