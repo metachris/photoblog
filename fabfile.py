@@ -175,7 +175,7 @@ def deploy():
     if not getattr(env, "dir_local", None):
         print "Error: No target. Run $ fab production deploy"
         return
-    
+
     # Save remote git hash
     hash_before = _get_cur_hash()
 
@@ -238,7 +238,7 @@ def _log(info, id="deployment"):
 def _update_bootstrap():
     """Requires a previous up-to-date deployment for the current bootstrap patch file"""
     fn_bootstrap_patch = os.path.join(env.dir_remote, "app/static/twitter-bootstrap.patch")
-    dir_bootstrap = os.path.join(env.dir_local, "app/static/twitter-bootstrap")
+    dir_bootstrap = os.path.join(env.dir_remote, "app/static/twitter-bootstrap")
     with cd(dir_bootstrap):
         run("git reset --hard")
         run("patch -f -p0 < %s" % fn_bootstrap_patch)

@@ -33,11 +33,11 @@
         <div id="photo-main-container">
             {% if photo.external_url|is_portrait %}
                 {% thumbnail photo.external_url "600" upscale=False as im %}
-                        <img src="{{ im.url }}" id="photo-main">
+                        <img src="{{ im.url }}" id="photo-main" width="{{ im.width }}" height="{{ im.height }}">
                 {% endthumbnail %}
             {% else %}
                 {% thumbnail photo.external_url "900" upscale=False as im %}
-                        <img src="{{ im.url }}" id="photo-main">
+                        <img src="{{ im.url }}" id="photo-main" width="{{ im.width }}" height="{{ im.height }}">
                 {% endthumbnail %}
             {% endif %}
 

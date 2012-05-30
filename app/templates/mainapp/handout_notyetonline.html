@@ -2,21 +2,20 @@
 
 {% load thumbnail %}
 
-{% block title-left %}Get Your Photos - {% endblock %}
-
 {% block body %}
-<div class="caption">Your Photos via id <b>{{ id }}</b></div>
-
+<div class="caption">Photos for you, via id <b>{{ id }}</b></div>
 
 {% if contact %}
-<p>
-    Your contact has been saved ({{ contact.name }}{% if email %}, email: {{ contact.email }}{% endif %}{% if contact.tel %}, tel: {{ contact.tel }}{% endif %}), and you'll get notified as soon as the photos are ready!
-</p>
-<br />
-<a href="/">Visit the homepage</a>
-        &middot;
-<a href="/get/{{ id }}/?n=1">Add another contact</a>
+    <p>
+        Your contact has been saved ({{ contact.name }}{% if email %}, email: {{ contact.email }}{% endif %}{% if contact.tel %}, tel: {{ contact.tel }}{% endif %}), and you'll get notified as soon as the photos are ready!
+    </p>
+    <br />
+    <a href="/">Visit the homepage</a>
+            &middot;
+    <a href="/get/{{ id }}/?n=1">Add another contact</a>
+
 {% else %}
+
 <p>
     The photos are not yet online! Please leave your email and/or phone number and you'll get  notified when they are available.
 </p>
@@ -45,7 +44,7 @@
         <div class="control-group" id="ctrlgrp-email">
             <label class="control-label" for="id_phone">Phone Number:</label>
             <div class="controls">
-                <input type="text" class="input-xlarge" id="id_phone" name="phone" value="{{ phone }}" placeholder="eg. +43 680 12312312"> &nbsp;<span class="help-after">(optional)</span>
+                <input type="text" class="input-xlarge" id="id_phone" name="phone" value="{{ phone }}" placeholder="eg. +43 680 12312312"> &nbsp;<span class="help-after">(receive a SMS when photos are available. optional)</span>
             </div>
         </div>
         <div class="control-group" id="ctrlgrp-message">
