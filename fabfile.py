@@ -40,6 +40,7 @@ Examples:
 
 """
 import os.path
+import datetime
 
 from fabric.api import run, local, cd, lcd, put, env, hosts, hide
 from fabric.contrib.files import exists
@@ -54,6 +55,9 @@ HOSTS_PROD = ["hetzner1"]
 # The git origin is where we the repo is.
 # Use the user@host syntax
 GIT_ORIGIN = "git://github.com/metachris/photoblog.git"
+
+# Deployments log file
+HISTFILE = "deployments.log"
 
 
 # Environments
@@ -177,6 +181,7 @@ def deploy():
     print
     print "  from: %s" % hash_before
     print "    to: %s" % hash_after
+    _log(hash_after)
 
     reload_uwsgi()
 
@@ -198,5 +203,12 @@ def rollback(hash):
     print
     print "  from: %s" % hash_before
     print "    to: %s" % hash_after
+    _log(hash_after, "rollback  ")
 
     reload_uwsgi()
+
+
+def _log(info, id="deployment"):
+    """Log a deployment or rollback"""
+    f = open(HISTFILE, "a+")
+    f.write("%s | %s | %s\n" % (id, datetime.datetime.now(), info))
