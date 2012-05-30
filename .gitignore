@@ -9,5 +9,4 @@ settings_production.py
 app/templates/analytics_snippet.html
 
 media/
-static/
 app/static/*.gz

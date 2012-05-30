@@ -232,3 +232,18 @@ def _log(info, id="deployment"):
     """Log a deployment or rollback"""
     f = open(HISTFILE, "a+")
     f.write("%s | %s | %s\n" % (id, datetime.datetime.now(), info))
+
+
+def build_bootstrap_patch():
+    # Create a patch of the local twitter bootstrap setup to apply on deployment
+    dir_bootstrap = os.path.join(env.dir_local, "app/static/twitter-bootstrap")
+    fn_bootstrap_patch = os.path.join(env.dir_local, "app/static/twitter-bootstrap.patch")
+    with lcd(dir_bootstrap):
+        local("git diff --no-prefix > %s" % fn_bootstrap_patch)
+
+def apply_bootstrap_patch():
+    # Apply latest local bootstrap patch on remote machine
+    dir_bootstrap = os.path.join(env.dir_remote, "app/static/twitter-bootstrap")
+    fn_bootstrap_patch = os.path.join(env.dir_remote, "app/static/twitter-bootstrap.patch")
+    with cd(dir_bootstrap):
+        run("patch -f -p0 < %s" % fn_bootstrap_patch)

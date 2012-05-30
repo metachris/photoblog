@@ -1,0 +1,13 @@
+diff --git less/responsive.less less/responsive.less
+index bbd76d6..7f40a62 100644
+--- less/responsive.less
++++ less/responsive.less
+@@ -38,7 +38,7 @@
+ @import "responsive-768px-979px.less";
+ 
+ // Large desktops
+-@import "responsive-1200px-min.less";
++//@import "responsive-1200px-min.less";
+ 
+ 
+ // RESPONSIVE NAVBAR
