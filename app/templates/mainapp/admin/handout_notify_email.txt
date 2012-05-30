@@ -1,0 +1,8 @@
+Hey!
+
+{{ handout.photos.all.count }} new photos are online: http://www.chrishager.at/p/{{ handout.hash }}
+
+Let me know what you think!
+
+Cheers,
+Chris

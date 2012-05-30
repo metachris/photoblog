@@ -18,6 +18,7 @@ import forms
 import tools
 import tools.sendmail
 import tools.mailchimp
+import tools.sms
 
 
 log = logging.getLogger(__name__)
@@ -355,3 +356,61 @@ def get_handout(request, handout_hash=None):
 
     except exceptions.ObjectDoesNotExist:
         return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})
+
+
+@login_required
+def handout_notify_contacts(request):
+    if not request.user.is_superuser:
+        return HttpResponse("hmmm...")
+
+    # Get handouts ready to notify
+    handouts_to_notify = models.Handout.objects.filter(is_published=True, has_notified_contacts=False)
+
+    # Check whether GET request for manual verification
+    if request.method != 'POST':
+        log.info("Notifying contacts: review. Authorization: %s [%s]" % (request.user.username, request.user.id))
+        return render(request, 'mainapp/admin/handout_notify.html', {"handouts": handouts_to_notify})
+
+    # POST goes here -- prepare templates and notify contacts!
+    log.info("Notifying contacts: Authorization: %s [%s]" % (request.user.username, request.user.id))
+
+    email_text_template = get_template('mainapp/admin/handout_notify_email.txt')
+    email_html_template = get_template('mainapp/admin/handout_notify_email.html')
+    sms_template = get_template('mainapp/admin/handout_notify_sms.txt')
+
+    count_contacts = 0
+    count_email = 0
+    count_sms = 0
+
+    for handout in handouts_to_notify:
+        log.info("Notifying handout %s" % handout)
+
+        # Prepare templates
+        email_msg_text = email_text_template.render(Context({"handout": handout}))
+        email_msg_html = email_html_template.render(Context({"handout": handout, "photos": handout.photos.all().order_by("-id")[:5]}))
+        sms_msg = sms_template.render(Context({"handout": handout}))
+
+        # Notify contacts
+        for contact in handout.contacts.all():
+            log.info("- Notifying contact %s" % contact)
+            count_contacts += 1
+
+            # Via email
+            if contact.email:
+                count_email += 1
+                log.info("-- via email to %s" % contact.email)
+                tools.sendmail.gmail(contact.email, "Photos online at chrishager.at/p/%s" % handout.hash, email_msg_text, email_msg_html)
+
+            # Via SMS
+            if contact.tel:
+                count_sms += 1
+                log.info("-- via sms to %s" % contact.tel)
+                tools.sms.send_sms(contact.tel, sms_msg)
+
+        # Finally, update handout
+        handout.has_notified_contacts = True
+        handout.date_notified_contacts = datetime.datetime.now()
+        handout.save()
+
+    return render(request, 'mainapp/admin/handout_notify.html', {"counts": True,
+            "count_contacts": count_contacts, "count_sms": count_sms, "count_email": count_email})

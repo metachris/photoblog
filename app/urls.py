@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
     url(r'^sitemap.xml$', 'mainapp.views.sitemap'),
     url(r'^p/$', 'mainapp.views.get_handout'),
+    url(r'^p/notify/$', 'mainapp.views.handout_notify_contacts'),
     url(r'^p/(?P<handout_hash>.*)/$', 'mainapp.views.get_handout'),
 
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),

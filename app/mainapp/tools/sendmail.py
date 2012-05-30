@@ -8,17 +8,26 @@ from django.conf import settings
 log = logging.getLogger(__name__)
 
 
-def gmail(to, subject, text):
+def gmail(to, subject, text, html=None):
     log.debug("Sending Email via Gmail to %s" % to)
-    msg = MIMEMultipart()
-
     sender = "%s <%s>" % (settings.SENDMAIL_SENDER_NAME, settings.SENDMAIL_GMAIL_USER)
+
+    if html:
+        msg = MIMEMultipart("alternative")
+    else:
+        msg = MIMEMultipart()
+
     msg['From'] = sender
     msg['To'] = to
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(text))
+    if html:
+        msg.attach(MIMEText(text, "plain"))
+        msg.attach(MIMEText(html, "html"))
+    else:
+        msg.attach(MIMEText(text))
 
+    # Send email
     mailServer = smtplib.SMTP("smtp.gmail.com", 587)
     mailServer.ehlo()
     mailServer.starttls()

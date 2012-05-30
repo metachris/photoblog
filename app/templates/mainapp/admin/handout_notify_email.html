@@ -1,0 +1,22 @@
+{% load thumbnail %}
+<p>Hey!</p>
+
+<p>{{ handout.photos.all.count }} new photos are online: http://www.chrishager.at/p/{{ handout.hash }}</p>
+<br />
+<p>
+{% for photo in photos %}
+    {% thumbnail photo.external_url "180x180" crop="center" as im %}
+        <a href="http://www.chrishager.at/photo/{{ photo.slug }}"><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" style="border:1px solid #666;"></a>
+    {% endthumbnail %}
+    &nbsp;
+    &nbsp;
+    &nbsp;
+{% endfor %}
+</p>
+
+<p>Let me know what you think!</p>
+
+<p>Best,<br />
+Chris
+</p>
+

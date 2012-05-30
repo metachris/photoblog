@@ -164,7 +164,7 @@ class HandoutContact(models.Model):
         return hash
 
     def __unicode__(self):
-        return "Contact: %s" % (self.name)
+        return "<Contact(%s, email=%s, tel=%s)>" % (self.name, self.email, self.tel)
 
 
 class Handout(models.Model):
@@ -178,6 +178,9 @@ class Handout(models.Model):
     views = models.IntegerField(default=0)
     hash = models.CharField(max_length=32)
     is_published = models.BooleanField(default=False)
+
+    has_notified_contacts = models.BooleanField(default=False)
+    date_notified_contacts = models.DateTimeField(blank=True, null=True)
 
     # Info for the viewer
     description_md = models.TextField(blank=True, null=True)  # markdown
@@ -195,7 +198,7 @@ class Handout(models.Model):
         return hash
 
     def __unicode__(self):
-        return "Handout: %s" % (self.hash)
+        return "<Handout(%s, %s)>" % (self.id, self.hash)
 
 
 class HandoutMessage(models.Model):

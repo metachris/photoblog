@@ -1,0 +1,1 @@
+Hey, Chris hier. {{ handout.photos.all.count }} photos sind online! http://www.chrishager.at/p/{{ handout.hash }}

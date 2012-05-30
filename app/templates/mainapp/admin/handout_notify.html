@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title-left %}Get Your Photos - {% endblock %}
+
+{% block body %}
+<h1>Admin Action</h1>
+
+<br />
+
+<div class="caption">
+    {% if counts %}
+        Notified {{ count_contacts }} contacts with {{ count_email }} emails and {{ count_sms }} SMS.
+    {% else %}
+        Notify contacts of newly published handouts
+    {% endif %}
+</div>
+
+{% if handouts.count %}
+<big>
+    <ul>
+        {% for handout in handouts %}
+            <li style="padding-bottom: 14px;"><a href="/admin/mainapp/handout/{{ handout.id }}/">{{ handout }}</a>
+                <ul>
+                    {% for contact in handout.contacts.all %}
+                        <li style="padding-top: 4px;"><a href="/admin/mainapp/handoutcontact/{{ contact.id }}/">{{ contact }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</big>
+
+<br />
+
+<form action="." method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-large btn-danger">Notify Users Now</button>
+</form>
+
+{% else %}
+    <p>No handouts published and not yet notified.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block js_bottom %}
+{% endblock %}

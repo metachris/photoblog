@@ -21,6 +21,11 @@ SENDMAIL_SENDER_NAME = "Your Name"
 MAILCHIMP_API_KEY = ""
 MAILCHIMP_LIST_ID = ""
 
+# IntelliSMS Account Info (for sending SMS)
+SEND_SMS = False
+INTELLISENSE_USERNAME = ""
+INTELLISENSE_PASSWORD = ""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
