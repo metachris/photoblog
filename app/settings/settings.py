@@ -9,9 +9,14 @@
 # ------------------------------------------------
 import platform
 import hosts
+import os
+import datetime
 
 
 APP_VERSION = "0.1"
+
+NOW = datetime.datetime.now()
+DATE_STR = NOW.strftime("%Y-%m-%d")
 
 # Import machine/environment specific settings based on the hostname
 # (current machine's network name). Specified in settings/hosts.py
@@ -112,18 +117,54 @@ if DEBUG:
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+
+    'formatters': {
+        'default' : {
+            'format' : '%(asctime)s %(levelname)-8s %(name)s \t%(message)s'
+        },
+    },
+
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+
+        'file':{
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'formatter': 'default',
+            'filename': os.path.join(APP_ROOT, "logs", "django-%s.log" % DATE_STR),
+        },
+
+        'querylog':{
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'backupCount': 5,
+            'maxBytes': 1024 * 1024,
+            'filename': os.path.join(APP_ROOT, "logs", "django-%s-queries.log" % DATE_STR),
+            'delay': True,
         }
     },
+
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
         },
+
+        'django.db.backends': {
+            'handlers': ['querylog'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+
+    'root': {
+        'handlers': ['file'],
+        'level': 'DEBUG',
     }
 }
 

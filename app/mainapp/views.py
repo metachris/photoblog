@@ -1,6 +1,7 @@
 import datetime
 import json
 from pprint import pprint
+import logging
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -19,6 +20,9 @@ import tools.sendmail
 import tools.mailchimp
 
 
+log = logging.getLogger(__name__)
+
+
 def home(request):
     #return HttpResponse("Hello, world. You're at the poll index.")
     # raise Http404
@@ -26,12 +30,14 @@ def home(request):
     photos = models.Photo.objects.filter(featured=True).order_by("-id")[:photos_per_page]
     return render(request, 'index.html', {'photos': photos, "count": photos_per_page})
 
+
 def sitemap(request):
     sets = models.Set.objects.all().order_by("-id")
     tags = models.Tag.objects.all().order_by("-id")
     locations = models.Location .objects.all().order_by("-id")
     photos = models.Photo.objects.all().order_by("-id")
     return render(request, 'sitemap.xml', {'photos': photos, "sets": sets, "locations": locations, "tags": tags})
+
 
 def photo(request, photo_slug):
     photo = models.Photo.objects.get(slug=photo_slug)

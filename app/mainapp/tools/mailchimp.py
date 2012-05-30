@@ -8,6 +8,9 @@ except ImportError:
     import json
 
 
+log = logging.getLogger(__name__)
+
+
 def mailchimp_subscribe(email, list_id=None, double_optin=True):
     """
     Subscribes this email to your mailchimp newsletter. If list_id is not
@@ -15,7 +18,7 @@ def mailchimp_subscribe(email, list_id=None, double_optin=True):
     """
     api_key = getattr(settings, "MAILCHIMP_API_KEY", None)
     if not api_key:
-        logging.error("Mailchimp Error: No Mailchimp API key; could not subscribe user '%s'. (settings.MAILCHIMP_API_KEY)" % email)
+        log.error("Mailchimp Error: No Mailchimp API key; could not subscribe user '%s'. (settings.MAILCHIMP_API_KEY)" % email)
         return
 
     ms = MailSnake(api_key)
@@ -34,7 +37,7 @@ def mailchimp_unsubscribe(email, list_id=None, delete_member=False,
     """
     api_key = getattr(settings, "MAILCHIMP_API_KEY", None)
     if not api_key:
-        logging.error("Mailchimp Error: No Mailchimp API key; could not subscribe user. (settings.MAILCHIMP_API_KEY)")
+        log.error("Mailchimp Error: No Mailchimp API key; could not subscribe user. (settings.MAILCHIMP_API_KEY)")
         return
 
     ms = MailSnake(api_key)
