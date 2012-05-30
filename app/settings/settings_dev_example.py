@@ -15,6 +15,11 @@ SECRET_KEY = 'MAKE_THIS_UNIQUE'
 # To send email via GMail with tools.sendmail.gmail(), set the credentials here
 SENDMAIL_GMAIL_USER = ""
 SENDMAIL_GMAIL_PASS = ""
+SENDMAIL_SENDER_NAME = "Your Name"
+
+# Mailchimp auto-subscription settings
+MAILCHIMP_API_KEY = ""
+MAILCHIMP_LIST_ID = ""
 
 DATABASES = {
     'default': {
@@ -78,7 +83,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/Users/chris/Projects/private/django/photosite/app/static/",
+    "%s/app/static/" % APP_ROOT,
 )
 
 # List of finder classes that know how to find static files in

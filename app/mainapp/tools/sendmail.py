@@ -1,13 +1,14 @@
-#!/usr/bin/python
 import smtplib
 from email.MIMEText import MIMEText
 from email.mime.multipart import MIMEMultipart
 from django.conf import settings
 
+
 def gmail(to, subject, text):
     msg = MIMEMultipart()
 
-    msg['From'] = settings.SENDMAIL_GMAIL_USER
+    sender = "%s <%s>" % (settings.SENDMAIL_SENDER_NAME, settings.SENDMAIL_GMAIL_USER)
+    msg['From'] = sender
     msg['To'] = to
     msg['Subject'] = subject
 
@@ -18,6 +19,6 @@ def gmail(to, subject, text):
     mailServer.starttls()
     mailServer.ehlo()
     mailServer.login(settings.SENDMAIL_GMAIL_USER, settings.SENDMAIL_GMAIL_PASS)
-    mailServer.sendmail(settings.SENDMAIL_GMAIL_USER, to, msg.as_string())
+    mailServer.sendmail(sender, to, msg.as_string())
     # Should be mailServer.quit(), but that crashes...
     mailServer.close()

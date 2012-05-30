@@ -16,6 +16,7 @@ import models
 import forms
 import tools
 import tools.sendmail
+import tools.mailchimp
 
 
 def home(request):
@@ -257,12 +258,20 @@ def ajax_contact(request):
             if photo_ref:
                 photo = models.Photo.objects.get(hash=photo_ref)
 
+            # Send email
             email_template = get_template('mainapp/email/contact.html')
             msg = email_template.render(Context({
                     "form": form.cleaned_data,
                     "photo": photo
             }))
             tools.sendmail.gmail("chris@metachris.org", "Photoblog Contact", msg)
+
+            # If requested, subscribe to newsletter
+            if request.POST.get("add_to_list") != "false":
+                email = form.cleaned_data["email"]
+                tools.mailchimp.mailchimp_subscribe(email)
+
+            # Return success
             return HttpResponse('1')
         else:
             return HttpResponse(str(form.errors))
