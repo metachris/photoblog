@@ -53,6 +53,7 @@ class Set(caching.base.CachingMixin, models.Model):
 
     user = models.ForeignKey(User)
     date_created = models.DateTimeField('date created', auto_now_add=True)
+    published = models.BooleanField(default=False)
 
     title = models.CharField(max_length=512)
     slug = models.CharField(max_length=512, null=True)
@@ -96,8 +97,11 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     date_captured = models.DateField('captured', blank=True, null=True)  # from exif
 
+    # Whether this photo is publicly accessible (TODO)
+    published = models.BooleanField(default=False)
+
     # Whether this photo should be featured on the front page, etc.
-    featured = models.BooleanField(default=True)
+    featured = models.BooleanField(default=False)
 
     @staticmethod
     def _mk_hash():

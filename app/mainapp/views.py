@@ -28,15 +28,15 @@ def home(request):
     #return HttpResponse("Hello, world. You're at the poll index.")
     # raise Http404
     photos_per_page = 10
-    photos = models.Photo.objects.filter(featured=True).order_by("-id")[:photos_per_page]
+    photos = models.Photo.objects.filter(published=True, featured=True).order_by("-id")[:photos_per_page]
     return render(request, 'index.html', {'photos': photos, "count": photos_per_page})
 
 
 def sitemap(request):
-    sets = models.Set.objects.all().order_by("-id")
+    sets = models.Set.objects.filter(published=True).order_by("-id")
     tags = models.Tag.objects.all().order_by("-id")
     locations = models.Location .objects.all().order_by("-id")
-    photos = models.Photo.objects.all().order_by("-id")
+    photos = models.Photo.objects.filter(published=True).order_by("-id")
     return render(request, 'sitemap.xml', {'photos': photos, "sets": sets, "locations": locations, "tags": tags})
 
 
@@ -46,8 +46,8 @@ def photo(request, photo_slug):
     set_slug = request.GET.get("set")
 
     # Get next and previous photo, based on current browsing
-    q_next = models.Photo.objects.filter(id__gt=photo.id).order_by("id")
-    q_prev = models.Photo.objects.filter(id__lt=photo.id).order_by("-id")
+    q_next = models.Photo.objects.filter(id__gt=photo.id, published=True).order_by("id")
+    q_prev = models.Photo.objects.filter(id__lt=photo.id, published=True).order_by("-id")
     if tag_slug:
         tag = models.Tag.objects.get(slug=tag_slug)
         tags = [tag]
@@ -184,7 +184,7 @@ def locations_list(request):
 
 def sets_list(request):
     """ Show a sets of tags """
-    sets = models.Set.objects.all()
+    sets = models.Set.objects.filter(published=True)
 
     photo_count = models.Photo.objects.all().count()
     sets_count = models.Set.objects.all().count()
@@ -197,7 +197,7 @@ def tag_photos(request, tag_slug):
     tag = models.Tag.objects.get(slug=tag_slug)
     tags = [tag]
     tags += tag.get_descendants()
-    photos = models.Photo.objects.filter(tags__in=tags).order_by("-id")[:10]
+    photos = models.Photo.objects.filter(tags__in=tags, published=True).order_by("-id")[:10]
     if len(photos) == 1:
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
@@ -209,7 +209,7 @@ def location_photos(request, location_slug):
     location = models.Location.objects.get(slug=location_slug)
     locations = [location]
     locations  += location.get_descendants()
-    photos = models.Photo.objects.filter(location__in=locations).order_by("-id")[:10]
+    photos = models.Photo.objects.filter(location__in=locations, published=True).order_by("-id")[:10]
     if len(photos) == 1:
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
@@ -219,7 +219,7 @@ def location_photos(request, location_slug):
 def set_photos(request, set_slug):
     """ Show photos in a set """
     set = models.Set.objects.get(slug=set_slug)
-    photos = models.Photo.objects.filter(sets=set).order_by("-id")[:10]
+    photos = models.Photo.objects.filter(sets=set, published=True).order_by("-id")[:10]
     if len(photos) == 1:
         return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
@@ -234,7 +234,7 @@ def ajax_photo_more(request):
     set_slug = request.GET.get("set")
 
     photo_last = models.Photo.objects.get(hash=last_hash)
-    photos = models.Photo.objects.filter(id__lt=photo_last.id)
+    photos = models.Photo.objects.filter(id__lt=photo_last.id, published=True)
     if featured: photos = photos.filter(featured=True)
     if tag_slug: photos = photos.filter(tags__slug=tag_slug)
     if set_slug: photos = photos.filter(sets__slug=set_slug)
