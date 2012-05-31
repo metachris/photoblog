@@ -1,7 +1,9 @@
+import os
 import datetime
 import json
 from pprint import pprint
 import logging
+import urllib
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -425,11 +427,28 @@ def upload_photo(request):
     if request.method == 'POST':
         form = forms.PhotoUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            try:
-                fn = tools.photo_upload.upload_photo(request.FILES["file"])
-                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s&hash=%s'>admin</a>" % (settings.MEDIA_URL, fn, fn))
-            except TypeError as e:
-                return HttpResponse(e)
+            uploader = tools.photo_upload.PhotoUploader(request.FILES["file"])
+            uploader.upload()
+
+            date_captured = None
+            datetime_captured = uploader.exif.get("DateTime")
+            if datetime_captured and " " in datetime_captured:
+                date_captured = datetime_captured.split(" ")[0]
+                date_captured = date_captured.replace(":", "-")  # some cameras use :
+
+            values = {
+                "user": 1,
+                "hash": uploader.hash,
+                "local_filename": "%s.%s" % (uploader.hash, uploader.ext),
+                "date_captured": date_captured,
+                "resolution_width": uploader.photo_width,
+                "resolution_height": uploader.photo_height,
+                "upload_resolution_width": uploader.upload_width,
+                "upload_resolution_height": uploader.upload_height,
+                "exif": json.dumps(uploader.exif.values),
+            }
+            photo_url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, "%s.%s" % (uploader.hash, uploader.ext))
+            return render(request, 'mainapp/admin/upload.html', {"values": values, "photo_url": photo_url})
 
     else:
         form = forms.PhotoUploadForm()

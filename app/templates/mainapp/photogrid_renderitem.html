@@ -1,5 +1,5 @@
 {% load thumbnail %}
-{% thumbnail photo.external_url "280x280" crop="center" as im %}
+{% thumbnail photo.url "280x280" crop="center" as im %}
 <div class="photo-container">
     <div class="photo-square">
         <a href="/photo/{{ photo.slug }}{% if tag %}?tag={{ tag.slug }}{% if set %}&set={{ set.slug }}{% endif %}{% else %}{% if set %}?set={{ set.slug }}{% endif %}{% endif %}" class="a-no-underline">

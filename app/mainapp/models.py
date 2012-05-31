@@ -1,3 +1,4 @@
+import os
 import datetime
 import logging
 from django.db.models.signals import pre_save
@@ -6,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch.dispatcher import receiver
 from treebeard.mp_tree import MP_Node
+from django.conf import settings
 
 import caching.base
 import tools
@@ -152,7 +154,7 @@ class Photo(caching.base.CachingMixin, models.Model):
         return "<Photo(%s, %s)>" % (self.pk, self.title)
 
     def update_url(self):
-        if self.is_original and self.local_filename:
+        if self.local_filename:
             self.url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, self.local_filename)
         elif self.external_url:
             self.url = self.external_url
@@ -166,14 +168,15 @@ def photo_save_handler(sender, **kwargs):
 
     if not photo.hash:
         photo.hash = Photo._mk_hash()
-        print "new hash: %s" % photo.hash
 
     if not photo.slug:
         photo.slug = Photo._mk_slug(photo.title)
         if not photo.slug:
             # Title not sluggable
             photo.slug = photo.hash
-        print "new slug: %s" % photo.slug
+
+    if not photo.url:
+        photo.update_url()
 
     if photo.description_md:
         md = markdown.Markdown(safe_mode="escape")
