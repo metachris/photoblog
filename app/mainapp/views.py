@@ -13,6 +13,8 @@ from django.core import exceptions
 from django.template.loader import get_template
 from django.template import Context, Template
 
+from django.conf import settings
+
 import models
 import forms
 import tools
@@ -414,3 +416,20 @@ def handout_notify_contacts(request):
 
     return render(request, 'mainapp/admin/handout_notify.html', {"counts": True,
             "count_contacts": count_contacts, "count_sms": count_sms, "count_email": count_email})
+
+
+def upload_photo(request):
+    if request.method == 'POST':
+        form = forms.PhotoUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                hash, ext = tools.upload_photo(request.FILES["file"])
+                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s.%s'>admin</a>" % (settings.MEDIA_URL, hash, ext))
+            except TypeError as e:
+                return HttpResponse(e)
+
+    else:
+        form = forms.PhotoUploadForm()
+
+    return render(request, 'mainapp/admin/upload.html',
+        {"form": form})

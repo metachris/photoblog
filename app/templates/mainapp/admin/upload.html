@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title-left %}Get Your Photos - {% endblock %}
+
+{% block body %}
+<h1>Admin Action: Upload</h1>
+
+<br />
+
+<div class="caption">
+    Upload a photo
+</div>
+
+<form action="/upload/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Upload Photo</button>
+</form>
+
+{% endblock %}
+
+{% block js_bottom %}
+{% endblock %}
