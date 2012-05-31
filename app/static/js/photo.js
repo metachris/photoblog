@@ -33,7 +33,7 @@ function runPrefixMethod(obj, method) {
 }
 
 function toggle_fullscreen() {
-    var e = document.getElementById("photo-main");
+    var e = document.getElementById("photo-main-frame");
     if (runPrefixMethod(document, "FullScreen") || runPrefixMethod(document, "IsFullScreen")) {
         runPrefixMethod(document, "CancelFullScreen");
     } else {

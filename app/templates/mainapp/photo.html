@@ -31,15 +31,17 @@
     <div class="span12" style="text-align: center;">
 
         <div id="photo-main-container">
+            <div id="photo-main-frame" style="border: width: 100%; height:100%;">
             {% if photo.external_url|is_portrait %}
                 {% thumbnail photo.external_url "600" upscale=False as im %}
-                        <img src="{{ im.url }}" id="photo-main" width="{{ im.width }}" height="{{ im.height }}">
+                        <img src="{{ im.url }}" id="photo-main" style="max-width: 100%">
                 {% endthumbnail %}
             {% else %}
                 {% thumbnail photo.external_url "900" upscale=False as im %}
-                        <img src="{{ im.url }}" id="photo-main" width="{{ im.width }}" height="{{ im.height }}">
+                        <img src="{{ im.url }}" id="photo-main" style="max-width: 100%">
                 {% endthumbnail %}
             {% endif %}
+            </div>
 
             <div class="photo-meta">
 

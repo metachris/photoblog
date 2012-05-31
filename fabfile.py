@@ -92,7 +92,7 @@ def init_server():
         run("git submodule update")
 
         run("mkdir logs")
-        run("mkdir media")
+        run("mkdir media && mkdir media/upload && mkdir media/photos")
 
     # Upload target-specific settings file and other files not in git
     upload_files_notingit()
