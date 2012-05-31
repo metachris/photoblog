@@ -1,9 +1,24 @@
+function on_fullscreen_change(is_fullscreen) {
+    console.log("Full screen state change to " + is_fullscreen);
+    if (is_fullscreen) {
+    } else {
+        $("#photo-main-container").removeClass("fullscreen");
+    }
+}
+
 $(document).ready(function(){
-    $("#photo-main").click(function() {
-        // Full screen capable browsers get full screen
+    $("#photo-main-container").click(function() {
         try {
-            toggle_fullscreen();
+            // Toggle full screen in capable browsers
+            var e = document.getElementById("photo-main-container");
+            if (runPrefixMethod(document, "FullScreen") || runPrefixMethod(document, "IsFullScreen")) {
+                runPrefixMethod(document, "CancelFullScreen");
+            } else {
+                $("#photo-main-container").addClass("fullscreen");
+                runPrefixMethod(e, "RequestFullScreen");
+            }
         } catch (err) {
+            // Fallback on non-html5 capable browsers
             $("#overlay").toggle();
         }
     });
@@ -11,6 +26,19 @@ $(document).ready(function(){
     $("#overlay").click(function() {
         $(this).toggle();
     });
+
+    // Add full screen event listeners to set css accordingly
+    document.addEventListener("fullscreenchange", function () {
+        on_fullscreen_change(document.fullscreen);
+    }, false);
+
+    document.addEventListener("mozfullscreenchange", function () {
+        on_fullscreen_change(document.mozFullScreen);
+    }, false);
+
+    document.addEventListener("webkitfullscreenchange", function () {
+        on_fullscreen_change(document.webkitIsFullScreen);
+    }, false);
 });
 
 // Full-screen prefix detector (via http://www.sitepoint.com/html5-full-screen-api)
@@ -32,11 +60,3 @@ function runPrefixMethod(obj, method) {
     }
 }
 
-function toggle_fullscreen() {
-    var e = document.getElementById("photo-main-frame");
-    if (runPrefixMethod(document, "FullScreen") || runPrefixMethod(document, "IsFullScreen")) {
-        runPrefixMethod(document, "CancelFullScreen");
-    } else {
-        runPrefixMethod(e, "RequestFullScreen");
-    }
-}
