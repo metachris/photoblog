@@ -21,6 +21,7 @@ import tools
 import tools.sendmail
 import tools.mailchimp
 import tools.sms
+import tools.photo_upload
 
 
 log = logging.getLogger(__name__)
@@ -423,8 +424,8 @@ def upload_photo(request):
         form = forms.PhotoUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                hash, ext = tools.upload_photo(request.FILES["file"])
-                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s.%s'>admin</a>" % (settings.MEDIA_URL, hash, ext))
+                fn = tools.photo_upload.upload_photo(request.FILES["file"])
+                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s'>admin</a>" % (settings.MEDIA_URL, fn))
             except TypeError as e:
                 return HttpResponse(e)
 
