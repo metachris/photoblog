@@ -419,13 +419,14 @@ def handout_notify_contacts(request):
             "count_contacts": count_contacts, "count_sms": count_sms, "count_email": count_email})
 
 
+@login_required
 def upload_photo(request):
     if request.method == 'POST':
         form = forms.PhotoUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 fn = tools.photo_upload.upload_photo(request.FILES["file"])
-                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s'>admin</a>" % (settings.MEDIA_URL, fn))
+                return HttpResponse("uploaded! visit <a href='http://127.0.0.1:8000/admin/mainapp/photo/add/?user=1&external_url=%sphotos/%s&hash=%s'>admin</a>" % (settings.MEDIA_URL, fn, fn))
             except TypeError as e:
                 return HttpResponse(e)
 
@@ -434,3 +435,16 @@ def upload_photo(request):
 
     return render(request, 'mainapp/admin/upload.html',
         {"form": form})
+
+
+@login_required
+def admin_build_photo_urls(request):
+    """
+    Create the final url for each photo, based on whether it's stored locally or externally
+    """
+    log.info("Admin Action: Updating urls. Authorization: %s [%s]" % (request.user.username, request.user.id))
+    for photo in models.Photo.objects.all():
+        photo.update_url()
+        photo.save()
+        log.info("- %s: %s" % (photo, photo.url))
+    return HttpResponse("200")

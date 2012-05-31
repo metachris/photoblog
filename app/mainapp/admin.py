@@ -19,7 +19,7 @@ class PhotoModelForm( forms.ModelForm ):
 
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ["title", "id", "slug", "hash"]
-    exclude = ["hash", "slug", "description_html", "views"]
+    exclude = ["hash", "slug", "description_html", "external_url"]
 
 
 admin.site.register(models.UserProfile)

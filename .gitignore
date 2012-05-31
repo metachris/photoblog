@@ -4,6 +4,7 @@
 *.log
 .idea
 env
+logs/
 settings_dev.py
 settings_production.py
 app/templates/analytics_snippet.html

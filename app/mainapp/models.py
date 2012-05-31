@@ -15,11 +15,18 @@ import markdown
 class UserProfile(caching.base.CachingMixin, models.Model):
     objects = caching.base.CachingManager()
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, null=True, blank=True)
+
     date_created = models.DateTimeField('date created', auto_now_add=True)
+    is_photographer = models.BooleanField(default=True)
 
     # Other fields here
     accepted_eula = models.BooleanField()
+
+    # Contact info
+    name = models.CharField(max_length=512, blank=False, null=True)
+    email = models.EmailField(blank=True, null=True)
+    tel = models.CharField(max_length=50, blank=True, null=True)
 
     def __unicode__(self):
         return "<UserProfile(%s)>" % self.user
@@ -69,39 +76,59 @@ class Set(caching.base.CachingMixin, models.Model):
 
 class Photo(caching.base.CachingMixin, models.Model):
     """
-    Ideas: exif info, related photos
     """
     objects = caching.base.CachingManager()
-
-    user = models.ForeignKey(User)
     date_created = models.DateTimeField('date created', auto_now_add=True)
 
-    #
-    filename = models.CharField(max_length=512, blank=True)
-    external_url = models.CharField(max_length=2048, blank=True)  # for photos on flickr, 500px, etc
+    # Who uploaded the photo
+    user = models.ForeignKey(User)
 
-    # Custom id
+    # Who captured this photo
+    photographer = models.ForeignKey(UserProfile, blank=True, null=True)
+
+    # If the uploaded image is an original
+    is_original = models.BooleanField(default=False)
+
+    # Use only one of either filename or an external url
+    local_filename = models.CharField(max_length=512, blank=True, null=True)
+    external_url = models.CharField(max_length=2048, blank=True)  # deprecated
+
+    # URL to use for displaying the primary image. Auto-computed based on
+    # whether the original is available, or an external url.
+    # eg. <MEDIA_URL>/photo/123123.png or http://500px.com/...
+    url = models.URLField()
+
+    # Title, slug and hash
+    title = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100)  # can be auto-generated with Photo._mk_slug
     hash = models.CharField(max_length=32)
-    location = models.ForeignKey(Location, blank=True, null=True)
 
     # Image info
-    sets = models.ManyToManyField(Set, blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
-    views = models.IntegerField(default=0)  # not yet implemented
-
-    title = models.CharField(max_length=100)
-    slug = models.CharField(max_length=100)
-
     description_md = models.TextField(blank=True, null=True)  # markdown
     description_html = models.TextField(blank=True, null=True)  # converted to html
 
+    sets = models.ManyToManyField(Set, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    location = models.ForeignKey(Location, blank=True, null=True)
+
     date_captured = models.DateField('captured', blank=True, null=True)  # from exif
 
-    # Whether this photo is publicly accessible (TODO)
+    # Whether this photo is publicly accessible
     published = models.BooleanField(default=False)
 
     # Whether this photo should be featured on the front page, etc.
     featured = models.BooleanField(default=False)
+
+    # Resolution of the processed base image
+    resolution_width = models.IntegerField(blank=True, null=True)   # px
+    resolution_height = models.IntegerField(blank=True, null=True)  # px
+
+    # Resolution of the uploaded image
+    upload_resolution_width = models.IntegerField(blank=True, null=True)   # px
+    upload_resolution_height = models.IntegerField(blank=True, null=True)  # px
+
+    # Exif info (currently stored on upload)
+    exif = models.TextField(blank=True)  # JSON dump of exif dictionary
 
     @staticmethod
     def _mk_hash():
@@ -124,6 +151,14 @@ class Photo(caching.base.CachingMixin, models.Model):
     def __unicode__(self):
         return "<Photo(%s, %s)>" % (self.pk, self.title)
 
+    def update_url(self):
+        if self.is_original and self.local_filename:
+            self.url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, self.local_filename)
+        elif self.external_url:
+            self.url = self.external_url
+        else:
+            raise TypeError("Could not build an url for photo %s" % self)
+
 
 @receiver(pre_save, sender=Photo)
 def photo_save_handler(sender, **kwargs):
@@ -143,7 +178,6 @@ def photo_save_handler(sender, **kwargs):
     if photo.description_md:
         md = markdown.Markdown(safe_mode="escape")
         photo.description_html = md.convert(photo.description_md)
-
 
 
 """

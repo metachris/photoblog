@@ -59,6 +59,8 @@ GIT_ORIGIN = "git://github.com/metachris/photoblog.git"
 # Deployments log file (in same path as fabfile)
 HISTFILE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "deployments.log")
 
+NOW = datetime.datetime.now()
+NOW_DATE_STR = NOW.strftime("%Y-%m-%d")
 
 # Environments
 
@@ -69,8 +71,8 @@ def production():
     env.git_origin = GIT_ORIGIN
     env.dir_remote = settings_production.APP_ROOT
     env.dir_local  = settings_dev.APP_ROOT
+    env.db_info = settings_production.DATABASES["default"]
     env.file_settings = "app/settings/settings_production.py"
-
 
 # Tasks
 
@@ -244,3 +246,13 @@ def _update_bootstrap():
         run("patch -f -p0 < %s" % fn_bootstrap_patch)
         run("rm -rf bootstrap")
         run("make bootstrap")
+
+
+def backup_db():
+    with cd("/tmp/"):
+        fn = "/tmp/dbdump_photoblog-%s.sql" % NOW_DATE_STR
+        cmd1 = 'export PGPASSWORD="%(PASSWORD)s"' % env.db_info
+        cmd2 = "pg_dump -C -h %(HOST)s -p %(PORT)s -U %(USER)s %(NAME)s" % env.db_info
+        run("%s && %s > %s" % (cmd1, cmd2, fn))
+        print
+        print "DB dumped to '%s'" % fn

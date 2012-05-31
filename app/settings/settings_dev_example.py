@@ -68,6 +68,10 @@ MEDIA_ROOT = '/opt/photosite/media/'
 #MEDIA_URL = 'http://localhost:8080/media/'
 MEDIA_URL = '/media/'
 
+# Media subdirectories for photo uploads
+MEDIA_DIR_UPLOAD = "upload"  # origs with exif, full res
+MEDIA_DIR_PHOTOS = "photos"  # pre-processed origs, HD resolution
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
