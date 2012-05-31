@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import exceptions
 from django.template.loader import get_template
 from django.template import Context, Template
+from django.core.cache import cache
 
 from django.conf import settings
 
@@ -447,4 +448,10 @@ def admin_build_photo_urls(request):
         photo.update_url()
         photo.save()
         log.info("- %s: %s" % (photo, photo.url))
+    return HttpResponse("200")
+
+@login_required
+def admin_cache_clear(request):
+    log.info("Admin Action: Clearing cache. Authorization: %s [%s]" % (request.user.username, request.user.id))
+    cache.clear()
     return HttpResponse("200")
