@@ -13,6 +13,8 @@ class ExifHolder(object):
     """
     values = {}
     def __init__(self, image):
+        if not image.format.lower() == "jpeg":
+            return
         info = image._getexif()
         for tag, value in info.items():
             decoded = TAGS.get(tag, tag)

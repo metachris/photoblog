@@ -121,6 +121,9 @@ class Photo(caching.base.CachingMixin, models.Model):
     # Whether this photo should be featured on the front page, etc.
     featured = models.BooleanField(default=False)
 
+    # Photo Infos...
+    filesize = models.IntegerField(null=True, blank=True)  # bytes
+
     # Resolution of the processed base image
     resolution_width = models.IntegerField(blank=True, null=True)   # px
     resolution_height = models.IntegerField(blank=True, null=True)  # px
@@ -128,6 +131,13 @@ class Photo(caching.base.CachingMixin, models.Model):
     # Resolution of the uploaded image
     upload_resolution_width = models.IntegerField(blank=True, null=True)   # px
     upload_resolution_height = models.IntegerField(blank=True, null=True)  # px
+
+    # Filename of the upload could have a different extension (keeps orig)
+    upload_filename = models.CharField(max_length=512, blank=True, null=True)
+    upload_filesize = models.IntegerField(null=True, blank=True)  # bytes
+
+    # Filename pass along with the html form
+    upload_filename_from = models.CharField(max_length=512, blank=True, null=True)
 
     # Exif info (currently stored on upload)
     exif = models.TextField(blank=True)  # JSON dump of exif dictionary
@@ -159,7 +169,7 @@ class Photo(caching.base.CachingMixin, models.Model):
         elif self.external_url:
             self.url = self.external_url
         else:
-            raise TypeError("Could not build an url for photo %s" % self)
+            raise TypeError("Could not build an url for photo %s (local_filename=%s)" % (self, self.local_filename))
 
 
 @receiver(pre_save, sender=Photo)

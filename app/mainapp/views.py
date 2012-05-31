@@ -427,19 +427,28 @@ def upload_photo(request):
     if request.method == 'POST':
         form = forms.PhotoUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            uploader = tools.photo_upload.PhotoUploader(request.FILES["file"])
-            uploader.upload()
+            try:
+                uploader = tools.photo_upload.PhotoUploader(request.FILES["file"])
+                uploader.upload()
+            except TypeError as e:
+                # Not an image file (most likely)
+                log.error(e)
+                return HttpResponse("Not an image file")
 
-            date_captured = None
+            date_captured = ""
             datetime_captured = uploader.exif.get("DateTime")
             if datetime_captured and " " in datetime_captured:
                 date_captured = datetime_captured.split(" ")[0]
                 date_captured = date_captured.replace(":", "-")  # some cameras use :
 
             values = {
-                "user": 1,
+                "user": request.user.id,
                 "hash": uploader.hash,
-                "local_filename": "%s.%s" % (uploader.hash, uploader.ext),
+                "local_filename": uploader.fn_photo,
+                "upload_filename": uploader.fn_upload,
+                "upload_filename_from": uploader.fn_form,
+                "upload_filesize": os.path.getsize(uploader.fn_upload_full),
+                "filesize": os.path.getsize(uploader.fn_photo_full),
                 "date_captured": date_captured,
                 "resolution_width": uploader.photo_width,
                 "resolution_height": uploader.photo_height,
@@ -468,6 +477,7 @@ def admin_build_photo_urls(request):
         photo.save()
         log.info("- %s: %s" % (photo, photo.url))
     return HttpResponse("200")
+
 
 @login_required
 def admin_cache_clear(request):
