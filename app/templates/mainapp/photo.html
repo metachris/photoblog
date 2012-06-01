@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
 {% load thumbnail %}
+{% load extras %}
 
 {% block title-left %}{{ photo.title }} - {% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Photo '{{ photo.title }}', captured by Chris Hager{% if photo.date_captured %} on {{ photo.date_captured|date }}{% endif %}{% if photo.location %} in {{ photo.location.name }}{% endif %}.">
+    <meta name="description" content="{{ photo|photo_alt }}">
 {% endblock %}
 
 {% block body-class %}{% if not photo.is_portrait %}wide-enabled{% endif %}{% endblock %}
@@ -35,7 +36,7 @@
         <div style="{% if photo.is_portrait %}display:inline-block;{% endif %}">
         <div id="photo-main-container" class="normal">
             <div id="photo-main-frame">
-                <img src="{{ photo.url }}" class="frame{% if photo.is_portrait %} portrait{% endif %}">
+                <img src="{{ photo.url }}" alt="{{ photo|photo_alt }}" class="frame{% if photo.is_portrait %} portrait{% endif %}">
             </div>
         </div>
 

@@ -6,12 +6,14 @@ from django.db.models.signals import pre_save
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch.dispatcher import receiver
-from treebeard.mp_tree import MP_Node
+from django.template.defaultfilters import slugify
 from django.conf import settings
-
+from treebeard.mp_tree import MP_Node
 import caching.base
-import tools
+
 import markdown
+
+import tools
 
 
 class UserProfile(caching.base.CachingMixin, models.Model):
@@ -161,7 +163,7 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     @staticmethod
     def _mk_slug(title):
-        slug = slug_orig = tools.slugify(title)
+        slug = slug_orig = slugify(title)
         if not slug:
             return
         count = 1

@@ -323,6 +323,9 @@ def get_handout(request, handout_hash=None):
             })
         log.debug("Handout: contact validation passed (%s)" % name)
 
+        # Sanitize phone number
+        phone = phone.strip().replace(" ", "").replace("-", "").replace("/", "")
+
         # Create Handout Contact
         handout_contact = models.HandoutContact(
             name=name, email=email, tel=phone, subscribed_to_mail_list=add_to_list, hash=models.Handout._mk_hash()
