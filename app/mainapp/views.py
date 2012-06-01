@@ -204,8 +204,8 @@ def tag_photos(request, tag_slug):
     tags = [tag]
     tags += tag.get_descendants()
     photos = models.Photo.objects.filter(tags__in=tags, published=True).order_by("-id")[:10]
-    if len(photos) == 1:
-        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
+#    if len(photos) == 1:
+#        return HttpResponseRedirect('/photo/%s' % photos[0].slug)
 
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
 
@@ -216,8 +216,8 @@ def location_photos(request, location_slug):
     locations = [location]
     locations  += location.get_descendants()
     photos = models.Photo.objects.filter(location__in=locations, published=True).order_by("-id")[:10]
-    if len(photos) == 1:
-        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
+#    if len(photos) == 1:
+#        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
 
     return render(request, 'mainapp/location_photos.html', {'location': location, 'photos': photos})
 
