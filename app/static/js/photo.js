@@ -1,8 +1,10 @@
 function on_fullscreen_change(is_fullscreen) {
     console.log("Full screen state change to " + is_fullscreen);
     if (is_fullscreen) {
+        $("#photo-main-container").removeClass("normal");
     } else {
         $("#photo-main-container").removeClass("fullscreen");
+        $("#photo-main-container").addClass("normal");
     }
 }
 

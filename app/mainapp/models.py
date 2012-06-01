@@ -101,8 +101,8 @@ class Photo(caching.base.CachingMixin, models.Model):
     url = models.URLField()
 
     # Title, slug and hash
-    title = models.CharField(max_length=100)
-    slug = models.CharField(max_length=100)  # can be auto-generated with Photo._mk_slug
+    title = models.CharField(max_length=100, blank=True, default="")
+    slug = models.CharField(max_length=100, blank=True, null=True)  # can be auto-generated with Photo._mk_slug
     hash = models.CharField(max_length=32)
 
     # Image info
@@ -171,6 +171,10 @@ class Photo(caching.base.CachingMixin, models.Model):
         else:
             raise TypeError("Could not build an url for photo %s (local_filename=%s)" % (self, self.local_filename))
 
+    @property
+    def is_portrait(self):
+        return self.resolution_height > self.resolution_width
+
 
 @receiver(pre_save, sender=Photo)
 def photo_save_handler(sender, **kwargs):
@@ -181,13 +185,9 @@ def photo_save_handler(sender, **kwargs):
 
     if not photo.slug:
         photo.slug = Photo._mk_slug(photo.title)
-        if not photo.slug:
-            # Title not sluggable
-            photo.slug = photo.hash
 
-    if not photo.url:
-        photo.update_url()
-
+    # Always update url and markdown
+    photo.update_url()
     if photo.description_md:
         md = markdown.Markdown(safe_mode="escape")
         photo.description_html = md.convert(photo.description_md)

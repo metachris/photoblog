@@ -436,28 +436,31 @@ def upload_photo(request):
                 return HttpResponse("Not an image file")
 
             date_captured = ""
-            datetime_captured = uploader.exif.get("DateTime")
+            datetime_captured = uploader.exif.get("DateTimeOriginal") or uploader.exif.get("DateTime")
             if datetime_captured and " " in datetime_captured:
                 date_captured = datetime_captured.split(" ")[0]
                 date_captured = date_captured.replace(":", "-")  # some cameras use :
 
-            values = {
-                "user": request.user.id,
-                "hash": uploader.hash,
-                "local_filename": uploader.fn_photo,
-                "upload_filename": uploader.fn_upload,
-                "upload_filename_from": uploader.fn_form,
-                "upload_filesize": os.path.getsize(uploader.fn_upload_full),
-                "filesize": os.path.getsize(uploader.fn_photo_full),
-                "date_captured": date_captured,
-                "resolution_width": uploader.photo_width,
-                "resolution_height": uploader.photo_height,
-                "upload_resolution_width": uploader.upload_width,
-                "upload_resolution_height": uploader.upload_height,
-                "exif": json.dumps(uploader.exif.values),
-            }
-            photo_url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, "%s.%s" % (uploader.hash, uploader.ext))
-            return render(request, 'mainapp/admin/upload.html', {"values": values, "photo_url": photo_url})
+            log.info("- creating photo object")
+            photo = models.Photo(
+                    user=request.user,
+                    hash=uploader.hash,
+                    local_filename=uploader.fn_photo,
+                    upload_filename=uploader.fn_upload,
+                    upload_filename_from=uploader.fn_form,
+                    upload_filesize=os.path.getsize(uploader.fn_upload_full),
+                    filesize=os.path.getsize(uploader.fn_photo_full),
+                    date_captured=date_captured,
+                    resolution_width=uploader.photo_width,
+                    resolution_height=uploader.photo_height,
+                    upload_resolution_width=uploader.upload_width,
+                    upload_resolution_height=uploader.upload_height,
+                    exif=json.dumps(uploader.exif.values)
+            )
+            photo.save()
+            log.info("- created")
+
+            return render(request, 'mainapp/admin/upload.html', {"photo": photo})
 
     else:
         form = forms.PhotoUploadForm()

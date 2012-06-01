@@ -22,12 +22,8 @@
         Photo uploaded!
     </div>
 
-        {{ values }}
-
-        <a href="/admin/mainapp/photo/add/{% for k, v in values.items %}{% if forloop.first %}?{% else %}&{% endif %}{{ k }}={{ v }}{% endfor %}" />Go to admin</a>
-
-
-    <a href="{{ photo_url }}" target="_blank"><img src="{{ photo_url }}" /></a>
+    <p><a href="/admin/mainapp/photo/{{ photo.id }}/" />Go to admin</a></p>
+    <p><a href="{{ photo.url }}" target="_blank"><img src="{{ photo_url }}" /></a></p>
 {% endif %}
 {% endblock %}
 
