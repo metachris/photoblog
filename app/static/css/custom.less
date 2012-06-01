@@ -183,6 +183,7 @@ small {
 }
 
 // The following two fullscreen styles enable vertical centering in a 100% container
+// Necessary for centered image in fullscreen mode for Safari, Firefox
 #photo-main-container.fullscreen {
     display: table;
     width: 100%;
@@ -205,22 +206,18 @@ small {
     margin-bottom: 16px;
 }
 
-
-
 #photo-main-license a { color:@gray; }
 #photo-main-license a:hover { color:@grayLight; }
 
 .photo-meta {
-/* border:1px solid green; */
     text-align: left;
     color: @grayLight;
 }
 
 .photo-meta a {
     color: @grayLight;
-
-
 }
+
 #photo-main-meta-right {
     float:right;
     padding-left:30px;

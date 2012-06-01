@@ -26,6 +26,8 @@ SEND_SMS = False
 INTELLISENSE_USERNAME = ""
 INTELLISENSE_PASSWORD = ""
 
+EXIF_COPYRIGHT_TAG = "Chris Hager <info@chrishager.at>"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

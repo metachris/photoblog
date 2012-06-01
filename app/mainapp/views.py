@@ -435,8 +435,10 @@ def upload_photo(request):
                 log.error(e)
                 return HttpResponse("Not an image file")
 
+            exif = uploader.exif
+
             date_captured = ""
-            datetime_captured = uploader.exif.get("DateTimeOriginal") or uploader.exif.get("DateTime")
+            datetime_captured = exif.get("DateTimeOriginal") or exif.get("CreateDate") or exif.get("DateTime")
             if datetime_captured and " " in datetime_captured:
                 date_captured = datetime_captured.split(" ")[0]
                 date_captured = date_captured.replace(":", "-")  # some cameras use :
@@ -445,6 +447,7 @@ def upload_photo(request):
             photo = models.Photo(
                     user=request.user,
                     hash=uploader.hash,
+                    is_original=True,
                     local_filename=uploader.fn_photo,
                     upload_filename=uploader.fn_upload,
                     upload_filename_from=uploader.fn_form,
@@ -455,7 +458,16 @@ def upload_photo(request):
                     resolution_height=uploader.photo_height,
                     upload_resolution_width=uploader.upload_width,
                     upload_resolution_height=uploader.upload_height,
-                    exif=json.dumps(uploader.exif.values)
+                    exif=json.dumps(exif.values),
+                    title=exif.get("Title"),
+                    description_md=exif.get("Description"),
+                    exif_camera="%s %s" % (exif.get("Make"), exif.get("Model")),
+                    exif_lens=exif.get("Lens") or exif.get("LensModel") or exif.get("LensInfo"),
+                    exif_exposuretime=exif.get("ExposureTime"),
+                    exif_aperture=exif.get("Aperture") or exif.get("FNumber") or exif.get("ApertureValue"),
+                    exif_iso=exif.get("ISO"),
+                    exif_focallength=exif.get("FocalLength"),
+                    exif_flash=str(exif.get("FlashFired")) if exif.get("FlashFired") is not None else None,
             )
             photo.save()
             log.info("- created")

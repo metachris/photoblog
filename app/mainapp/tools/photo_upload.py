@@ -11,7 +11,7 @@ from django.conf import settings
 
 import app.mainapp.models
 import app.mainapp.tools
-from app.mainapp.tools.exif import ExifHolder
+from app.mainapp.tools.exif import ExifToolHolder
 
 
 log = logging.getLogger(__name__)
@@ -82,15 +82,8 @@ class PhotoUploader(object):
         Make sure it's a valid image and return detected filetype (file extension).
         Returns one string which is the detected filetype (eg. "jpeg" or "png")
         """
-        # First filetype check with `file`
         log.info("- verify")
-#        filetype = commands.getoutput("file -b %s" % self.fn_tmp)
-#        if not "JPEG" in filetype and not "PNG" in filetype:
-#            print e
-#            raise TypeError("Unsupported filetype for upload %s: %s" % (self.f, filetype))
-#
-#        log.info("- verify 2")
-        # Second filetype check with PIL.
+        # First filetype check with `file`
         try:
             im = Image.open(self.fn_tmp)
             im.verify()
@@ -101,7 +94,6 @@ class PhotoUploader(object):
         # Valid image. Save infos
         self.format = im.format
         self.ext = "jpeg" if ALWAYS_OUTPUT_JPEG else self.format.lower()
-        self.exif = ExifHolder(im)
 
     def process_verified_image(self):
         self.hash = app.mainapp.models.Photo._mk_hash()
@@ -111,6 +103,12 @@ class PhotoUploader(object):
         self.fn_upload_full = os.path.join(DIR_UPLOAD_FULL, self.fn_upload)
         shutil.move(self.fn_tmp, self.fn_upload_full)
         log.info("- added %s" % self.fn_upload_full)
+
+        # Add copyright exif tag to uploaded image
+        os.system("""exiftool "-EXIF:Copyright=%s" %s""" % (settings.EXIF_COPYRIGHT_TAG, self.fn_upload_full))
+
+        # Load exif infos for local access
+        self.exif = ExifToolHolder(self.fn_upload_full)
 
         # Resize
         im = Image.open(self.fn_upload_full)
@@ -145,6 +143,8 @@ class PhotoUploader(object):
         self.fn_photo_full = os.path.join(DIR_PHOTOS_FULL, self.fn_photo)
         log.info("- saving to %s..." % self.fn_photo_full)
         im.save(self.fn_photo_full, quality=PHOTO_QUALITY_VALUE)
-        log.info("- saved")
+        log.info("- saved. copying exif tags...")
 
-        # - Add copyright exif tag (TODO)
+        # - Copy exif tags
+        os.system("""exiftool -tagsFromFile %s %s""" % (self.fn_upload_full, self.fn_photo_full))
+        log.info("- all done")

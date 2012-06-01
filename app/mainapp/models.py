@@ -142,6 +142,16 @@ class Photo(caching.base.CachingMixin, models.Model):
     # Exif info (currently stored on upload)
     exif = models.TextField(blank=True)  # JSON dump of exif dictionary
 
+    # Selected exif tags
+    exif_camera = models.CharField(max_length=512, blank=True, null=True)
+    exif_lens = models.CharField(max_length=512, blank=True, null=True)
+
+    exif_exposuretime = models.CharField(max_length=512, blank=True, null=True)
+    exif_aperture = models.CharField(max_length=512, blank=True, null=True)
+    exif_iso = models.CharField(max_length=512, blank=True, null=True)
+    exif_focallength = models.CharField(max_length=512, blank=True, null=True)
+    exif_flash = models.CharField(max_length=512, blank=True, null=True)
+
     @staticmethod
     def _mk_hash():
         hash = None

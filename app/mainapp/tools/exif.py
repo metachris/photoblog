@@ -1,15 +1,16 @@
 import json
 import logging
 import Image
+import commands
 from PIL.ExifTags import TAGS
-
+from pprint import pprint
 
 log = logging.getLogger(__name__)
 
 
 class ExifHolder(object):
     """
-    Immediately loads all tags which are then serializeable.
+    Exif info holder via PIL
     """
     values = {}
     def __init__(self, image):
@@ -27,11 +28,23 @@ class ExifHolder(object):
         return self.values.get(key, default)
 
 
+class ExifToolHolder(object):
+    """
+    Exif info holder via `exiftool`
+    """
+    values = {}
+    def __init__(self, fn):
+        self.values = json.loads(commands.getoutput("exiftool -json %s" % fn))[0]
+    def get(self, key, default=None):
+        return self.values.get(key, default)
+
+
 if __name__ == "__main__":
     # Monkey patch to stdout logging
     log = logging
 
     # Do some exif testing
-    exif = ExifHolder(Image.open("/opt/photosite/media/upload/789wqx.jpeg"))
-    exif.get("DateTimeOriginal")
-    print json.dumps(exif.values)
+#    exif = ExifHolder(Image.open("/opt/photosite/media/upload/789wqx.jpeg"))
+#    exif.get("DateTimeOriginal")
+    exif = ExifToolHolder("/opt/photosite/media/upload/789wqx.jpeg")
+    pprint(exif.values)
