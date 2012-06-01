@@ -27,7 +27,7 @@
     {% include "analytics_snippet.html" %}
 </head>
 
-<body>
+<body class="{% block body-class %}{% endblock %}">
     <div class="container">
         {% include "header.html" %}
         {% block body %}{% endblock %}

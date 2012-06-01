@@ -19,16 +19,50 @@ index 827b692..6edfbdb 100644
 -.PHONY: docs watch gh-pages
 \ No newline at end of file
 +.PHONY: docs watch gh-pages
-diff --git less/responsive.less less/responsive.less
-index bbd76d6..7f40a62 100644
---- less/responsive.less
-+++ less/responsive.less
-@@ -38,7 +38,7 @@
- @import "responsive-768px-979px.less";
+diff --git less/responsive-1200px-min.less less/responsive-1200px-min.less
+index a7c9f4e..a8b946a 100644
+--- less/responsive-1200px-min.less
++++ less/responsive-1200px-min.less
+@@ -2,25 +2,25 @@
+ // ------------------
  
- // Large desktops
--@import "responsive-1200px-min.less";
-+//@import "responsive-1200px-min.less";
+ @media (min-width: 1200px) {
++  body.wide-enabled {
++      // Fixed grid
++      #grid > .core(70px, 30px);
  
+-  // Fixed grid
+-  #grid > .core(70px, 30px);
++      // Fluid grid
++      #grid > .fluid(5.982905983%, 2.564102564%);
  
- // RESPONSIVE NAVBAR
+-  // Fluid grid
+-  #grid > .fluid(5.982905983%, 2.564102564%);
++      // Input grid
++      #grid > .input(70px, 30px);
+ 
+-  // Input grid
+-  #grid > .input(70px, 30px);
+-
+-  // Thumbnails
+-  .thumbnails {
+-    margin-left: -30px;
+-  }
+-  .thumbnails > li {
+-    margin-left: 30px;
++      // Thumbnails
++      .thumbnails {
++        margin-left: -30px;
++      }
++      .thumbnails > li {
++        margin-left: 30px;
++      }
++      .row-fluid .thumbnails {
++        margin-left: 0;
++      }
+   }
+-  .row-fluid .thumbnails {
+-    margin-left: 0;
+-  }
+-
+ }
