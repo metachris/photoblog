@@ -450,6 +450,7 @@ def upload_photo(request):
             log.info("- creating photo object")
             photo = models.Photo(
                     user=request.user,
+                    photographer=models.UserProfile.get_or_create(request.user),
                     hash=uploader.hash,
                     is_original=True,
                     local_filename=uploader.fn_photo,

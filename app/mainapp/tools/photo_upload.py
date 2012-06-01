@@ -105,7 +105,7 @@ class PhotoUploader(object):
         log.info("- added %s" % self.fn_upload_full)
 
         # Add copyright exif tag to uploaded image
-        os.system("""exiftool "-EXIF:Copyright=%s" %s""" % (settings.EXIF_COPYRIGHT_TAG, self.fn_upload_full))
+        os.system("""exiftool -overwrite_original "-EXIF:Copyright=%s" %s""" % (settings.EXIF_COPYRIGHT_TAG, self.fn_upload_full))
 
         # Load exif infos for local access
         self.exif = ExifToolHolder(self.fn_upload_full)
@@ -146,5 +146,7 @@ class PhotoUploader(object):
         log.info("- saved. copying exif tags...")
 
         # - Copy exif tags
-        os.system("""exiftool -tagsFromFile %s %s""" % (self.fn_upload_full, self.fn_photo_full))
+        os.system("""exiftool -overwrite_original -tagsFromFile %s %s""" % (self.fn_upload_full, self.fn_photo_full))
         log.info("- all done")
+
+        # Cleanup after `exiftool`

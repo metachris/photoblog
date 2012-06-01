@@ -32,6 +32,16 @@ class UserProfile(caching.base.CachingMixin, models.Model):
     email = models.EmailField(blank=True, null=True)
     tel = models.CharField(max_length=50, blank=True, null=True)
 
+    @staticmethod
+    def get_or_create(user):
+        try:
+            profile = UserProfile.objects.get(user=user)
+        except Exception as e:
+            print "create userprofile", e
+            profile = UserProfile(user=user)
+            profile.save()
+        return profile
+
     def __unicode__(self):
         return "<UserProfile(%s)>" % self.user
 
