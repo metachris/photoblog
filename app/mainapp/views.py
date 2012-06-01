@@ -25,6 +25,7 @@ import tools.sendmail
 import tools.mailchimp
 import tools.sms
 import tools.photo_upload
+import tools.exif
 
 
 log = logging.getLogger(__name__)
@@ -499,3 +500,46 @@ def admin_cache_clear(request):
     log.info("Admin Action: Clearing cache. Authorization: %s [%s]" % (request.user.username, request.user.id))
     cache.clear()
     return HttpResponse("200")
+
+
+@login_required
+def admin_tmp(request):
+    """ Temporary action: EXIF update for all photos """
+    log.info("Admin Action: tmp. Authorization: %s [%s]" % (request.user.username, request.user.id))
+    dir_upload = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD)
+    dir_photos = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS)
+
+    for photo in models.Photo.objects.all():
+        if not photo.local_filename:
+            continue
+
+        try:
+            # Compute filenames
+            fn_upload = os.path.join(dir_upload, photo.local_filename)
+            fn_photos = os.path.join(dir_photos, photo.local_filename)
+            log.info("%s | %s" % (photo, photo.local_filename))
+
+            # Add copyright exif tag to original
+            os.system("""exiftool "-EXIF:Copyright=%s" %s""" % (settings.EXIF_COPYRIGHT_TAG, fn_upload))
+
+            # Copy exif tags onto resized image
+            os.system("""exiftool -tagsFromFile %s %s""" % (fn_upload, fn_photos))
+
+            # Add exif tags to photo and save photo
+            exif = tools.exif.ExifToolHolder(fn_upload)
+            photo.exif = json.dumps(exif.values)
+            photo.exif_camera = "%s %s" % (exif.get("Make"), exif.get("Model"))
+            photo.exif_lens = exif.get("Lens") or exif.get("LensModel") or exif.get("LensInfo")
+            photo.exif_exposuretime = exif.get("ExposureTime")
+            photo.exif_aperture = exif.get("Aperture") or exif.get("FNumber") or exif.get("ApertureValue")
+            photo.exif_iso = exif.get("ISO")
+            photo.exif_focallength = exif.get("FocalLength")
+            photo.exif_flash = str(exif.get("FlashFired")) if exif.get("FlashFired") is not None else None
+            photo.save()
+
+        except Exception as e:
+            log.warn("- %s" % e)
+
+    return HttpResponse("200")
+
+
