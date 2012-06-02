@@ -27,9 +27,11 @@ urlpatterns = patterns('',
     url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
     url(r'^ajax/contact/$', 'mainapp.views.ajax_contact'),
 
+    url(r'^adminx/$', 'mainapp.views.admin_index'),
     url(r'^adminx/build_photo_urls/$', 'mainapp.views.admin_build_photo_urls'),
     url(r'^adminx/cache_clear/$', 'mainapp.views.admin_cache_clear'),
     url(r'^adminx/tmp/$', 'mainapp.views.admin_tmp'),
+    url(r'^adminx/mover/$', 'mainapp.views.admin_photo_mover'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

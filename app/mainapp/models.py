@@ -93,6 +93,7 @@ class Photo(caching.base.CachingMixin, models.Model):
     """
     objects = caching.base.CachingManager()
     date_created = models.DateTimeField('date created', auto_now_add=True)
+    order_id = models.IntegerField(default=0)
 
     # Who uploaded the photo
     user = models.ForeignKey(User)
@@ -201,6 +202,9 @@ class Photo(caching.base.CachingMixin, models.Model):
 @receiver(pre_save, sender=Photo)
 def photo_save_handler(sender, **kwargs):
     photo = kwargs["instance"]
+
+    if not photo.order_id:
+        photo.order_id = photo.pk
 
     if not photo.hash:
         photo.hash = Photo._mk_hash()

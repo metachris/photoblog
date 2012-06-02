@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title-left %}Admin Actions - {% endblock %}
+
+{% block body %}
+<h1>Admin Actions</h1>
+
+<br />
+
+<ul>
+
+    <li><a href="/adminx/cache_clear/">Clear Cache</a></li>
+    <li><a href="/adminx/mover/">Photo Mover</a></li>
+    <li><a href="/upload/">Photo Upload</a></li>
+    <li><a href="/p/notify/">Handout Notifications</a></li>
+</ul>
+{% endblock %}
+
+{% block js_bottom %}
+{% endblock %}
