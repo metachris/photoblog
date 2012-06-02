@@ -113,7 +113,7 @@ class Photo(caching.base.CachingMixin, models.Model):
     url = models.URLField()
 
     # Title, slug and hash
-    title = models.CharField(max_length=100, blank=True, default="")
+    title = models.CharField(max_length=100, blank=True, null=True)
     slug = models.CharField(max_length=100, blank=True, null=True)  # can be auto-generated with Photo._mk_slug
     hash = models.CharField(max_length=32)
 

@@ -6,7 +6,7 @@
 {% block title-left %}{{ photo.title }} - {% endblock %}
 
 {% block meta %}
-    <meta name="description" content="{{ photo|photo_alt }}">
+    <meta name="description" content="{{ photo|photo_alt }}.">
 {% endblock %}
 
 {% block body-class %}{% if not photo.is_portrait %}wide-enabled{% endif %}{% endblock %}

@@ -24,7 +24,7 @@ def photo_alt(photo):
     ret = "Photo '{photo.title}'"
     if photo.photographer or photo.date_captured or photo.location:
         ret += ", captured"
-    if photo.photographer:
+    if photo.photographer and photo.photographer.name:
         ret += " by {photo.photographer.name}"
     if photo.date_captured:
         if photo.photographer:

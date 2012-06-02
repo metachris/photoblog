@@ -472,7 +472,7 @@ def upload_photo(request):
                     exif_aperture=exif.get("Aperture") or exif.get("FNumber") or exif.get("ApertureValue"),
                     exif_iso=exif.get("ISO"),
                     exif_focallength=exif.get("FocalLength"),
-                    exif_flash=str(exif.get("FlashFired")) if exif.get("FlashFired") is not None else None,
+                    exif_flash=exif.get("FlashFired")
             )
             photo.save()
             log.info("- created")
