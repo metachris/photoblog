@@ -14,6 +14,7 @@ from django.core import exceptions
 from django.template.loader import get_template
 from django.template import Context, Template
 from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 
 from django.conf import settings
 
@@ -28,11 +29,13 @@ from mainapp.views.photopager import *
 log = logging.getLogger(__name__)
 
 
+@cache_page(60 * 15)
 def home(request):
     page = ThumbnailPager(Filters()).load_page()
     return render(request, 'index.html', {'page': page})
 
 
+@cache_page(60 * 15)
 def sitemap(request):
     sets = models.Set.objects.filter(published=True).order_by("-id")
     tags = models.Tag.objects.all().order_by("-id")
@@ -41,6 +44,7 @@ def sitemap(request):
     return render(request, 'sitemap.xml', {'photos': photos, "sets": sets, "locations": locations, "tags": tags})
 
 
+@cache_page(60 * 15)
 def photo(request, photo_slug):
     photo = models.Photo.objects.get(slug=photo_slug)
     tag_slug = request.GET.get("tag")
@@ -65,32 +69,33 @@ def photo(request, photo_slug):
     return render(request, 'mainapp/photo.html', {'photo': photo, "tag": tag_slug, "set": set_slug, "next": next, "prev": prev})
 
 
-def register(request):
-    if request.method == 'POST':
-        form = forms.RegisterForm(request.POST)
-
-        if form.is_valid():
-            user = User.objects.create_user(
-                form.cleaned_data["username"],
-                form.cleaned_data["email"],
-                form.cleaned_data["password"])
-            models.UserProfile.objects.create(user=user)
-            user_authenticated = auth.authenticate(
-                username=form.cleaned_data["username"],
-                password=form.cleaned_data["password"])
-            auth.login(request, user_authenticated)
-            return HttpResponseRedirect('/')
-    else:
-        form = forms.RegisterForm()
-
-    return render(request, 'register.html', {'form': form})
-
+#def register(request):
+#    if request.method == 'POST':
+#        form = forms.RegisterForm(request.POST)
+#
+#        if form.is_valid():
+#            user = User.objects.create_user(
+#                form.cleaned_data["username"],
+#                form.cleaned_data["email"],
+#                form.cleaned_data["password"])
+#            models.UserProfile.objects.create(user=user)
+#            user_authenticated = auth.authenticate(
+#                username=form.cleaned_data["username"],
+#                password=form.cleaned_data["password"])
+#            auth.login(request, user_authenticated)
+#            return HttpResponseRedirect('/')
+#    else:
+#        form = forms.RegisterForm()
+#
+#    return render(request, 'register.html', {'form': form})
+#
 
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
 
 
+@cache_page(60 * 15)
 def tags_list(request):
     """ Show a list of tags """
     class CountAwareTagTree(object):
@@ -137,6 +142,7 @@ def tags_list(request):
     return render(request, 'mainapp/tags.html', {'tags': tags, "photo_count": photo_count, "tag_count": tag_count})
 
 
+@cache_page(60 * 15)
 def locations_list(request):
     """ Show a list of locations """
     class CountAwareLocationTree(object):
@@ -183,6 +189,7 @@ def locations_list(request):
     return render(request, 'mainapp/locations.html', {'locations': locations, "photo_count": photo_count, "location_count": location_count})
 
 
+@cache_page(60 * 15)
 def sets_list(request):
     """ Show a sets of tags """
     sets = models.Set.objects.filter(published=True)
@@ -191,6 +198,7 @@ def sets_list(request):
     return render(request, 'mainapp/sets.html', {'sets': sets, "photo_count": photo_count, "sets_count": sets_count})
 
 
+@cache_page(60 * 15)
 def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
     tag = models.Tag.objects.get(slug=tag_slug)
@@ -198,6 +206,7 @@ def tag_photos(request, tag_slug):
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'page': page})
 
 
+@cache_page(60 * 15)
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
     location = models.Location.objects.get(slug=location_slug)
@@ -205,6 +214,7 @@ def location_photos(request, location_slug):
     return render(request, 'mainapp/location_photos.html', {'location': location, 'page': page})
 
 
+@cache_page(60 * 15)
 def set_photos(request, set_slug):
     """ Show photos in a set """
     set = models.Set.objects.get(slug=set_slug)

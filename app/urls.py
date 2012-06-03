@@ -40,7 +40,7 @@ urlpatterns = patterns('',
          {'template_name': 'login.html'}),
     (r'^accounts/login/$', 'django.contrib.auth.views.login',
          {'template_name': 'login.html'}),
-    url(r'^register/$', 'mainapp.views.register'),
+    #url(r'^register/$', 'mainapp.views.register'),
     url(r'^logout/$', 'mainapp.views.logout'),
 
     # Admin Url's
