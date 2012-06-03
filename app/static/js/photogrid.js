@@ -37,6 +37,8 @@ function load_photos(featured, cur_tag, cur_set) {
 
     // Make ajax request
     $.get("/ajax/photo/more",  args, function(data) {
+        console.log("More Photos 200: " + data);
+
         d = JSON.parse(data);
         photogrid_last_hash = d.last;
 

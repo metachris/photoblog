@@ -22,6 +22,7 @@ import mainapp.forms as forms
 import mainapp.tools as tools
 import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
+from mainapp.views.apis import *
 
 
 log = logging.getLogger(__name__)
@@ -230,6 +231,23 @@ def set_photos(request, set_slug):
 
 
 def ajax_photo_more(request):
+    pager = ThumbnailPager.from_request(request)
+    pager.next_page()
+
+    # Prepare return json
+    ret = {
+        "photos": [],
+        "has_more": pager.has_more,
+        "last_hash": pager.last_hash,
+    }
+
+    griditem_template = get_template('mainapp/photogrid_renderitem.html')
+    for photo in pager.photos:
+        ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
+
+    return HttpResponse(json.dumps(ret))
+
+    """
     last_hash = request.GET.get("last")
     photos_per_page = int(request.GET.get("n"))
     featured = request.GET.get("featured")
@@ -256,7 +274,7 @@ def ajax_photo_more(request):
     #print ret
 
     return HttpResponse(json.dumps(ret))
-
+    """
 
 def ajax_contact(request):
     if request.method == 'POST':
