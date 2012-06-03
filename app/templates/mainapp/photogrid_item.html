@@ -2,7 +2,7 @@
 {% load extras %}
 
 {% thumbnail photo.url "280x280" crop="center" as im %}
-<{% if li %}li{% else %}div{% endif %} class="photo-container">
+<li class="photo-container">
     <div class="photo-square">
         <a href="/photo/{{ photo.slug }}{% if tag %}?tag={{ tag.slug }}{% if set %}&set={{ set.slug }}{% endif %}{% else %}{% if set %}?set={{ set.slug }}{% endif %}{% endif %}" class="a-no-underline">
             <img src="{{ im.url }}" alt="{{ photo|photo_alt }}" width="{{ im.width }}" height="{{ im.height }}">
@@ -13,5 +13,5 @@
             </div>
         </a>
     </div>
-</{% if li %}li{% else %}div{% endif %}>
+</li>
 {% endthumbnail %}

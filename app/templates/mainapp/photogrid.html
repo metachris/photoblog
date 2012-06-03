@@ -1,23 +1,25 @@
-{% for photo in photos %}
-    {% include "mainapp/photogrid_item.html" %}
-{% endfor %}
+<ul class="photo-grid">
+    {% for photo in photos %}
+        {% include "mainapp/photogrid_item.html" %}
+    {% endfor %}
 
-{% if has_more %}
-<div class="photo-container" id="photo-container-more">
-    <a href="javascript:load_photos()" title="Load more photos...">
-        <div class="photo-square" style="text-align: center;">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <span class="default">more...</span>
-            <span class="loading">loading...</span>
-        </div>
-    </a>
-</div>
-{% endif %}
+    {% if has_more %}
+        <li class="photo-container" id="photo-container-more">
+            <a href="javascript:load_photos()" title="Load more photos...">
+                <div class="photo-square" style="text-align: center;">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <span class="default">more...</span>
+                    <span class="loading">loading...</span>
+                </div>
+            </a>
+        </li>
+    {% endif %}
+</ul>
 
 {% if filters %}
 <script type="text/javascript">

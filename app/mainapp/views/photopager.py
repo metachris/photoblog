@@ -1,7 +1,4 @@
-from django.http import HttpResponse
 import mainapp.models as models
-from django.template.context import Context
-from django.template.loader import get_template
 
 
 PHOTOS_PER_PAGE = 2
@@ -96,6 +93,8 @@ class ThumbnailPager(object):
         if self.photos_count:
             self.last_hash = self.filters.last_hash = self.photos[self.photos_count-1].hash
 
+        return self
+
     def _build_query(self):
         """
         This method builds a QuerySet out of one image filters object
@@ -124,11 +123,15 @@ class ThumbnailPager(object):
             for set_slug in self.filters.sets:
                 _set = models.Set.objects.get(slug=set_slug)
                 sets += [_set]
-                sets += _set.get_descendants()
             query = query.filter(sets__in=sets)
 
         if self.filters.location:
-            query = query.filter(location=self.filters.location)
+            locations = []
+            for location_slug in self.filters.location:
+                l = models.Location.objects.get(slug=location_slug)
+                locations += [l]
+                locations += l.get_descendants()
+            query = query.filter(location__in=locations)
 
         query = query.order_by("-order_id")[:PHOTOS_PER_PAGE+1]  # +1 to see whether there are more
         #print query.query

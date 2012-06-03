@@ -22,18 +22,15 @@ import mainapp.forms as forms
 import mainapp.tools as tools
 import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
-from mainapp.views.apis import *
+from mainapp.views.photopager import *
 
 
 log = logging.getLogger(__name__)
 
 
 def home(request):
-    #return HttpResponse("Hello, world. You're at the poll index.")
-    # raise Http404
-    photos_per_page = 10
-    photos = models.Photo.objects.filter(published=True, featured=True).order_by("-id")[:photos_per_page]
-    return render(request, 'index.html', {'photos': photos, "count": photos_per_page})
+    page = ThumbnailPager(Filters()).load_page()
+    return render(request, 'index.html', {'page': page})
 
 
 def sitemap(request):
@@ -199,44 +196,22 @@ def sets_list(request):
 def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
     tag = models.Tag.objects.get(slug=tag_slug)
-    tags = [tag]
-    tags += tag.get_descendants()
-    photos = models.Photo.objects.filter(tags__in=tags, published=True).order_by("-id")[:10]
-#    if len(photos) == 1:
-#        return HttpResponseRedirect('/photo/%s' % photos[0].slug)
-
-    return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
-
-
-def tag_photos_new(request, tag_slug):
-    """ Show photos with a specific tag """
-    tag = models.Tag.objects.get(slug=tag_slug)
-    filters = Filters(tags=[tag_slug])
-    pager = ThumbnailPager(filters)
-    pager.load_page()
-    return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'pager': pager})
+    page = ThumbnailPager(Filters(tags=[tag_slug])).load_page()
+    return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'page': page})
 
 
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
     location = models.Location.objects.get(slug=location_slug)
-    locations = [location]
-    locations  += location.get_descendants()
-    photos = models.Photo.objects.filter(location__in=locations, published=True).order_by("-id")[:10]
-#    if len(photos) == 1:
-#        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
-
-    return render(request, 'mainapp/location_photos.html', {'location': location, 'photos': photos})
+    page = ThumbnailPager(Filters(location=location_slug)).load_page()
+    return render(request, 'mainapp/location_photos.html', {'location': location, 'page': page})
 
 
 def set_photos(request, set_slug):
     """ Show photos in a set """
     set = models.Set.objects.get(slug=set_slug)
-    photos = models.Photo.objects.filter(sets=set, published=True).order_by("-id")[:10]
-    if len(photos) == 1:
-        return HttpResponseRedirect('/photo/%s' % photos[0].hash)
-
-    return render(request, 'mainapp/set_photos.html', {'set': set, 'photos': photos})
+    page = ThumbnailPager(Filters(sets=[set_slug])).load_page()
+    return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
 
 def ajax_photo_more(request):
@@ -256,34 +231,6 @@ def ajax_photo_more(request):
 
     return HttpResponse(json.dumps(ret))
 
-    """
-    last_hash = request.GET.get("last")
-    photos_per_page = int(request.GET.get("n"))
-    featured = request.GET.get("featured")
-    tag_slug = request.GET.get("tag")
-    set_slug = request.GET.get("set")
-
-    photo_last = models.Photo.objects.get(hash=last_hash)
-    photos = models.Photo.objects.filter(id__lt=photo_last.id, published=True)
-    if featured: photos = photos.filter(featured=True)
-    if tag_slug: photos = photos.filter(tags__slug=tag_slug)
-    if set_slug: photos = photos.filter(sets__slug=set_slug)
-    photos = photos.order_by("-id")
-
-    ret = {
-        "photos": [],
-        "has_more": photos.count() - photos_per_page > 0
-    }
-
-    griditem_template = get_template('mainapp/photogrid_item.html')
-    for photo in photos[:photos_per_page]:
-        ret["photos"].append(griditem_template.render(Context({ "photo": photo })));
-
-    ret["last"] = photo.hash
-    #print ret
-
-    return HttpResponse(json.dumps(ret))
-    """
 
 def ajax_contact(request):
     if request.method == 'POST':
