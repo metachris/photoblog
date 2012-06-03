@@ -67,6 +67,8 @@ def build_gzip():
     for root_path in build_abspaths:
         for (path, dirs, files) in os.walk(root_path):
             for file in files:
+                if file.endswith(".gz"):
+                    continue
                 fn = os.path.join(path, file)
                 print "- %s" % fn
                 cmd = "gzip -c %(file)s > %(file)s.gz" % { "file": fn }

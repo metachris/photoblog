@@ -1,12 +1,12 @@
 function sortable() {
-    $( ".photo-list" ).sortable({
+    $( ".photo-grid" ).sortable({
         update: function(event, ui) {
             console.log(event);
             console.log(ui);
             console.log(ui.position);
         }
     });
-    $( ".photo-list" ).disableSelection();
+    $( ".photo-grid" ).disableSelection();
 }
 
 $(document).ready(function(){
@@ -16,6 +16,6 @@ $(document).ready(function(){
 });
 
 window.onMorePhotosLoaded = function() {
-    $( ".photo-list" ).sortable("refresh");
+    $( ".photo-grid" ).sortable("refresh");
     console.log("asd");
 };

@@ -25,6 +25,7 @@ import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 import mainapp.tools.photo_upload as photo_upload
 import mainapp.tools.exif as exif
+from mainapp.views.photopager import ThumbnailPager, Filters
 
 
 log = logging.getLogger(__name__)
@@ -189,6 +190,5 @@ def admin_tmp(request):
 @login_required
 def admin_photo_mover(request):
     # Move photos around
-    photos_per_page = 10
-    photos = models.Photo.objects.filter(published=True, featured=True).order_by("-id")[:photos_per_page]
-    return render(request, 'mainapp/admin/photo_mover.html', {'photos': photos, "count": photos_per_page})
+    page = ThumbnailPager(Filters(featured=True)).load_page()
+    return render(request, 'mainapp/admin/photo_mover.html', {'page': page })
