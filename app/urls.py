@@ -26,6 +26,7 @@ urlpatterns = patterns('',
 
     url(r'^ajax/photo/more/$', 'mainapp.views.ajax_photo_more'),
     url(r'^ajax/contact/$', 'mainapp.views.ajax_contact'),
+    url(r'^ajax/admin/photo-move/?$', 'mainapp.views.ajax_admin_photo_move'),
 
     url(r'^api/thumbnail/$', 'mainapp.views.ajax_contact'),
 

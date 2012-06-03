@@ -192,3 +192,49 @@ def admin_photo_mover(request):
     # Move photos around
     page = ThumbnailPager(Filters(featured=True)).load_page()
     return render(request, 'mainapp/admin/photo_mover.html', {'page': page })
+
+
+def move_photo_in_front_of(hash_photo, hash_next):
+    """Move photo with hash_photo in front of photo with hash_next"""
+    photo = models.Photo.objects.get(hash=hash_photo)
+    photo_next = models.Photo.objects.get(hash=hash_next)
+    print photo.order_id, ">", photo_next.order_id+1
+
+    if photo.order_id > photo_next.order_id:
+        # photo_next stays the same
+        # photo gets it's id+1
+        # all photos in between +1
+        photos = models.Photo.objects.filter(order_id__lt=photo.order_id).filter(order_id__gt=photo_next.order_id).order_by("-order_id")
+        for p in photos:
+            p.order_id += 1
+            p.save()
+        photo.order_id = photo_next.order_id + 1
+        photo.save()
+
+    else:
+        # Moving up.
+        # - this gets photo_next's order_id
+        # - photo_next gets -1
+        # - all in between get -1
+        photos = models.Photo.objects.filter(order_id__lt=photo_next.order_id).filter(order_id__gt=photo.order_id).order_by("-order_id")
+        for p in photos:
+            p.order_id -= 1
+            p.save()
+
+        photo.order_id = photo_next.order_id
+        photo.save()
+
+        photo_next.order_id = photo_next.order_id - 1
+        photo_next.save()
+
+
+@login_required
+def ajax_admin_photo_move(request):
+    """ Move photo before another photo (via Photo.order_id)"""
+    moves = request.GET.get("moves")
+    for move in moves.split("|"):
+        arr = move.split("_")
+        hash_photo = arr[0]
+        hash_next = arr[1]
+        move_photo_in_front_of(hash_photo, hash_next)
+    return HttpResponse("200")
