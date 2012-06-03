@@ -54,5 +54,8 @@ function load_photos(featured, cur_tag, cur_set) {
         }
 
         is_loading = false;
+        if (window.onMorePhotosLoaded) {
+            window.onMorePhotosLoaded();
+        }
     })
 }

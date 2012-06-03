@@ -2,6 +2,12 @@
 
 {% block title-left %}Photo Mover - {% endblock %}
 
+{% block meta-css %}
+<link href="{{ STATIC_URL }}css/admin.css" rel="stylesheet">
+{% endblock %}
+
+{% block body-class %}photogrid{% endblock %}
+
 {% block body %}
 <h1>Admin Action: Photo Mover</h1>
 
@@ -10,7 +16,7 @@
     <div class="span12">
 
         <div class="caption">Recently Added Photos</div>
-        <ul id="photo-list sortable">
+        <ul class="photo-list">
         {% with li=1 %}
             {% include "mainapp/photogrid.html" %}
         {% endwith %}
