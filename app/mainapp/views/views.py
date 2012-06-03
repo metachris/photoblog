@@ -186,10 +186,8 @@ def locations_list(request):
 def sets_list(request):
     """ Show a sets of tags """
     sets = models.Set.objects.filter(published=True)
-
     photo_count = models.Photo.objects.all().count()
     sets_count = models.Set.objects.all().count()
-
     return render(request, 'mainapp/sets.html', {'sets': sets, "photo_count": photo_count, "sets_count": sets_count})
 
 

@@ -1,3 +1,7 @@
+import hashlib
+
+from django.core.cache import cache
+
 import mainapp.models as models
 
 
@@ -49,6 +53,49 @@ class Filters(object):
         return "<Filters%s>" % self.to_dict()
 
 
+def filters_to_query(filters, limit=PHOTOS_PER_PAGE):
+    """
+    This method builds a QuerySet out of one  filters object
+    """
+    # 1. see if this query is already cached
+    query = models.Photo.objects.filter(published=True)
+
+    if filters.last_hash:
+        photo_last = models.Photo.objects.get(hash=filters.last_hash)
+        query = query.filter(order_id__lt=photo_last.order_id)
+
+    if filters.featured_only:
+        query = query.filter(featured=True)
+
+    if filters.tags:
+        # These tags and all their descendants
+        tags = []
+        for tag_slug in filters.tags:
+            tag = models.Tag.objects.get(slug=tag_slug)
+            tags += [tag]
+            tags += tag.get_descendants()
+        query = query.filter(tags__in=tags)
+
+    if filters.sets:
+        # These sets and all their descendants
+        sets = []
+        for set_slug in filters.sets:
+            _set = models.Set.objects.get(slug=set_slug)
+            sets += [_set]
+        query = query.filter(sets__in=sets)
+
+    if filters.location:
+        locations = []
+        for location_slug in filters.location:
+            l = models.Location.objects.get(slug=location_slug)
+            locations += [l]
+            locations += l.get_descendants()
+        query = query.filter(location__in=locations)
+
+    query = query.order_by("-order_id")[:limit]  # +1 to see whether there are more
+    #print query.query
+    return query
+
 class ThumbnailPager(object):
     """
     Helper to move between pages
@@ -80,14 +127,15 @@ class ThumbnailPager(object):
         """
         # Get the db query for these filters
         print "filters:", str(self.filters)
-        self.photo_query = self._build_query()
+        self.photo_query = filters_to_query(self.filters, limit=PHOTOS_PER_PAGE+1)
 
+        count = self.photo_query.count()
         # Poor mans has-more: get 1 more than requested
-        self.has_more = self.photo_query.count() > PHOTOS_PER_PAGE
+        self.has_more = count > PHOTOS_PER_PAGE
 
         # Save photos (trim the extra item if needed)
         self.photos = self.photo_query[:PHOTOS_PER_PAGE]
-        self.photos_count = self.photos.count()
+        self.photos_count = count if count < PHOTOS_PER_PAGE else count-1
 
         # Save last photos hash
         if self.photos_count:
@@ -95,45 +143,4 @@ class ThumbnailPager(object):
 
         return self
 
-    def _build_query(self):
-        """
-        This method builds a QuerySet out of one image filters object
-        """
-        query = models.Photo.objects.filter(published=True)
-
-        if self.filters.last_hash:
-            photo_last = models.Photo.objects.get(hash=self.filters.last_hash)
-            query = query.filter(order_id__lt=photo_last.order_id)
-
-        if self.filters.featured_only:
-            query = query.filter(featured=True)
-
-        if self.filters.tags:
-            # These tags and all their descendants
-            tags = []
-            for tag_slug in self.filters.tags:
-                tag = models.Tag.objects.get(slug=tag_slug)
-                tags += [tag]
-                tags += tag.get_descendants()
-            query = query.filter(tags__in=tags)
-
-        if self.filters.sets:
-            # These sets and all their descendants
-            sets = []
-            for set_slug in self.filters.sets:
-                _set = models.Set.objects.get(slug=set_slug)
-                sets += [_set]
-            query = query.filter(sets__in=sets)
-
-        if self.filters.location:
-            locations = []
-            for location_slug in self.filters.location:
-                l = models.Location.objects.get(slug=location_slug)
-                locations += [l]
-                locations += l.get_descendants()
-            query = query.filter(location__in=locations)
-
-        query = query.order_by("-order_id")[:PHOTOS_PER_PAGE+1]  # +1 to see whether there are more
-        #print query.query
-        return query
 
