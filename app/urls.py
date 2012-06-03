@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^location/(?P<location_slug>.*)/$', 'mainapp.views.location_photos'),
 
     url(r'^tags/$', 'mainapp.views.tags_list'),
-    url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag_photos'),
+    url(r'^tag/(?P<tag_slug>.*)/$', 'mainapp.views.tag_photos_new'),
 
     url(r'^sets/$', 'mainapp.views.sets_list'),
     url(r'^set/(?P<set_slug>.*)/$', 'mainapp.views.set_photos'),

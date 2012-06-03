@@ -4,7 +4,7 @@ from django.template.context import Context
 from django.template.loader import get_template
 
 
-PHOTOS_PER_PAGE = 3
+PHOTOS_PER_PAGE = 2
 
 
 class Filters(object):
@@ -16,12 +16,18 @@ class Filters(object):
     # For paging
     last_hash = None
 
+    keys = ["tags", "sets", "location", "featured_only", "last_hash"]
+
+    def __init__(self, *args, **kwargs):
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
     @staticmethod
     def from_dict(vars):
         ret = Filters()
-        ret.last_hash = vars.get("last-hash")
-        ret.location = vars.get("location")
-        if vars.get("featured-only") is not None:
+        ret.last_hash = vars.get("last_hash") or None
+        ret.location = vars.get("location") or None
+        if vars.get("featured_only") is not None:
             ret.featured = vars.get("featured-only")
         if vars.get("tags"):
             ret.tags = vars.get("tags").split("+")
@@ -30,8 +36,17 @@ class Filters(object):
         return ret
 
     def to_dict(self):
-        keys = ["tags", "sets", "location", "featured_only", "last_hash"]
-        return { k: getattr(self, k) for k in keys }
+        return { k: getattr(self, k) for k in self.keys }
+
+    def to_html_dict(self):
+        r = {
+            "tags": "+".join(self.tags) if self.tags else "",
+            "sets": "+".join(self.sets) if self.sets else "",
+            "location": self.location or "",
+            "featured_only": 1 if self.featured_only else -1 if self.featured_only is not None else 0,
+            "last_hash": self.last_hash or "",
+        }
+        return r
 
     def __str__(self):
         return "<Filters%s>" % self.to_dict()
@@ -47,28 +62,21 @@ class ThumbnailPager(object):
     has_more = False
     photos = None
 
-    @staticmethod
-    def from_request(request):
-        ret = ThumbnailPager()
-        if request.method == 'GET':
-            ret.filters = Filters.from_dict(request.GET)
-        elif request.method == 'POST':
-            ret.filters = Filters.from_dict(request.POST)
-        return ret
+    def __init__(self, filters):
+        self.filters = filters
 
     @staticmethod
-    def from_filters(filters):
-        ret = ThumbnailPager()
-        ret.filters = filters
-        return ret
+    def from_request(request):
+        if request.method == 'GET':
+            return ThumbnailPager(Filters.from_dict(request.GET))
+        elif request.method == 'POST':
+            return ThumbnailPager(Filters.from_dict(request.POST))
 
     @staticmethod
     def from_dict(vars):
-        ret = ThumbnailPager()
-        ret.filters = Filters.from_dict(vars)
-        return ret
+        return ThumbnailPager(Filters.from_dict(vars))
 
-    def next_page(self):
+    def load_page(self):
         """
         Get one page of thumbnails for this set of filters.
         If last_hash is given, use all photos with order_id < that one
@@ -86,7 +94,7 @@ class ThumbnailPager(object):
 
         # Save last photos hash
         if self.photos_count:
-            self.last_hash = self.photos[self.photos_count-1].hash
+            self.last_hash = self.filters.last_hash = self.photos[self.photos_count-1].hash
 
     def _build_query(self):
         """
@@ -125,3 +133,4 @@ class ThumbnailPager(object):
         query = query.order_by("-order_id")[:PHOTOS_PER_PAGE+1]  # +1 to see whether there are more
         #print query.query
         return query
+

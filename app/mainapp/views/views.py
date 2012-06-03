@@ -208,6 +208,15 @@ def tag_photos(request, tag_slug):
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'photos': photos})
 
 
+def tag_photos_new(request, tag_slug):
+    """ Show photos with a specific tag """
+    tag = models.Tag.objects.get(slug=tag_slug)
+    filters = Filters(tags=[tag_slug])
+    pager = ThumbnailPager(filters)
+    pager.load_page()
+    return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'pager': pager})
+
+
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
     location = models.Location.objects.get(slug=location_slug)
@@ -232,7 +241,7 @@ def set_photos(request, set_slug):
 
 def ajax_photo_more(request):
     pager = ThumbnailPager.from_request(request)
-    pager.next_page()
+    pager.load_page()
 
     # Prepare return json
     ret = {
@@ -241,7 +250,7 @@ def ajax_photo_more(request):
         "last_hash": pager.last_hash,
     }
 
-    griditem_template = get_template('mainapp/photogrid_renderitem.html')
+    griditem_template = get_template('mainapp/photogrid_item.html')
     for photo in pager.photos:
         ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
 
@@ -266,7 +275,7 @@ def ajax_photo_more(request):
         "has_more": photos.count() - photos_per_page > 0
     }
 
-    griditem_template = get_template('mainapp/photogrid_renderitem.html')
+    griditem_template = get_template('mainapp/photogrid_item.html')
     for photo in photos[:photos_per_page]:
         ret["photos"].append(griditem_template.render(Context({ "photo": photo })));
 

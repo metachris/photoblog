@@ -13,25 +13,6 @@
         <div class="caption">Recently Added Photos</div>
         {% include "mainapp/photogrid.html" %}
 
-        <script type="text/javascript">
-            var photos_per_page = {{ count }};
-        </script>
-
-        <div class="photo-container" id="photo-container-more">
-            <a href="javascript:load_photos(true)" title="Load more photos...">
-                <div class="photo-square" style="text-align: center;">
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <span class="default">more...</span>
-                    <span class="loading">loading...</span>
-                </div>
-            </a>
-        </div>
-
     </div>
 </div>
 {% endblock %}

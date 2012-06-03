@@ -1,10 +1,10 @@
 $(document).ready(function(){
     $(".photo-container").each(function() {
-        set_photo_click_handler($(this));
+        set_photo_hover_handler($(this));
     })
 });
 
-function set_photo_click_handler(el) {
+function set_photo_hover_handler(el) {
     el.hover(function() {
         $(this).find(".photo-caption").show();
     }, function() {
@@ -13,9 +13,8 @@ function set_photo_click_handler(el) {
 }
 
 var is_loading = false;
-// `photos_per_page` is set in the template
 
-function load_photos(featured, cur_tag, cur_set) {
+function load_photos() {
     if (is_loading) {
         console.log("Already loading.");
         return;
@@ -27,25 +26,19 @@ function load_photos(featured, cur_tag, cur_set) {
     $("#photo-container-more .loading").show();
 
     // Build arguments
-    var args = {
-        n: photos_per_page,
-        last: photogrid_last_hash
-    };
-    if (featured) args["featured"] = 1;
-    if (cur_tag) args["tag"] = cur_tag;
-    if (cur_set) args["set"] = cur_set;
+    console.log(photogrid_info);
 
     // Make ajax request
-    $.get("/ajax/photo/more",  args, function(data) {
-        console.log("More Photos 200: " + data);
+    $.get("/ajax/photo/more", photogrid_info, function(data) {
+        console.log("More Photos 200");
 
         d = JSON.parse(data);
-        photogrid_last_hash = d.last;
+        photogrid_info["last_hash"] = d.last_hash;
 
         for (var i=0; i<d.photos.length; i++) {
             item = $(d.photos[i]);
             item.insertBefore("#photo-container-more");
-            set_photo_click_handler(item);
+            set_photo_hover_handler(item);
         }
 
         if (d.has_more) {
