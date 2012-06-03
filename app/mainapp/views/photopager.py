@@ -5,7 +5,7 @@ from django.core.cache import cache
 import mainapp.models as models
 
 
-PHOTOS_PER_PAGE = 2
+PHOTOS_PER_PAGE = 10
 
 
 class Filters(object):
