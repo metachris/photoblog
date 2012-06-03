@@ -6,7 +6,41 @@
 <h1>Admin Action: Photo Mover</h1>
 
 <br />
+<div class="row">
+    <div class="span12">
+
+        <div class="caption">Recently Added Photos</div>
+        <ul id="photo-list sortable">
+        {% with li=1 %}
+            {% include "mainapp/photogrid.html" %}
+        {% endwith %}
+        </ul>
+
+        <script type="text/javascript">
+            var photos_per_page = {{ count }};
+        </script>
+
+        <div class="photo-container" id="photo-container-more">
+            <a href="javascript:load_photos(true)" title="Load more photos...">
+                <div class="photo-square" style="text-align: center;">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <span class="default">more...</span>
+                    <span class="loading">loading...</span>
+                </div>
+            </a>
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block js_bottom %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script src="{{ STATIC_URL }}js/photogrid.js"></script>
+<script src="{{ STATIC_URL }}js/photogrid_mover.js"></script>
 {% endblock %}

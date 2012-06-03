@@ -99,9 +99,6 @@ def init_server():
     # Upload target-specific settings file and other files not in git
     upload_files_notingit()
 
-    # Build customized twitter bootstrap for the first time
-    _update_bootstrap()
-
     # Collect the static directory
     _make_static()
 
@@ -144,14 +141,15 @@ def upload_files_notingit():
 
 
 def _make_static():
-    """Prepare static dir for collection for deployment"""
-    # 1. convert static/css/*.less files to css files
-    with cd(os.path.join(env.dir_remote, "app/static/css/")):
-        run("sh less_build_all.sh")
+    """
+    Prepare static dir for collection for deployment:
 
-    # 2. pre-gzip all css, js files in static/
+    1. Make Bootstrap
+    2. Make Less files
+    3. Pre-Gzip all static files for nginx
+    """
     with cd(os.path.join(env.dir_remote, "app/static/")):
-        run("sh gzip_static.sh")
+        run("./build.py all")
 
     # 3. collect final static files into separate dir outside of project
     with cd(env.dir_remote):
@@ -191,7 +189,6 @@ def deploy():
 
     # Upload stuff and build all the statics
     upload_files_notingit()
-    _update_bootstrap()
     _make_static()
 
     # Finally reload uwsgi
@@ -218,7 +215,6 @@ def rollback(hash):
     hash_before = _get_cur_hash()
     with cd(env.dir_remote):
         run("git reset --hard %s" % hash)
-    _update_bootstrap()
     _make_static()
     hash_after = _get_cur_hash()
 

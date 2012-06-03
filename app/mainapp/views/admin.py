@@ -189,4 +189,6 @@ def admin_tmp(request):
 @login_required
 def admin_photo_mover(request):
     # Move photos around
-    return render(request, 'mainapp/admin/photo_mover.html')
+    photos_per_page = 10
+    photos = models.Photo.objects.filter(published=True, featured=True).order_by("-id")[:photos_per_page]
+    return render(request, 'mainapp/admin/photo_mover.html', {'photos': photos, "count": photos_per_page})

@@ -8,6 +8,6 @@ logs/
 settings_dev.py
 settings_production.py
 app/templates/analytics_snippet.html
-
+app/static/css
 media/
 app/static/*.gz
