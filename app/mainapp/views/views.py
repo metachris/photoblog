@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 @cache_page(60 * 15)
 def home(request):
-    page = ThumbnailPager(Filters()).load_page()
+    page = ThumbnailPager().load_page()
     return render(request, 'index.html', {'page': page})
 
 

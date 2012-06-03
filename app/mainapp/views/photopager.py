@@ -9,6 +9,12 @@ PHOTOS_PER_PAGE = 10
 
 
 class Filters(object):
+    """
+    Represent any possible combination of filters for browsing the photos.
+
+    This class simplifies using this system by having the code in one place
+    and referencing it from many views.
+    """
     tags = None  # list of tag slugs
     sets = None  # list of set slugs
     location = None  # location slug
@@ -17,27 +23,24 @@ class Filters(object):
     # For paging
     last_hash = None
 
-    keys = ["tags", "sets", "location", "featured_only", "last_hash"]
-
     def __init__(self, *args, **kwargs):
+        """Lazy init method (eg. Filters(tags=[mytags]))"""
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
     @staticmethod
     def from_dict(vars):
-        ret = Filters()
-        ret.last_hash = vars.get("last_hash") or None
-        ret.location = vars.get("location") or None
-        if vars.get("featured_only") is not None:
-            ret.featured = vars.get("featured-only")
-        if vars.get("tags"):
-            ret.tags = vars.get("tags").split("+")
-        if vars.get("sets"):
-            ret.sets = vars.get("sets").split("+")
-        return ret
+        return Filters(
+            last_hash=vars.get("last_hash") or None,
+            location=vars.get("location") or None,
+            featured=vars.get("featured-only") if vars.get("featured-only") is not None else None,
+            tags=vars.get("tags").split("+") if vars.get("tags") else None,
+            sets=vars.get("sets").split("+") if vars.get("sets") else None
+        )
 
     def to_dict(self):
-        return { k: getattr(self, k) for k in self.keys }
+        keys = ["tags", "sets", "location", "featured_only", "last_hash"]
+        return { k: getattr(self, k) for k in keys }
 
     def to_html_dict(self):
         r = {
@@ -106,7 +109,7 @@ class ThumbnailPager(object):
     has_more = False
     photos = None
 
-    def __init__(self, filters):
+    def __init__(self, filters=Filters()):
         self.filters = filters
 
     @staticmethod

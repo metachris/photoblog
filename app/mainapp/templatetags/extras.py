@@ -29,16 +29,15 @@ def photo_alt(photo):
     if cached:
         return cached
 
-    ret = "Photo '{photo.title}'"
-    if photo.photographer or photo.date_captured or photo.location:
+    ret = "Photo '{photo.title}'" if photo.title else "Untitled photo"
+    if (photo.photographer and photo.photographer.name) or photo.date_captured or photo.location:
         ret += ", captured"
     if photo.photographer and photo.photographer.name:
         ret += " by {photo.photographer.name}"
     if photo.date_captured:
-        if photo.photographer:
-            ret += " on %s" % date_filter(photo.date_captured)
+        ret += " on %s" % date_filter(photo.date_captured)
     if photo.location:
-            ret += " in {photo.location.name}"
+        ret += " in {photo.location.name}"
     ret = ret.format(photo=photo).replace('"', "'")
     cache.set(key, ret, 60)
     return ret
