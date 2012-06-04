@@ -46,6 +46,9 @@ def build_css():
 
     # Build all the less files
     for (path, dirs, files) in os.walk(path_source):
+        if not path == path_source:
+            # Skip subdirectories
+            continue
         for file in files:
             if file.endswith("less"):
                 fn = os.path.join(path, file)
