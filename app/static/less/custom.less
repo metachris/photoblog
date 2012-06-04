@@ -66,6 +66,7 @@ body.photogrid .page-header {
 .page-header #topnav a {
     padding-left:20px;
     color: @grayLight;
+    .transition(color 0.2s);
 }
 
 .page-header #topnav a:hover {
@@ -85,8 +86,9 @@ body.photogrid .page-header {
     width:280px;
     margin-right: 18px;
     margin-bottom: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
     .border-radius(2px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    .transition(border 0.5s);
 }
 
 .photo-container:hover {
