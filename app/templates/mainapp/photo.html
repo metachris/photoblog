@@ -14,8 +14,8 @@
 {% block body %}
 <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="span2 span-prev">
-        {% if prev %}
-        <a href="/photo/{{ next.slug }}{% if linkvars %}?{{ linkvars }}{% endif %}" title="{{ prev.title }}">&lt; prev.</a>
+        {% if next %}
+        <a href="/photo/{{ next.slug }}{% if linkvars %}?{{ linkvars }}{% endif %}" title="{{ next.title }}">&lt; prev.</a>
         {% endif %}
     </div>
 
@@ -24,8 +24,8 @@
     </div>
 
     <div class="span2 span-next" style="text-align: right;">
-        {% if next %}
-        <a href="/photo/{{ prev.slug }}{% if linkvars %}?{{ linkvars }}{% endif %}" title="{{ next.title }}">next &gt;</a>
+        {% if prev %}
+        <a href="/photo/{{ prev.slug }}{% if linkvars %}?{{ linkvars }}{% endif %}" title="{{ prev.title }}">next &gt;</a>
         {% endif %}
     </div>
 </div>
