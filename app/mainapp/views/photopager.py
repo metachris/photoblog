@@ -89,14 +89,12 @@ def filters_to_query(filters, limit=PHOTOS_PER_PAGE):
 
     if filters.location:
         locations = []
-        for location_slug in filters.location:
-            l = models.Location.objects.get(slug=location_slug)
-            locations += [l]
-            locations += l.get_descendants()
+        l = models.Location.objects.get(slug=filters.location)
+        locations += [l]
+        locations += l.get_descendants()
         query = query.filter(location__in=locations)
 
     query = query.order_by("-order_id")[:limit]  # +1 to see whether there are more
-    #print query.query
     return query
 
 class ThumbnailPager(object):

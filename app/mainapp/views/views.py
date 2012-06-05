@@ -52,8 +52,8 @@ def photo(request, photo_slug):
     set_slug = request.GET.get("set")
 
     # Get next and previous photo, based on current browsing
-    q_next = models.Photo.objects.filter(id__gt=photo.id, published=True).order_by("id")
-    q_prev = models.Photo.objects.filter(id__lt=photo.id, published=True).order_by("-id")
+    q_next = models.Photo.objects.filter(id__gt=photo.id, published=True).order_by("order_id")
+    q_prev = models.Photo.objects.filter(id__lt=photo.id, published=True).order_by("-order_id")
     if tag_slug:
         tag = models.Tag.objects.get(slug=tag_slug)
         tags = [tag]
