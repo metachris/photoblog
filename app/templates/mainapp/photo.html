@@ -34,7 +34,7 @@
     <div class="span12" style="text-align: center; padding-top: 10px;">
 
         <div style="{% if photo.is_portrait %}display:inline-block;{% endif %}">
-        <div id="photo-main-container" class="normal">
+        <div id="photo-main-container" class="normal {% if photo.is_portrait %}portrait{% else %}landscape{% endif %}">
             <div id="photo-main-frame">
                 <img src="{{ photo.url }}" alt="{{ photo|photo_alt }}" class="frame{% if photo.is_portrait %} portrait{% endif %}">
             </div>
