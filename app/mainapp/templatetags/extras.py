@@ -22,13 +22,14 @@ def custom_upper(value):
 
 @register.filter
 def photo_alt(photo):
-    key = "photo<%s>-alt:" % photo.id
+    key = "photo-alt:%s" % photo.id
 
     # See if we can get that cached
     cached = cache.get(key)
     if cached:
         return cached
 
+    # Else build, cache and return
     ret = "Photo '{photo.title}'" if photo.title else "Untitled photo"
     if (photo.photographer and photo.photographer.name) or photo.date_captured or photo.location:
         ret += ", captured"
@@ -41,13 +42,3 @@ def photo_alt(photo):
     ret = ret.format(photo=photo).replace('"', "'")
     cache.set(key, ret, 60)
     return ret
-
-#@register.tag
-#def get_contact_form(parser, token):
-#    class ContactFormRenderer(template.Node):
-#        def render(self, context):
-#            # Get the contact form
-#            contact_form = mainapp.forms.ContactForm()
-#            return contact_form.as_p()
-#    return ContactFormRenderer()
-

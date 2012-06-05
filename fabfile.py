@@ -191,6 +191,10 @@ def deploy():
     upload_files_notingit()
     _make_static()
 
+    # !!!!!!!!!!!!!!!!!!!!!!!!!
+    # TODO: Clear Cache!!!!!!!!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!
+
     # Finally reload uwsgi
     reload_uwsgi()
 
