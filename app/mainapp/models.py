@@ -203,9 +203,6 @@ class Photo(caching.base.CachingMixin, models.Model):
 def photo_save_handler(sender, **kwargs):
     photo = kwargs["instance"]
 
-    if not photo.order_id:
-        photo.order_id = photo.pk
-
     if not photo.hash:
         photo.hash = Photo._mk_hash()
 

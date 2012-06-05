@@ -138,6 +138,10 @@ def upload_photo(request):
                 exif_flash=exif.get("FlashFired")
             )
             photo.save()
+
+            photo.order_id = photo.id
+            photo.save()
+
             log.info("- created")
 
             return render(request, 'mainapp/admin/upload.html', {"photo": photo})
