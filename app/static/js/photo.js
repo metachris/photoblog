@@ -9,7 +9,7 @@ function on_fullscreen_change(is_fullscreen) {
 }
 
 $(document).ready(function(){
-    $("#photo-main-container").click(function() {
+    $("#photo-main-container img").click(function() {
         try {
             // Toggle full screen in capable browsers
             var e = document.getElementById("photo-main-container");

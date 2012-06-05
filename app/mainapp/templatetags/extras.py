@@ -42,3 +42,4 @@ def photo_alt(photo):
     ret = ret.format(photo=photo).replace('"', "'")
     cache.set(key, ret, 60)
     return ret
+

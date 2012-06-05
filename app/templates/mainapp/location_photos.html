@@ -10,7 +10,7 @@
 
         <div class="caption">Photos taken in '{% for l in location.get_ancestors %}<a href="/location/{{ l.slug }}">{{ l.name }}</a> / {% endfor %}<a href="/location/{{ location.slug }}">{{ location.name }}</a>'</div>
 
-        {% with photos=page.photos has_more=page.has_more filters=page.filters %}
+        {% with photos=page.photos has_more=page.has_more filters=page.filters photo_link_attr="location" photo_link_val=location.slug %}
             {% include "mainapp/photogrid.html" %}
         {% endwith %}
 

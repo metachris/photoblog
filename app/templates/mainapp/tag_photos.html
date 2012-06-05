@@ -10,7 +10,7 @@
 
         <div class="caption">Photos tagged '{% for t in tag.get_ancestors %}<a href="/tag/{{ t.slug }}">{{ t.name }}</a> / {% endfor %}<a href="/tag/{{ tag.slug }}">{{ tag.name }}</a>'</div>
 
-        {% with photos=page.photos has_more=page.has_more filters=page.filters %}
+        {% with photos=page.photos has_more=page.has_more filters=page.filters photo_link_attr="tag" photo_link_val=tag.slug %}
             {% include "mainapp/photogrid.html" %}
         {% endwith %}
 

@@ -10,7 +10,7 @@
 
         <div class="caption">Photos in Collection '<a href="/set/{{ set.slug }}">{{ set.title }}</a>'</div>
 
-        {% with photos=page.photos has_more=page.has_more filters=page.filters %}
+        {% with photos=page.photos has_more=page.has_more filters=page.filters photo_link_attr="set" photo_link_val=set.slug %}
             {% include "mainapp/photogrid.html" %}
         {% endwith %}
 

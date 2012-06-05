@@ -50,24 +50,35 @@ def photo(request, photo_slug):
     photo = models.Photo.objects.get(slug=photo_slug)
     tag_slug = request.GET.get("tag")
     set_slug = request.GET.get("set")
+    location_slug = request.GET.get("location")
 
     # Get next and previous photo, based on current browsing
-    q_next = models.Photo.objects.filter(id__gt=photo.id, published=True).order_by("order_id")
-    q_prev = models.Photo.objects.filter(id__lt=photo.id, published=True).order_by("-order_id")
+    q_next = models.Photo.objects.filter(order_id__gt=photo.order_id, published=True).order_by("order_id")
+    q_prev = models.Photo.objects.filter(order_id__lt=photo.order_id, published=True).order_by("-order_id")
+    linkvars = ""
     if tag_slug:
         tag = models.Tag.objects.get(slug=tag_slug)
         tags = [tag]
         tags += tag.get_descendants()
         q_next = q_next.filter(tags__in=tags)
         q_prev = q_prev.filter(tags__in=tags)
+        linkvars = "tag=%s" % tag_slug
+    elif location_slug:
+        location = models.Location.objects.get(slug=location_slug)
+        locations = [location]
+        locations += location.get_descendants()
+        q_next = q_next.filter(location__in=locations)
+        q_prev = q_prev.filter(location__in=locations)
+        linkvars = "location=%s" % location_slug
     elif set_slug:
         cur_set = models.Set.objects.get(slug=set_slug)
         q_next = q_next.filter(sets=cur_set)
         q_prev = q_prev.filter(sets=cur_set)
+        linkvars = "set=%s" % set_slug
 
     next = q_next[0] if q_next.count() else None
     prev = q_prev[0] if q_prev.count() else None
-    return render(request, 'mainapp/photo.html', {'photo': photo, "tag": tag_slug, "set": set_slug, "next": next, "prev": prev})
+    return render(request, 'mainapp/photo.html', {'photo': photo, "linkvars": linkvars, "next": next, "prev": prev})
 
 
 #def register(request):
