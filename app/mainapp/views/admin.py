@@ -194,7 +194,7 @@ def admin_tmp(request):
 @login_required
 def admin_photo_mover(request):
     # Move photos around
-    page = ThumbnailPager(Filters(featured=True)).load_page()
+    page = ThumbnailPager(Filters(featured_only=True)).load_page()
     return render(request, 'mainapp/admin/photo_mover.html', {'page': page })
 
 
