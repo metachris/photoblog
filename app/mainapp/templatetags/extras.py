@@ -1,3 +1,4 @@
+# encoding: utf-8
 import datetime
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -43,3 +44,31 @@ def photo_alt(photo):
     cache.set(key, ret, 60)
     return ret
 
+
+@register.filter
+def photo_exif_shot(photo):
+    """Format photo exif info"""
+    ret = u""
+    if photo.exif_exposuretime or photo.exif_aperture or photo.exif_iso or photo.exif_focallength:
+        if photo.exif_exposuretime:
+            if "/" in photo.exif_exposuretime:
+                # format for html fraction
+                time = photo.exif_exposuretime.split("/")
+                ret += "<big><sup>%s</sup>&frasl;<sub>%s</sub> </big>sec" % (time[0], time[1])
+            else:
+                ret += "{photo.exif_exposuretime} sec"
+            if photo.exif_aperture:
+                ret += " at "
+        if photo.exif_aperture:
+            ret += u"ƒ {photo.exif_aperture}"
+        if photo.exif_iso:
+            if ret:
+                ret += ", "
+            ret += "ISO {photo.exif_iso}"
+        if photo.exif_focallength:
+            if ret:
+                ret += ", "
+            ret += "{photo.exif_focallength}"
+        ret = ret.format(photo=photo)
+        ret = "<p>%s</p>" % ret
+    return ret
