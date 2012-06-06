@@ -1,4 +1,5 @@
 import hashlib
+import logging
 
 from django.core.cache import cache
 
@@ -6,6 +7,9 @@ import mainapp.models as models
 
 
 PHOTOS_PER_PAGE = 10
+
+
+log = logging.getLogger(__name__)
 
 
 class Filters(object):
@@ -26,6 +30,10 @@ class Filters(object):
     def __init__(self, *args, **kwargs):
         """Lazy init method (eg. Filters(tags=[mytags]))"""
         for key in kwargs:
+            if not hasattr(self, key):
+                err = "Value '%s' is not available in Filters." % key
+                log.error(err)
+                raise AttributeError(err)
             setattr(self, key, kwargs[key])
 
     @staticmethod
@@ -33,7 +41,8 @@ class Filters(object):
         return Filters(
             last_hash=vars.get("last_hash") or None,
             location=vars.get("location") or None,
-            featured=vars.get("featured-only") if vars.get("featured-only") is not None else None,
+            featured_only=True if vars.get("featured_only") == "1" else \
+                    False if vars.get("featured_only") is "-1" else None,
             tags=vars.get("tags").split("+") if vars.get("tags") else None,
             sets=vars.get("sets").split("+") if vars.get("sets") else None
         )
@@ -127,7 +136,7 @@ class ThumbnailPager(object):
         If last_hash is given, use all photos with order_id < that one
         """
         # Get the db query for these filters
-        print "filters:", str(self.filters)
+        log.info("ThumbailPager: load page with filters: %s" % str(self.filters))
         self.photo_query = filters_to_query(self.filters, limit=PHOTOS_PER_PAGE+1)
 
         count = self.photo_query.count()

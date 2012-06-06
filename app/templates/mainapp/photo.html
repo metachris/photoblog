@@ -42,11 +42,14 @@
 
         <div class="photo-meta">
                 <div id="photo-main-license">
+                    <p>
                     This work is licensed under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons BY-NC-SA</a>.
                     <a href="mailto:chris@metachris.org?subject=License for photo '{{ photo.title }}' ({{ photo.hash }})">Get a commercial license</a>.
+                    </p>
+                    {{ photo|photo_exif_shot|safe }}
                 </div>
 
-                <div id="photo-main-meta-right">
+                <div class="photo-main-meta-right">
                     <p><a name="fb_share"></a></p>
                     <p><a href="{{ photo.url }}">Download</a></p>
                 </div>

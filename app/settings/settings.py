@@ -88,15 +88,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # Django admin interface
-    "sorl.thumbnail",
     'django.contrib.admin',
 
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    # Thumbnail template tags
+    "sorl.thumbnail",
 
     # South is a tool to document and simplify database schema updates
     'south',
 
+    # Tag hierarchies
     'treebeard',
 
     # Redis status info for the admin interface
