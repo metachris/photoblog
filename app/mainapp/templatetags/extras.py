@@ -15,6 +15,18 @@ def split(val, separator=" "):
     return (v for v in val.split(separator) if v)
 
 
+def _photo_title(photo, prefix="", apostrophes=True, capitalized=False):
+    """Compose a photo title or return default for photos without title"""
+    default = "Untitled %shoto" % ("p" if not capitalized else "P")
+    wanted = "{prefix}'{photo.title}'" if apostrophes else "{prefix}{photo.title}"
+    return wanted.format(prefix=prefix, photo=photo) if photo.title else default
+
+
+@register.filter
+def photo_title(photo, apostrophes=False, capitalized=True):
+    return _photo_title(photo, apostrophes=apostrophes, capitalized=capitalized)
+
+
 @register.filter
 def photo_alt(photo):
     """Format photo alt html info"""
@@ -26,7 +38,7 @@ def photo_alt(photo):
         return cached
 
     # Else build, cache and return
-    ret = "Photo '{photo.title}'" if photo.title else "Untitled photo"
+    ret = _photo_title(photo, prefix="Photo ")
     if (photo.photographer and photo.photographer.name) or \
             photo.date_captured or photo.location:
         ret += ", captured"

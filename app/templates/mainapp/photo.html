@@ -3,7 +3,7 @@
 {% load thumbnail %}
 {% load extras %}
 
-{% block title-left %}{{ photo.title }} - {% endblock %}
+{% block title-left %}{{ photo|photo_title }} - {% endblock %}
 
 {% block meta %}
     <meta name="description" content="{{ photo|photo_alt }}.">
@@ -20,7 +20,7 @@
     </div>
 
     <div class="span8" style="text-align: center;">
-        <div id="photo-main-caption"><a href="/photo/{{ photo.slug }}">{{ photo.title }}</a></div>
+        <div id="photo-main-caption"><a href="/photo/{{ photo.slug }}">{{ photo|photo_title }}</a></div>
     </div>
 
     <div class="span2 span-next" style="text-align: right;">
