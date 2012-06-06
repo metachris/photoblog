@@ -13,8 +13,8 @@ import os
 import datetime
 
 
-PHOTOGRID_ITEMS_INITIAL = 10
-PHOTOGRID_ITEMS_PERPAGE = 3
+PHOTOGRID_ITEMS_INITIAL = 11
+PHOTOGRID_ITEMS_PERPAGE = 6
 
 
 NOW = datetime.datetime.now()

@@ -115,7 +115,7 @@ function show_new_photos() {
 // Scroll helper
 function check_scroll_bottom() {
     if (scroll_enabled) {
-        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 80) {
+        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 180) {
             load_photos();
         }
     }
