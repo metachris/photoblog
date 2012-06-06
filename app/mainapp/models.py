@@ -1,7 +1,7 @@
 import os
 import datetime
 import logging
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_delete
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,6 +14,9 @@ import caching.base
 import markdown
 
 import tools
+
+
+log = logging.getLogger(__name__)
 
 
 class UserProfile(caching.base.CachingMixin, models.Model):
@@ -198,22 +201,37 @@ class Photo(caching.base.CachingMixin, models.Model):
     def is_portrait(self):
         return self.resolution_height > self.resolution_width
 
+    @staticmethod
+    def post_delete_handler(sender, **kwargs):
+        """Called when an image is deleted. Remove the image files."""
+        photo = kwargs["instance"]
+        log.info("Photo post delete handler: removing image files '%s'" % photo.local_filename)
+        if photo.local_filename:
+            fn_upload = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD, photo.local_filename)
+            fn_photo = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS, photo.local_filename)
+            os.remove(fn_upload)
+            os.remove(fn_photo)
+            log.info("- all removed")
+        else:
+            log.info("- no local filename")
 
-@receiver(pre_save, sender=Photo)
-def photo_save_handler(sender, **kwargs):
-    photo = kwargs["instance"]
+    @staticmethod
+    def pre_save_handler(sender, **kwargs):
+        """Before saving update hash, slug, url and description_html"""
+        photo = kwargs["instance"]
+        if not photo.hash:
+            photo.hash = Photo._mk_hash()
+        if not photo.slug:
+            photo.slug = Photo._mk_slug(photo.title)
+        if photo.description_md:
+            md = markdown.Markdown(safe_mode="escape")
+            photo.description_html = md.convert(photo.description_md)
+        photo.update_url()
 
-    if not photo.hash:
-        photo.hash = Photo._mk_hash()
 
-    if not photo.slug:
-        photo.slug = Photo._mk_slug(photo.title)
-
-    # Always update url and markdown
-    photo.update_url()
-    if photo.description_md:
-        md = markdown.Markdown(safe_mode="escape")
-        photo.description_html = md.convert(photo.description_md)
+# Registering Signals. using `connect()` prevents receiving signals twice (as happens with @receiver)
+post_delete.connect(Photo.post_delete_handler, Photo, dispatch_uid="mainapp.models")
+pre_save.connect(Photo.pre_save_handler, Photo, dispatch_uid="mainapp.models")
 
 
 """
