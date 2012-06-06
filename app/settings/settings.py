@@ -13,7 +13,9 @@ import os
 import datetime
 
 
-APP_VERSION = "0.1"
+PHOTOGRID_ITEMS_INITIAL = 10
+PHOTOGRID_ITEMS_PERPAGE = 3
+
 
 NOW = datetime.datetime.now()
 DATE_STR = NOW.strftime("%Y-%m-%d")

@@ -14,7 +14,7 @@
                     <br>
                     <br>
                     <span class="default">more...</span>
-                    <span class="loading">loading...</span>
+                    <span class="loading"><img src="{{ STATIC_URL }}img/ajax-loader-darkbg2.gif" /></span>
                 </div>
             </a>
         </li>
@@ -23,6 +23,7 @@
 
 {% if filters %}
 <script type="text/javascript">
+    var scroll_load_more_enabled = {% if scroll_load_more_disabled %}false{% else %}true{% endif %};
     var photogrid_info = {
         {% for k, v in filters.to_html_dict.items %}"{{ k }}": "{{ v }}", {% endfor %}
     }
