@@ -2,11 +2,9 @@ import hashlib
 import logging
 
 from django.core.cache import cache
+from django.conf import settings
 
 import mainapp.models as models
-
-
-PHOTOS_PER_PAGE = 10
 
 
 log = logging.getLogger(__name__)
@@ -65,7 +63,7 @@ class Filters(object):
         return "<Filters%s>" % self.to_dict()
 
 
-def filters_to_query(filters, limit=PHOTOS_PER_PAGE):
+def filters_to_query(filters, limit):
     """
     This method builds a QuerySet out of one  filters object
     """
@@ -130,22 +128,25 @@ class ThumbnailPager(object):
     def from_dict(vars):
         return ThumbnailPager(Filters.from_dict(vars))
 
-    def load_page(self):
+    def load_page(self, photos_per_page=None):
         """
         Get one page of thumbnails for this set of filters.
         If last_hash is given, use all photos with order_id < that one
         """
+        if not photos_per_page:
+            photos_per_page = settings.PHOTOGRID_ITEMS_INITIAL
+
         # Get the db query for these filters
         log.info("ThumbailPager: load page with filters: %s" % str(self.filters))
-        self.photo_query = filters_to_query(self.filters, limit=PHOTOS_PER_PAGE+1)
+        self.photo_query = filters_to_query(self.filters, limit=photos_per_page+1)
 
         count = self.photo_query.count()
         # Poor mans has-more: get 1 more than requested
-        self.has_more = count > PHOTOS_PER_PAGE
+        self.has_more = count > photos_per_page
 
         # Save photos (trim the extra item if needed)
-        self.photos = self.photo_query[:PHOTOS_PER_PAGE]
-        self.photos_count = count if count < PHOTOS_PER_PAGE else count-1
+        self.photos = self.photo_query[:photos_per_page]
+        self.photos_count = count if count < photos_per_page else count-1
 
         # Save last photos hash
         if self.photos_count:

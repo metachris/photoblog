@@ -235,7 +235,7 @@ def set_photos(request, set_slug):
 
 def ajax_photo_more(request):
     pager = ThumbnailPager.from_request(request)
-    pager.load_page()
+    pager.load_page(photos_per_page=settings.PHOTOGRID_ITEMS_PERPAGE)
 
     # Prepare return json
     ret = {
