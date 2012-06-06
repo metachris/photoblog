@@ -43,12 +43,12 @@ class UserProfile(caching.base.CachingMixin, models.Model):
         return profile
 
     def __unicode__(self):
-        return "<UserProfile(%s)>" % self.user
+        return "<UserProfile(%s, %s)>" % (self.user, self.name)
 
 
 class Tag(MP_Node):
     name = models.CharField(max_length=50)
-    slug = models.CharField(max_length=256, null=True)
+    slug = models.CharField(max_length=256, null=True, unique=True)
 
     node_order_by = ['name']
 
@@ -58,7 +58,7 @@ class Tag(MP_Node):
 
 class Location(MP_Node):
     name = models.CharField(max_length=50)
-    slug = models.CharField(max_length=256, null=True)
+    slug = models.CharField(max_length=256, null=True, unique=True)
 
     node_order_by = ['name']
 
@@ -77,7 +77,7 @@ class Set(caching.base.CachingMixin, models.Model):
     published = models.BooleanField(default=False)
 
     title = models.CharField(max_length=512)
-    slug = models.CharField(max_length=512, null=True)
+    slug = models.CharField(max_length=512, null=True, unique=True)
 
     description_md = models.TextField(blank=True, null=True)  # markdown
     description_html = models.TextField(blank=True, null=True)  # converted to html
@@ -115,7 +115,7 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     # Title, slug and hash
     title = models.CharField(max_length=100, blank=True, null=True)
-    slug = models.CharField(max_length=100, blank=True, null=True)  # can be auto-generated with Photo._mk_slug
+    slug = models.CharField(max_length=100, blank=True, null=True, unique=True)  # can be auto-generated with Photo._mk_slug
     hash = models.CharField(max_length=32)
 
     # Image info
