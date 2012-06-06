@@ -36,7 +36,7 @@
         <div style="{% if photo.is_portrait %}display:inline-block;{% endif %}">
         <div id="photo-main-container" class="normal {% if photo.is_portrait %}portrait{% else %}landscape{% endif %}">
             <div id="photo-main-frame">
-                <img src="{{ photo.url }}" alt="{{ photo|photo_alt }}" class="frame{% if photo.is_portrait %} portrait{% endif %}">
+                <img src="{{ photo.url }}" alt="{{ photo|photo_alt }}" title="Go Fullscreen" class="frame{% if photo.is_portrait %} portrait{% endif %}">
             </div>
         </div>
 
