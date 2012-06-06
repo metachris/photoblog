@@ -141,6 +141,7 @@ class ThumbnailPager(object):
         self.photo_query = filters_to_query(self.filters, limit=photos_per_page+1)
 
         count = self.photo_query.count()
+
         # Poor mans has-more: get 1 more than requested
         self.has_more = count > photos_per_page
 

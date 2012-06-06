@@ -43,14 +43,17 @@ var is_loading = false;
 var page = 0;
 var last_response;
 
+// Stack of photos to fade in
+var photos_to_add = new Array();
+
 function load_photos() {
     if (is_loading) {
-        console.log("Already loading.");
+//        console.log("Already loading.");
         return;
     }
 
     if (last_response && !last_response.has_more) {
-        console.log("Cannot load page; no more available");
+//        console.log("No more available");
         return;
     }
 
@@ -59,28 +62,27 @@ function load_photos() {
     $("#photo-container-more .default").hide();
     $("#photo-container-more .loading").show();
 
-    // Build arguments
-    console.log(photogrid_info);
-
     // Make ajax request
     $.get("/ajax/photo/more", photogrid_info, function(data) {
         d = JSON.parse(data);
         photogrid_info["last_hash"] = d.last_hash;
 
+//        console.log("200. has more: " + d.has_more);
         for (var i=0; i<d.photos.length; i++) {
-            item = $(d.photos[i]);
-            item.insertBefore("#photo-container-more");
-            set_photo_hover_handler(item);
+            photos_to_add.push($(d.photos[i]));
         }
 
-        if (d.has_more) {
+        // Show new photos (fade in)
+        $("#photo-container-more").fadeOut("normal", function() {
             $("#photo-container-more .default").show();
             $("#photo-container-more .loading").hide();
-        } else {
-            $("#photo-container-more").hide();
+            show_new_photos();
+        });
+
+        if (!d.has_more) {
+            $("#photo-container-more").fadeOut();
         }
 
-        is_loading = false;
         if (window.onMorePhotosLoaded) {
             window.onMorePhotosLoaded();
         }
@@ -92,10 +94,28 @@ function load_photos() {
     })
 }
 
+function show_new_photos() {
+    photo = photos_to_add.pop();
+    if (photo) {
+        photo.hide();
+        set_photo_hover_handler(photo);
+        photo.insertBefore("#photo-container-more");
+        photo.fadeIn("normal", function() {
+            show_new_photos();
+        });
+    } else {
+        is_loading = false;
+        if (last_response && last_response.has_more) {
+            $("#photo-container-more").fadeIn();
+            el_win.scroll();
+        }
+    }
+}
+
 // Scroll helper
 function check_scroll_bottom() {
     if (scroll_enabled) {
-        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 40) {
+        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 80) {
             load_photos();
         }
     }
