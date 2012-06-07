@@ -114,7 +114,7 @@ class ThumbnailPager(object):
     has_more = False
     photos = None
 
-    def __init__(self, filters=Filters()):
+    def __init__(self, filters):
         self.filters = filters
 
     @staticmethod
@@ -128,7 +128,7 @@ class ThumbnailPager(object):
     def from_dict(vars):
         return ThumbnailPager(Filters.from_dict(vars))
 
-    def load_page(self, photos_per_page=None):
+    def load_page(self, photos_per_page):
         """
         Get one page of thumbnails for this set of filters.
         If last_hash is given, use all photos with order_id < that one
@@ -136,8 +136,9 @@ class ThumbnailPager(object):
         if not photos_per_page:
             photos_per_page = settings.PHOTOGRID_ITEMS_INITIAL
 
-        # Get the db query for these filters
         log.info("ThumbailPager: load page with filters: %s" % str(self.filters))
+
+        # Get the db query for these filters
         self.photo_query = filters_to_query(self.filters, limit=photos_per_page+1)
 
         count = self.photo_query.count()

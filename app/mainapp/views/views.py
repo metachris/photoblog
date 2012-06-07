@@ -24,6 +24,7 @@ import mainapp.tools as tools
 import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 from mainapp.views.photopager import *
+from mainapp.tools import photoflow
 
 
 log = logging.getLogger(__name__)
@@ -234,8 +235,10 @@ def set_photos(request, set_slug):
 
 
 def ajax_photo_more(request):
+    n = settings.PHOTOFLOW_BLOCKS_PERPAGE * 8 if request.GET.get("t") == "flow" else settings.PHOTOGRID_ITEMS_PERPAGE
+    print "ajax more. n=", n
     pager = ThumbnailPager.from_request(request)
-    pager.load_page(photos_per_page=settings.PHOTOGRID_ITEMS_PERPAGE)
+    pager.load_page(photos_per_page=n)
 
     # Prepare return json
     ret = {
@@ -358,5 +361,9 @@ def get_handout(request, handout_hash=None):
 
 
 def view_flow(request):
-    page = ThumbnailPager(Filters(featured_only=True)).load_page()
-    return render(request, 'mainapp/flow.html', {'page': page})
+    flow = photoflow.FlowManager()
+    photo_count = flow.get_items_per_block(1) + flow.get_items_per_block(2)
+    pager = ThumbnailPager(Filters(featured_only=True))
+    pager.load_page(photos_per_page=photo_count)
+    flow_html = flow.get_html(pager.photos)
+    return render(request, 'mainapp/flow.html', {'page': pager, "flow_html": flow_html })

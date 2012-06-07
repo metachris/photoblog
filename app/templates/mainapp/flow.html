@@ -10,9 +10,7 @@
 <div class="row">
     <div class="span12">
 
-        {% with photos=page.photos has_more=page.has_more filters=page.filters %}
-            {% include "mainapp/photoflow.html" %}
-        {% endwith %}
+        {{ flow_html|safe }}
 
     </div>
 </div>
