@@ -49,6 +49,16 @@ class UserProfile(caching.base.CachingMixin, models.Model):
         return "<UserProfile(%s, %s)>" % (self.user, self.name)
 
 
+class AdminValue(caching.base.CachingMixin, models.Model):
+    objects = caching.base.CachingManager()
+
+    key = models.CharField(max_length=50)
+    val = models.TextField()
+
+    def __unicode__(self):
+        return "<AdminValue(%s='%s')>" % (self.key, self.val)
+
+
 class Tag(MP_Node):
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=256, null=True, unique=True)

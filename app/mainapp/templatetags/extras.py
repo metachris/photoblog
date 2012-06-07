@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+import hashlib
 from django import template
 from django.template.context import Context
 from django.template.defaultfilters import stringfilter
@@ -8,6 +9,7 @@ from django.core.cache import cache
 from django.template.loader import get_template
 
 from mainapp.tools import photoflow
+from mainapp import models
 
 register = template.Library()
 
@@ -89,7 +91,24 @@ def photo_exif_shot(photo):
 @register.filter
 def build_flow(photos):
     """Build photo flow tables."""
-    cols = photoflow.Renderer(layout_ids=[3, 2]).build_cols(photos[:9])
+    try:
+        # This 'db' query is cached, so no need to really worry about performance issues
+        layouts = [int(id) for id in models.AdminValue.objects.get(key="photoflow_layouts_test").val.split(",")]
+    except models.AdminValue.DoesNotExist:
+        layouts = [3, 1]
+
+    print layouts
+    cache_key = "photo_flow:%s" % hashlib.sha256("%s%s" % (repr(layouts), photos.query)).hexdigest()
+    print "Cache key:", cache_key
+    # See if we can get that cached
+#    cached = cache.get(cache_key)
+#    if cached:
+#        print "Return cached"
+#        return cached
+
+
+    cols = photoflow.Renderer(layout_ids=layouts).build_cols(photos)
     flow_template = get_template('mainapp/photoflow_item.html')
     res = flow_template.render(Context({ "cols": cols }))
+    cache.set(cache_key, res, 60)
     return res

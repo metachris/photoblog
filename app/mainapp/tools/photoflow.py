@@ -10,9 +10,12 @@ FLOW_LAYOUTS = [
     # | 1 2 2 2 |
     ({ "item": "1x2" }, { "item": "3x2" }),
 
-    # | 1 1 2 3 | 2 columns: 2x2, 1x2, 1x1 + 1x1
+    # | 1 1 2 3 | 3 columns: 2x2, 1x2, 1x1 + 1x1
     # | 1 1 2 4 |
     ({ "item": "2x2" }, { "item": "1x2" }, { "items": ["1x1", "1x1"], "size": "1x2" }),
+
+    ({ "items": ["1x1", "1x1"], "size": "1x2" }, { "item": "1x2" }, { "item": "2x2" }),
+    ({ "item": "3x2" }, { "items": ["1x1", "1x1"], "size": "1x2" }),
 
     # | 1 2 2 5 | 3 columns: 1x2, 2x1 + 1x1 + 1x1, 1x2
     # | 1 3 4 5 |
@@ -86,7 +89,7 @@ class Item:
         img_w = (self.DEF_WIDTH * w) + w_extra
         self.size = "%sx%s" % (img_w, img_h)
 
-class Renderer:
+class Renderer(object):
     """
     Builds a list of columns based on the supplied photos and chosen layouts. Example usage:
 
@@ -111,6 +114,10 @@ class Renderer:
 
     def build_cols(self, photos):
         """Build the columns with the supplied photos. Returns the columns list"""
+        self.cur_col = 0
+        self.cur_item = 0
+        self.cols = []
+        self.items_tmp = []
         for photo in photos:
             self.add_item(photo)
         self.finish_adding()
