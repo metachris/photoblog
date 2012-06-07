@@ -88,31 +88,42 @@ def photo_exif_shot(photo):
 
 @register.filter
 def build_flow(photos):
-    """Build photo flow tables"""
+    """Build photo flow tables."""
     class Col:
+        """One column of photos; rendered into one left-floating div. Computes the correct size in px."""
         items = []
 
-        def __init__(self, items, w, h):
+        def __init__(self, items, w=None, h=None):
+            """If w or h is None, get it from the first image"""
             self.items = items
+            if w is None or h is None:
+                if len(items) == 1:
+                    w = w or items[0].w
+                    h = h or items[0].h
+                else:
+                    raise AttributeError("Class col requires exactly one item to auto-compute width and hight (got %s)." % len(items))
+
             self.w = w
             self.h = h
-
+            
+            # Calculate extra h+w (margin, border)
             frame_top, frame_right, frame_bottom, frame_left = Item.FRAME_SIZE
-            w_extra = w * (Item.MARGIN_RIGHT + frame_left + frame_right)
-            h_extra = h * (Item.MARGIN_BOTTOM + frame_top + frame_bottom)
+            w_extra = self.w * (Item.MARGIN_RIGHT + frame_left + frame_right)
+            h_extra = self.h * (Item.MARGIN_BOTTOM + frame_top + frame_bottom)
 
-            # Get total width (add
-            self.w_px = (Item.DEF_WIDTH * w) + w_extra
-            self.h_px = (Item.DEF_HEIGHT * h) + h_extra
+            # Compute total column container size
+            self.w_px = (Item.DEF_WIDTH * self.w) + w_extra
+            self.h_px = (Item.DEF_HEIGHT * self.h) + h_extra
 
     class Item:
+        """One item in a specific row. Computes the correct size in px."""
         # Default width and height for one grid item
-        DEF_WIDTH = 200
+        DEF_WIDTH = 220
         DEF_HEIGHT = 260
 
         # Margin right and bottom of an image
-        MARGIN_RIGHT = 10
-        MARGIN_BOTTOM = 10
+        MARGIN_RIGHT = 13
+        MARGIN_BOTTOM = 13
 
         # Frame size in px (top, right, bottom, left)
         FRAME_SIZE = (1, 1, 1, 1)
@@ -126,6 +137,7 @@ def build_flow(photos):
         img_size = ""  # WxH
 
         def __init__(self, photo, w, h):
+            """w and h in 'grid'-columns"""
             self.photo = photo;
             self.w = w; self.h = h
 
@@ -140,27 +152,17 @@ def build_flow(photos):
     n = len(photos)
     print "flow for ", n, "photos"
 
-    cols = []
-
-    # Build 1st col
-    cols.append(Col([
-        Item(photos[0], 1, 2)
-    ], 1, 2))
-
-    # Build middle col
-    cols.append(Col([
-        Item(photos[1], 2, 1),
-        Item(photos[3], 1, 1),
-        Item(photos[4], 1, 1)
-    ], 2, 2))  # left w=1, h=2
-
-    # Build right col
-    cols.append(Col([
-        Item(photos[2], 1, 2)
-    ], 1, 2))
-
-    print "cols"
-    print cols
+    cols = (
+        Col([Item(photos[0], 1, 2)]),
+        Col([
+            Item(photos[1], 2, 1),
+            Item(photos[3], 1, 1),
+            Item(photos[4], 1, 1)
+        ], 2, 2),
+        Col([Item(photos[2], 1, 2)]),
+        Col([Item(photos[5], 1, 2)]),
+        Col([Item(photos[6], 3, 2)]),
+    )
 
     flow_template = get_template('mainapp/photoflow_item.html')
     res = flow_template.render(Context({ "cols": cols }))
