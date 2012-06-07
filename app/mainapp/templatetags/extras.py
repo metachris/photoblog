@@ -89,12 +89,35 @@ def photo_exif_shot(photo):
 @register.filter
 def build_flow(photos):
     """Build photo flow tables"""
+    class Col:
+        items = []
+
+        def __init__(self, items, w, h):
+            self.items = items
+            self.w = w
+            self.h = h
+
+            frame_top, frame_right, frame_bottom, frame_left = Item.FRAME_SIZE
+            w_extra = w * (Item.MARGIN_RIGHT + frame_left + frame_right)
+            h_extra = h * (Item.MARGIN_BOTTOM + frame_top + frame_bottom)
+
+            # Get total width (add
+            self.w_px = (Item.DEF_WIDTH * w) + w_extra
+            self.h_px = (Item.DEF_HEIGHT * h) + h_extra
+
     class Item:
-        DIV_WIDTH = 200  # 4 cols = 960 px
-        DIV_HEIGHT = 260
+        # Default width and height for one grid item
+        DEF_WIDTH = 200
+        DEF_HEIGHT = 260
+
+        # Margin right and bottom of an image
         MARGIN_RIGHT = 10
         MARGIN_BOTTOM = 10
 
+        # Frame size in px (top, right, bottom, left)
+        FRAME_SIZE = (1, 1, 1, 1)
+
+        # Set on init
         photo = None
         w = 0  # number of tds
         h = 0  # number of tds
@@ -106,36 +129,41 @@ def build_flow(photos):
             self.photo = photo;
             self.w = w; self.h = h
 
-            h_extra = 0 if h < 2 else (h-1) * (self.MARGIN_BOTTOM + 2)  # 2px for image frame (border)
-            w_extra = 0 if w < 2 else (w-1) * (self.MARGIN_RIGHT + 2)
-            img_h = (self.DIV_HEIGHT * h) + h_extra
-            img_w = (self.DIV_WIDTH * w) + w_extra
+            frame_top, frame_right, frame_bottom, frame_left = Item.FRAME_SIZE
+            w_extra = 0 if w < 2 else (w-1) * (Item.MARGIN_RIGHT + frame_left + frame_right)
+            h_extra = 0 if h < 2 else (h-1) * (Item.MARGIN_BOTTOM + frame_left + frame_right)
+
+            img_h = (self.DEF_HEIGHT * h) + h_extra
+            img_w = (self.DEF_WIDTH * w) + w_extra
             self.size = "%sx%s" % (img_w, img_h)
 
     n = len(photos)
     print "flow for ", n, "photos"
 
-    rows = []
+    cols = []
 
-    # Build 1st row
-    items = []
-    items.append(Item(photos[0], 1, 2))  # left col, 2 rows
-    items.append(Item(photos[1], 2, 1))  # 1st row, cols 2+3
-#    items.append(Item(photos[2], 1, 2))  # right col, 2 rows
-#    rows.append(items)
+    # Build 1st col
+    cols.append(Col([
+        Item(photos[0], 1, 2)
+    ], 1, 2))
 
-    # Build 2nd row
-#    items = []
-    items.append(Item(photos[3], 1, 1))  # 2nd row, cols 2+3
-    items.append(Item(photos[4], 1, 1))  # 2nd row, cols 2+3
-    items.append(Item(photos[2], 1, 2))  # right col, 2 rows
-#    rows.append(items)
+    # Build middle col
+    cols.append(Col([
+        Item(photos[1], 2, 1),
+        Item(photos[3], 1, 1),
+        Item(photos[4], 1, 1)
+    ], 2, 2))  # left w=1, h=2
 
-#    print "rows"
-#    print rows
+    # Build right col
+    cols.append(Col([
+        Item(photos[2], 1, 2)
+    ], 1, 2))
+
+    print "cols"
+    print cols
 
     flow_template = get_template('mainapp/photoflow_item.html')
-    res = flow_template.render(Context({ "items": items }))
+    res = flow_template.render(Context({ "cols": cols }))
     return res
 
 # Decide on a schema inside an 8 cols, 2 rows table (WxH, XxY)
