@@ -7,7 +7,6 @@ from django.template.defaultfilters import date as date_filter
 from django.core.cache import cache
 from django.template.loader import get_template
 
-import mainapp.forms
 from mainapp.tools import photoflow
 
 register = template.Library()
@@ -90,13 +89,7 @@ def photo_exif_shot(photo):
 @register.filter
 def build_flow(photos):
     """Build photo flow tables."""
-
-    n = len(photos)
-    print "flow for ", n, "photos"
-
-    cols = photoflow.Renderer(layout_ids=[0, 1]).build_cols(photos[:7])
-    print cols
-
+    cols = photoflow.Renderer(layout_ids=[3, 2]).build_cols(photos[:9])
     flow_template = get_template('mainapp/photoflow_item.html')
     res = flow_template.render(Context({ "cols": cols }))
     return res

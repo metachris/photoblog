@@ -2,13 +2,25 @@
 Helper to build photo flows.
 
 Html uses container divs for all columns and places image divs inside.
+
+Todo: Cache based on photo-query-hash + layouts-used
 """
 FLOW_LAYOUTS = [
-    # 3 columns: 1x2, 2x1 + 1x1 + 1x1, 1x2
-    ({ "size": "1x2", "items": ["1x2"]}, { "size": "2x2", "items": ["2x1", "1x1", "1x1"]}, { "size": "1x2", "items": ["1x2"]}),
+    # | 1 2 2 2 | 2 columns: 1x2, 3x2
+    # | 1 2 2 2 |
+    ({ "item": "1x2" }, { "item": "3x2" }),
 
-    # 2 columns: 1x2, 1x3
-    ({ "size": "1x2", "items": ["1x2"]}, { "size": "3x2", "items": ["3x2"]}),
+    # | 1 1 2 3 | 2 columns: 2x2, 1x2, 1x1 + 1x1
+    # | 1 1 2 4 |
+    ({ "item": "2x2" }, { "item": "1x2" }, { "items": ["1x1", "1x1"], "size": "1x2" }),
+
+    # | 1 2 2 5 | 3 columns: 1x2, 2x1 + 1x1 + 1x1, 1x2
+    # | 1 3 4 5 |
+    ({ "item": "1x2" }, { "items": ["2x1", "1x1", "1x1"], "size": "2x2" }, { "item": "1x2"}),
+
+    # | 1 3 3 4 | 3 columns: 1x1 + 1x1, 2x2, 1x1 + 1x1
+    # | 2 3 3 5 |
+    ({ "items": ["1x1", "1x1"], "size": "1x2" }, { "item": "2x2"}, { "items": ["1x1", "1x1"], "size": "1x2" }),
 ]
 
 class Col:
@@ -107,8 +119,14 @@ class Renderer:
     def add_item(self, photo):
         """Add a single photo into the current div-column"""
         cur_col = self.layout[self.cur_col]
-        col_size = cur_col["size"]
-        col_itemsschemas = cur_col["items"]
+        if "item" in cur_col:
+            # If only one item in this column, we need no additional params
+            col_itemsschemas = [cur_col["item"]]
+            col_size = cur_col["item"]
+        else:
+            col_size = cur_col["size"]
+            col_itemsschemas = cur_col["items"]
+
         cur_itemschema = col_itemsschemas[self.cur_item]
         w, h = cur_itemschema.split("x")
 
