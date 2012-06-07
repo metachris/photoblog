@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<meta name="description" content="Stunning sport, climbing and nature photography.">
+{% endblock %}
+
+{% block body-class %}photogrid{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="span12">
+
+        <div class="caption">Flow</div>
+
+        {% with photos=page.photos has_more=page.has_more filters=page.filters %}
+            {% include "mainapp/photoflow.html" %}
+        {% endwith %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+<script src="{{ STATIC_URL }}js/photogrid.js"></script>
+{% endblock %}

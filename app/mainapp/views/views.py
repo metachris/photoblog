@@ -357,3 +357,6 @@ def get_handout(request, handout_hash=None):
         return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})
 
 
+def view_flow(request):
+    page = ThumbnailPager(Filters(featured_only=True)).load_page()
+    return render(request, 'mainapp/flow.html', {'page': page})
