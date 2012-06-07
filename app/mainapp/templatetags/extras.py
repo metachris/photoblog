@@ -89,26 +89,27 @@ def photo_exif_shot(photo):
 @register.filter
 def build_flow(photos):
     """Build photo flow tables"""
-    TD_WIDTH = 220  # 4 cols = 880 px
-    TD_HEIGHT = 220
-    PADDING_HORIZ = 14 + 2 # 2px border
-    PADDING_VERT = 14 + 2  # 2px border
     class Item:
+        DIV_WIDTH = 200  # 4 cols = 960 px
+        DIV_HEIGHT = 260
+        MARGIN_RIGHT = 10
+        MARGIN_BOTTOM = 10
+
         photo = None
         w = 0  # number of tds
         h = 0  # number of tds
         td_w = 0  # px width of td
         td_h = 0  # px height of td
         img_size = ""  # WxH
+
         def __init__(self, photo, w, h):
             self.photo = photo;
             self.w = w; self.h = h
 
-            self.td_w = TD_WIDTH * w
-            self.td_h = TD_HEIGHT * h
-
-            img_w = self.td_w - PADDING_HORIZ
-            img_h = self.td_h - PADDING_VERT
+            h_extra = 0 if h < 2 else (h-1) * (self.MARGIN_BOTTOM + 2)  # 2px for image frame (border)
+            w_extra = 0 if w < 2 else (w-1) * (self.MARGIN_RIGHT + 2)
+            img_h = (self.DIV_HEIGHT * h) + h_extra
+            img_w = (self.DIV_WIDTH * w) + w_extra
             self.size = "%sx%s" % (img_w, img_h)
 
     n = len(photos)
@@ -120,19 +121,21 @@ def build_flow(photos):
     items = []
     items.append(Item(photos[0], 1, 2))  # left col, 2 rows
     items.append(Item(photos[1], 2, 1))  # 1st row, cols 2+3
-    items.append(Item(photos[2], 1, 2))  # right col, 2 rows
-    rows.append(items)
+#    items.append(Item(photos[2], 1, 2))  # right col, 2 rows
+#    rows.append(items)
 
     # Build 2nd row
-    items = []
-    items.append(Item(photos[3], 2, 1))  # 2nd row, cols 2+3
-    rows.append(items)
+#    items = []
+    items.append(Item(photos[3], 1, 1))  # 2nd row, cols 2+3
+    items.append(Item(photos[4], 1, 1))  # 2nd row, cols 2+3
+    items.append(Item(photos[2], 1, 2))  # right col, 2 rows
+#    rows.append(items)
 
-    print "rows"
-    print rows
+#    print "rows"
+#    print rows
 
     flow_template = get_template('mainapp/photoflow_item.html')
-    res = flow_template.render(Context({ "rows": rows }))
+    res = flow_template.render(Context({ "items": items }))
     return res
 
 # Decide on a schema inside an 8 cols, 2 rows table (WxH, XxY)
