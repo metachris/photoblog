@@ -12,6 +12,8 @@ from mainapp import models
 
 from django.core.cache import cache
 
+from mainapp import adminvalues
+
 
 FLOW_LAYOUTS = [
     # | 1 2 2 2 | 2 columns: 1x2, 3x2
@@ -198,8 +200,14 @@ class Renderer(object):
 
 class FlowManager(object):
     """Helps with managing flow pages"""
-    def __init__(self, layout_ids=None):
-        """Sets the current layout based on models.AdminValue. If layout_ids list is supplied, use that instead."""
+    def __init__(self, layout_ids=None, is_test_layouts=False):
+        """
+        Sets the current layout based on models.AdminValue; if layout_ids list
+        is supplied, use that instead.
+
+        If is_test_layouts is True, use the LAYOUTS_TEST AdminValue instead of LAYOUTS.
+        """
+        self.is_test_layouts = is_test_layouts
         self.layout_ids = layout_ids or self.get_layout_ids()
         self.layout = []
         for id in self.layout_ids:
@@ -207,8 +215,9 @@ class FlowManager(object):
 
     def get_layout_ids(self):
         try:
-            # This 'db' query is cached, so no need to really worry about performance issues
-            layout_ids = [int(id) for id in models.AdminValue.objects.get(key="photoflow_layouts_test").val.split(",")]
+            # This 'db' query is cached, so no need to worry about performance issues
+            key = adminvalues.PHOTOFLOW_LAYOUTS_TEST if self.is_test_layouts else adminvalues.PHOTOFLOW_LAYOUTS
+            layout_ids = [int(id) for id in models.AdminValue.objects.get(key=key).val.split(",")]
         except models.AdminValue.DoesNotExist:
             layout_ids = [0]
         return layout_ids
