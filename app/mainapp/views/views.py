@@ -396,7 +396,7 @@ def view_flow(request):
     layout_ids = [int(id) for id in _layout_ids.split(",")] if _layout_ids else None
 
     # Create a flow manager
-    flow = photoflow.FlowManager(layout_ids=layout_ids)
+    flow = photoflow.FlowManager(layout_ids=layout_ids, is_test_layouts=True)
 
     # Calculate the number of photos for the initial blocks
     photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
