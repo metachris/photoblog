@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.conf import settings
 
 import mainapp.models as models
-
+from mainapp import adminvalues
 
 log = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class ThumbnailPager(object):
         If last_hash is given, use all photos with order_id < that one
         """
         if not photos_per_page:
-            photos_per_page = settings.PHOTOGRID_ITEMS_INITIAL
+            photos_per_page = adminvalues.get(adminvalues.PHOTOGRID_ITEMS_INITIAL)
 
         log.info("ThumbailPager: load page with filters: %s" % str(self.filters))
 

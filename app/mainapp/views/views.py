@@ -26,7 +26,7 @@ import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 from mainapp.views.photopager import *
 from mainapp.tools import photoflow
-
+from mainapp import adminvalues
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,8 @@ def home(request):
     flow = photoflow.FlowManager()
 
     # Calculate the number of photos for the initial blocks
-    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+    blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(blocks_initial))
 
     # Get the photos for the current page
     pager = ThumbnailPager(Filters(featured_only=True))
@@ -251,24 +252,26 @@ def set_photos(request, set_slug):
 def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
+        blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
+        blocks_perpage = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_PERPAGE)
+
+        ajax_page_count = int(request.REQUEST.get("page"))  # 0-indexed
+        cur_block = blocks_initial + (ajax_page_count * blocks_perpage)  # 0-indexed
+
+        # Count the photos for the currently requested blocks
         flow = photoflow.FlowManager()
+        photo_count = sum(flow.get_items_per_block(n) for n in xrange(cur_block, cur_block+blocks_perpage))
 
-        page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
-
-        blocks_to_get = settings.PHOTOFLOW_BLOCKS_PERPAGE
-        photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_PERPAGE))
-
-        #print "Ajax flow more: Loading block #%s, %s images" % (page, n)
         pager = ThumbnailPager.from_request(request)
         pager.load_page(photos_per_page=photo_count)
         ret = {
-            "html": flow.get_html(pager.photos, block_offset=page),
+            "html": flow.get_html(pager.photos, block_offset=cur_block),
             "has_more": pager.has_more,
             "last_hash": pager.last_hash,
         }
 
     else:
-        n = settings.PHOTOGRID_ITEMS_PERPAGE
+        n = adminvalues.get_int(adminvalues.PHOTOGRID_ITEMS_PERPAGE)
         pager = ThumbnailPager.from_request(request)
         pager.load_page(photos_per_page=n)
 
@@ -402,7 +405,7 @@ def view_flow(request):
     flow = photoflow.FlowManager(layout_ids=layout_ids, is_test_layouts=True)
 
     # Calculate the number of photos for the initial blocks
-    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)))
 
     # Get the current page from the pager
     pager = ThumbnailPager(Filters(featured_only=True))

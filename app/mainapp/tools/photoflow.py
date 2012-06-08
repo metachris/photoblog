@@ -12,7 +12,7 @@ from mainapp import models
 
 from django.core.cache import cache
 
-from mainapp.adminvalues import AdminValues
+from mainapp import adminvalues
 
 
 FLOW_LAYOUTS = [
@@ -214,8 +214,8 @@ class FlowManager(object):
             self.layout.append(FLOW_LAYOUTS[id])
 
     def get_layout_ids(self):
-        lid_str = AdminValues.get(AdminValues.PHOTOFLOW_LAYOUTS_TEST \
-                if self.is_test_layouts else AdminValues.PHOTOFLOW_LAYOUTS)
+        lid_str = adminvalues.get(adminvalues.PHOTOFLOW_LAYOUTS_TEST \
+                if self.is_test_layouts else adminvalues.PHOTOFLOW_LAYOUTS)
         lids = [int(id) for id in lid_str.split(",")]
         return lids
 
