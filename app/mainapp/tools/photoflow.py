@@ -198,17 +198,20 @@ class Renderer(object):
 
 class FlowManager(object):
     """Helps with managing flow pages"""
-    def __init__(self):
-        """Sets the current layout"""
-        try:
-            # This 'db' query is cached, so no need to really worry about performance issues
-            self.layout_ids = [int(id) for id in models.AdminValue.objects.get(key="photoflow_layouts_test").val.split(",")]
-        except models.AdminValue.DoesNotExist:
-            self.layout_ids = [0]
-
+    def __init__(self, layout_ids=None):
+        """Sets the current layout based on models.AdminValue. If layout_ids list is supplied, use that instead."""
+        self.layout_ids = layout_ids or self.get_layout_ids()
         self.layout = []
         for id in self.layout_ids:
             self.layout.append(FLOW_LAYOUTS[id])
+
+    def get_layout_ids(self):
+        try:
+            # This 'db' query is cached, so no need to really worry about performance issues
+            layout_ids = [int(id) for id in models.AdminValue.objects.get(key="photoflow_layouts_test").val.split(",")]
+        except models.AdminValue.DoesNotExist:
+            layout_ids = [0]
+        return layout_ids
 
     def get_cols_per_block(self, block_index):
         """Get the number of columns for a specific block (0..n)"""

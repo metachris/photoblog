@@ -15,6 +15,7 @@ from django.template.loader import get_template
 from django.template import Context, Template
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
+from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 
@@ -374,9 +375,12 @@ def get_handout(request, handout_hash=None):
         return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})
 
 
+@login_required
 def view_flow(request):
     """Show initial flow page"""
-    flow = photoflow.FlowManager()
+    _layout_ids = request.GET.get("l")
+    layout_ids = [int(id) for id in _layout_ids.split(",")] if _layout_ids else None
+    flow = photoflow.FlowManager(layout_ids=layout_ids)
     photo_count = flow.get_items_per_block(0) + flow.get_items_per_block(1)
     pager = ThumbnailPager(Filters(featured_only=True))
     pager.load_page(photos_per_page=photo_count)
