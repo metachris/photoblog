@@ -71,7 +71,7 @@ def minify_js():
     d = os.path.join(CUR_PATH, "js")
     for (path, dirs, files) in os.walk(d):
         for file in files:
-            if file.endswith("js"):
+            if file.endswith("js") and not file.endswith(".min.js"):
                 fn = os.path.join(path, file)
                 fn_to = "%s.min.js" % fn[:-3]
 

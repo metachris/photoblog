@@ -50,7 +50,6 @@ function check_scroll_bottom() {
 // Photo hover handler
 function set_photo_hover_handler(el) {
     // Update hover mechanism for all photos (at start and after loading another page)
-    console.log("Set hover handler");
     el.hover(function() {
         $(this).find(".photo-caption").show();
     }, function() {
