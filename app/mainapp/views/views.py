@@ -252,12 +252,15 @@ def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
         flow = photoflow.FlowManager()
+
         page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
-        n = flow.get_items_per_block(page)
+
+        blocks_to_get = settings.PHOTOFLOW_BLOCKS_PERPAGE
+        photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_PERPAGE))
 
         #print "Ajax flow more: Loading block #%s, %s images" % (page, n)
         pager = ThumbnailPager.from_request(request)
-        pager.load_page(photos_per_page=n)
+        pager.load_page(photos_per_page=photo_count)
         ret = {
             "html": flow.get_html(pager.photos, block_offset=page),
             "has_more": pager.has_more,

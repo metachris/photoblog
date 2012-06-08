@@ -13,14 +13,14 @@ import os
 import datetime
 
 
+# Number of photos to show in the grid initially and on more pages
 PHOTOGRID_ITEMS_INITIAL = 11
 PHOTOGRID_ITEMS_PERPAGE = 6
 
-PHOTOFLOW_BLOCKS_INITIAL = 2  # 4x2 block
-PHOTOFLOW_BLOCKS_PERPAGE = 1  # 4x2 block
-
-NOW = datetime.datetime.now()
-DATE_STR = NOW.strftime("%Y-%m-%d")
+# Number of flow containers to show in the photo-flow,
+# One block is a 4x2 container with up to 4 cols
+PHOTOFLOW_BLOCKS_INITIAL = 3
+PHOTOFLOW_BLOCKS_PERPAGE = 2
 
 # Import machine/environment specific settings based on the hostname
 # (current machine's network name). Specified in settings/hosts.py
@@ -31,8 +31,10 @@ else:
     print "Loading dev settings"
     from settings_dev import *
 
-# Second step: Common settings
-# ----------------------------
+# Helper for later
+NOW = datetime.datetime.now()
+DATE_STR = NOW.strftime("%Y-%m-%d")
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 TIME_ZONE = 'Europe/Vienna'
