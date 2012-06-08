@@ -10,12 +10,14 @@
 var el_win = $(window);
 var el_doc = $(document);
 
+var photo_class = mode_flow ? ".photoflow-item" : ".photo-container";
+
 // var scroll_load_more_enabled ... set in photogrid.html
 var scroll_enabled = true; // to disable temporarily. only works if scroll_load_more_enabled is true.
 
 $(document).ready(function(){
     // Set hover handler
-    $(".photo-container").each(function() {
+    $(photo_class).each(function() {
         set_photo_hover_handler($(this));
     });
 
@@ -48,6 +50,7 @@ function check_scroll_bottom() {
 // Photo hover handler
 function set_photo_hover_handler(el) {
     // Update hover mechanism for all photos (at start and after loading another page)
+    console.log("Set hover handler");
     el.hover(function() {
         $(this).find(".photo-caption").show();
     }, function() {
@@ -98,6 +101,7 @@ function load_photos_grid() {
             var photo = $(d.photos[i]);
             photo.hide();
             photo.insertBefore("#photo-container-more");
+            set_photo_hover_handler(photo);
             photos_to_add.push(photo);
         }
 
@@ -141,7 +145,8 @@ function load_photos_flow() {
 
         // Build the HTML block, hide all images and add them to the fade-in array
         block = $(d.html);
-        block.find("img").each(function() {
+        block.find(photo_class).each(function() {
+            set_photo_hover_handler($(this));
             $(this).hide();
             photos_to_add.push($(this));
         });
@@ -171,7 +176,6 @@ function show_new_photos() {
     // Fade in one photo after another
     photo = photos_to_add.shift();
     if (photo) {
-        set_photo_hover_handler(photo);
         photo.fadeIn("normal", function() {
             show_new_photos();
         });
