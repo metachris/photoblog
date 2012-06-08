@@ -22,6 +22,10 @@ class PhotoAdmin(admin.ModelAdmin):
     exclude = ["description_html", "external_url", "url", "hash"]
 
 
+class AdminValueAdmin(admin.ModelAdmin):
+    list_display = ["key", "val", "id"]
+
+
 admin.site.register(models.UserProfile)
 admin.site.register(models.Tag, MP_Tag_Admin)
 admin.site.register(models.Photo, PhotoAdmin)
@@ -30,4 +34,4 @@ admin.site.register(models.Location, MP_Location_Admin)
 
 admin.site.register(models.Handout)
 admin.site.register(models.HandoutContact)
-admin.site.register(models.AdminValue)
+admin.site.register(models.AdminValue, AdminValueAdmin)
