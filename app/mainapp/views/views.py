@@ -381,7 +381,10 @@ def view_flow(request):
     _layout_ids = request.GET.get("l")
     layout_ids = [int(id) for id in _layout_ids.split(",")] if _layout_ids else None
     flow = photoflow.FlowManager(layout_ids=layout_ids)
-    photo_count = flow.get_items_per_block(0) + flow.get_items_per_block(1)
+
+    photo_count = 0
+    for i in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL):
+        photo_count += flow.get_items_per_block(i)
     pager = ThumbnailPager(Filters(featured_only=True))
     pager.load_page(photos_per_page=photo_count)
     flow_html = flow.get_html(pager.photos)

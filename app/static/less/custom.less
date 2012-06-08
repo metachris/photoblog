@@ -96,14 +96,8 @@ ul.photo-grid, ol.photo-grid {
     width:280px;
     margin-right: 18px;
     margin-bottom: 18px;
-    .border-radius(2px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    .transition(border 0.5s);
 }
 
-.photo-container:hover {
-    border: 1px solid rgba(255, 255, 255, 0.38);
-}
 
 .photo-square {
     width: 280px;
@@ -114,7 +108,11 @@ ul.photo-grid, ol.photo-grid {
 
 // Photo Flow
 // ----------
-
+.photoflow-item {
+    float:left;
+    position: relative;
+    overflow: hidden;
+}
 
 // Photo Grid + Flow
 // -----------------
@@ -128,49 +126,61 @@ ul.photo-grid, ol.photo-grid {
     width: 100%;
     height: 40px;
     display: none;
-}
 
-.photo-caption .title {
-    width: 260px;
-    font-size: 18px;
-    font-weight: 300;
-    line-height: 20px;
-    height: 23px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color:white;
+    .title {
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 20px;
+        height: 23px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color:@white;
+    }
 }
 
 #photo-container-more .loading {
     display:none;
 }
 
-/** PHOTO DETAIL PAGE **/
+// Dynamic Photo Frame (grid & glow)
+.frame-dynamic {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    .transition(border 0.5s);
+    .border-radius(2px);
+}
+
+.frame-dynamic:hover {
+    border: 1px solid rgba(255, 255, 255, 0.38);
+}
+
+// PHOTO DETAIL PAGE
+// -----------------
 #photo-main-caption {
     font-size:18px;
     color: @orange;
 }
 
-.span-prev a, .span-next a {
-    color: @grayLight;
-}
-.span-prev a:hover, .span-next a:hover {
-    color: @grayLighter;
-    text-decoration: none;
+.span-prev, .span-next {
+    font-weight: 300;
+
+    a {
+        color: @grayLight;
+    }
+
+    a:hover {
+        color: @grayLighter;
+        text-decoration: none;
+    }
 }
 
-// Photo Itself
+// Photo Frame (Detail page)
 .frame {
     border: 1px solid rgba(255, 255, 255, 0.2);
     .border-radius(2px);
 }
-
-//#photo-main-container.fullscreen .frame {
-//    border: 1px solid rgba(255, 255, 255, 0.2);
-//}
 
 #photo-main-container {
     background: @black;

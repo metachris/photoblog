@@ -20,18 +20,18 @@
 {% for col in cols %}
     <div style="float:left; max-width:{{ col.w_px }}px; max-height:{{ col.h_px }}px;">
         {% for item in col.items %}
-        <div class="photoflow-item" style="float:left; position: relative; overflow: hidden; margin-right: {{ item.MARGIN_RIGHT }}px; margin-bottom: {{ item.MARGIN_BOTTOM }}px;">
-            {% thumbnail item.photo.url item.size crop="center" as im %}
+            <div class="photoflow-item" style="margin-right: {{ item.MARGIN_RIGHT }}px; margin-bottom: {{ item.MARGIN_BOTTOM }}px;">
+                {% thumbnail item.photo.url item.size crop="center" as im %}
                     <a href="/photo/{{ item.photo.slug }}{% if photo_link_attr %}?{{ photo_link_attr }}={{ photo_link_val }}{% endif %}" class="a-no-underline">
-                        <img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}" class="frame">
+                        <img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}" class="frame-dynamic">
                         <div class="photo-caption">
                             <div class="title">
                                 {{ item.photo.title }}
                             </div>
                         </div>
                     </a>
-            {% endthumbnail %}
-        </div>
+                {% endthumbnail %}
+            </div>
         {% endfor %}
     </div>
 {% endfor %}
