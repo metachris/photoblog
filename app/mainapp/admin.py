@@ -18,12 +18,17 @@ class PhotoModelForm( forms.ModelForm ):
 
 
 class PhotoAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "published", "order_id", "hash", "slug", "url"]
-    exclude = ["description_html", "external_url", "url", "hash"]
+    list_display = ["title", "id", "order_id", "published", "slug", "hash", "url"]
+    exclude = ["description_html", "external_url", "url"]
+    list_filter = ("published",)
 
 
 class AdminValueAdmin(admin.ModelAdmin):
     list_display = ["key", "val", "id"]
+
+
+class HandoutContactAdmin(admin.ModelAdmin):
+    list_display = ["name", "email", "tel"]
 
 
 admin.site.register(models.UserProfile)
@@ -33,5 +38,5 @@ admin.site.register(models.Set)
 admin.site.register(models.Location, MP_Location_Admin)
 
 admin.site.register(models.Handout)
-admin.site.register(models.HandoutContact)
+admin.site.register(models.HandoutContact, HandoutContactAdmin)
 admin.site.register(models.AdminValue, AdminValueAdmin)

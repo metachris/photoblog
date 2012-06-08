@@ -217,11 +217,13 @@ class Photo(caching.base.CachingMixin, models.Model):
         photo = kwargs["instance"]
         log.info("Photo post delete handler: removing image files '%s'" % photo.local_filename)
         if photo.local_filename:
+            # Delete photos
             fn_upload = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD, photo.local_filename)
             fn_photo = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS, photo.local_filename)
-            os.remove(fn_upload)
-            os.remove(fn_photo)
-            log.info("- all removed")
+            if os.path.isfile(fn_upload):
+                os.remove(fn_upload)
+            if os.path.isfile(fn_photo):
+                os.remove(fn_photo)
         else:
             log.info("- no local filename")
 
