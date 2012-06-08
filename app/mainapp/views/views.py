@@ -33,8 +33,21 @@ log = logging.getLogger(__name__)
 
 @cache_page(60 * 15)
 def home(request):
-    page = ThumbnailPager(Filters(featured_only=True)).load_page()
-    return render(request, 'index.html', {'page': page})
+#    page = ThumbnailPager(Filters(featured_only=True)).load_page()
+#    return render(request, 'index.html', {'page': page})
+    # Create a flow manager
+    flow = photoflow.FlowManager()
+
+    # Calculate the number of photos for the initial blocks
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+
+    # Get the photos for the current page
+    pager = ThumbnailPager(Filters(featured_only=True))
+    pager.load_page(photos_per_page=photo_count)
+
+    # Build the flow-html and render to response
+    flow_html = flow.get_html(pager.photos)
+    return render(request, 'index.html', {'page': pager, "flow_html": flow_html })
 
 
 @cache_page(60 * 15)
@@ -242,7 +255,7 @@ def ajax_photo_more(request):
         page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
         n = flow.get_items_per_block(page)
 
-        print "Ajax flow more: Loading block #%s, %s images" % (page, n)
+        #print "Ajax flow more: Loading block #%s, %s images" % (page, n)
         pager = ThumbnailPager.from_request(request)
         pager.load_page(photos_per_page=n)
         ret = {
@@ -378,14 +391,20 @@ def get_handout(request, handout_hash=None):
 @login_required
 def view_flow(request):
     """Show initial flow page"""
+    # Allow overwriting layout-ids for testing with eg. '/flow/?l=0,3'
     _layout_ids = request.GET.get("l")
     layout_ids = [int(id) for id in _layout_ids.split(",")] if _layout_ids else None
+
+    # Create a flow manager
     flow = photoflow.FlowManager(layout_ids=layout_ids)
 
-    photo_count = 0
-    for i in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL):
-        photo_count += flow.get_items_per_block(i)
+    # Calculate the number of photos for the initial blocks
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+
+    # Get the current page from the pager
     pager = ThumbnailPager(Filters(featured_only=True))
     pager.load_page(photos_per_page=photo_count)
+
+    # Get the flow html and render to response
     flow_html = flow.get_html(pager.photos)
     return render(request, 'mainapp/flow.html', {'page': pager, "flow_html": flow_html })
