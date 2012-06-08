@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<meta name="description" content="Stunning sport, climbing and nature photography.">
+{% endblock %}
+
+{% block body-class %}photoflow{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="span12">
+        <div class="photoflow-wrapper">
+            {{ flow_html|safe }}
+            <div id="end-of-flow"></div>
+        </div>
+    </div>
+
+    <div class="span12">
+        <a name="load_photos" />
+        <a href="#load_photos" onclick="load_photos()" title="Load more photos...">
+            <div id="photo-container-more-wrapper" style="height: 57px; margin-right:13px; text-align: center;">
+                <div id="photo-container-more" style="height: 55px; text-align: center;" class="frame">
+                    <div class="default" style="margin-top:16px;">more...</div>
+                    <div class="loading" style="margin-top:10px;"><img src="{{ STATIC_URL }}img/ajax-loader-darkbg2.gif" /></div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_bottom %}
+<script type="text/javascript">
+    var mode_flow = true;
+    var scroll_load_more_enabled = true;
+    var photogrid_info = {
+        {% for k, v in page.filters.to_html_dict.items %}"{{ k }}": "{{ v }}", {% endfor %}
+    }
+</script>
+<script src="{{ STATIC_URL }}js/photogrid.js"></script>
+{% endblock %}

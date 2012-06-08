@@ -5,7 +5,9 @@ function on_fullscreen_change(is_fullscreen) {
     is_full_screen = is_fullscreen;
     if (is_fullscreen) {
         $("#photo-main-container").removeClass("normal");
+        $("#photo-main-container img").attr("title", "");
     } else {
+        $("#photo-main-container img").attr("title", "Go Fullscreen");
         $("#photo-main-container").removeClass("fullscreen");
         $("#photo-main-container").addClass("normal");
     }

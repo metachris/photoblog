@@ -1,11 +1,16 @@
 # encoding: utf-8
 import datetime
+import hashlib
 from django import template
+from django.template.context import Context
 from django.template.defaultfilters import stringfilter
 from django.template.defaultfilters import date as date_filter
 from django.core.cache import cache
+from django.template.loader import get_template
+from django.conf import settings
 
-import mainapp.forms
+from mainapp.tools import photoflow
+from mainapp import models
 
 register = template.Library()
 
@@ -82,3 +87,4 @@ def photo_exif_shot(photo):
         ret = ret.format(photo=photo)
         ret = "<p>%s</p>" % ret
     return ret
+

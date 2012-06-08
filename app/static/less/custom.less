@@ -35,69 +35,69 @@ small {
     color:@black;
 }
 
-ul.photo-grid, ol.photo-grid {
-    margin:0px;
-    padding:0px;
-    list-style-type: none;
+.page-header {
+    border-bottom-color: @grayDark;
+    margin-top: 20px;
+    font-weight:300;
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    h1 {
+        font-weight: 300;
+        a {
+            color: @orange;
+        }
+    }
+
+    #topnav {
+        float:right;
+        padding-top: 12px;
+
+        a {
+            padding-left:20px;
+            color: @grayLight;
+        }
+
+        a:hover {
+            color: @grayLighter;
+        }
+    }
 }
 
 body.photogrid .page-header {
     max-width: 882px; // perfectly matches 3 grid items
 }
 
-.page-header {
-    border-bottom-color: @gray;
-    margin-top: 20px;
+body.photoflow  {
+    .page-header {
+        max-width: 927px; // perfectly matches photo flow width
+    }
 }
 
-.page-header a:hover {
-    text-decoration: none;
-}
-
-.page-header h1 {
-    font-weight: normal;
-}
-
-.page-header h1 a {
-    color: @orange;
-}
-
-.page-header #topnav {
-    float:right;
-    padding-top: 12px;
-}
-
-.page-header #topnav a {
-    padding-left:20px;
-    color: @grayLight;
-    .transition(color 0.2s);
-}
-
-.page-header #topnav a:hover {
-    color: @grayLighter;
+ul.photo-grid, ol.photo-grid {
+    margin:0px;
+    padding:0px;
+    list-style-type: none;
 }
 
 .caption {
     font-size: 18px;
+    font-weight:300;
     margin-bottom:20px;
 }
 
 
-// Photo grid containers
-// ---------------------
+// Photo Grid
+// ----------
 .photo-container {
     float:left;
     width:280px;
     margin-right: 18px;
     margin-bottom: 18px;
-    .border-radius(2px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    .transition(border 0.5s);
 }
 
-.photo-container:hover {
-    border: 1px solid rgba(255, 255, 255, 0.38);
-}
 
 .photo-square {
     width: 280px;
@@ -106,6 +106,20 @@ body.photogrid .page-header {
     position: relative;
 }
 
+// Photo Flow
+// ----------
+.photoflow-wrapper {
+    padding-top:2px;
+}
+
+.photoflow-item {
+    float:left;
+    position: relative;
+    overflow: hidden;
+}
+
+// Photo Grid + Flow
+// -----------------
 .photo-caption {
     position: absolute;
     overflow: hidden;
@@ -116,49 +130,61 @@ body.photogrid .page-header {
     width: 100%;
     height: 40px;
     display: none;
-}
 
-.photo-caption .title {
-    width: 260px;
-    font-size: 18px;
-    line-height: 20px;
-    height: 23px;
-    font-weight: 300;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color:white;
+    .title {
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 20px;
+        height: 23px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color:@white;
+    }
 }
 
 #photo-container-more .loading {
     display:none;
 }
 
-/** PHOTO DETAIL PAGE **/
+// Dynamic Photo Frame (grid & glow)
+.frame-dynamic {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    .transition(border 0.5s);
+    .border-radius(2px);
+}
+
+.frame-dynamic:hover {
+    border: 1px solid rgba(255, 255, 255, 0.38);
+}
+
+// PHOTO DETAIL PAGE
+// -----------------
 #photo-main-caption {
     font-size:18px;
     color: @orange;
 }
 
-.span-prev a, .span-next a {
-    color: @grayLight;
-}
-.span-prev a:hover, .span-next a:hover {
-    color: @grayLighter;
-    text-decoration: none;
+.span-prev, .span-next {
+    font-weight: 300;
+
+    a {
+        color: @grayLight;
+    }
+
+    a:hover {
+        color: @grayLighter;
+        text-decoration: none;
+    }
 }
 
-// Photo Itself
+// Photo Frame (Detail page)
 .frame {
     border: 1px solid rgba(255, 255, 255, 0.2);
     .border-radius(2px);
 }
-
-//#photo-main-container.fullscreen .frame {
-//    border: 1px solid rgba(255, 255, 255, 0.2);
-//}
 
 #photo-main-container {
     background: @black;
@@ -297,3 +323,4 @@ form.form-bg-dark {
         font-size: 85%;
     }
 }
+

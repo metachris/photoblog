@@ -16,6 +16,8 @@ import datetime
 PHOTOGRID_ITEMS_INITIAL = 11
 PHOTOGRID_ITEMS_PERPAGE = 6
 
+PHOTOFLOW_BLOCKS_INITIAL = 2  # 4x2 block
+PHOTOFLOW_BLOCKS_PERPAGE = 1  # 4x2 block
 
 NOW = datetime.datetime.now()
 DATE_STR = NOW.strftime("%Y-%m-%d")

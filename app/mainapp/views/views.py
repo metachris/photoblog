@@ -15,6 +15,7 @@ from django.template.loader import get_template
 from django.template import Context, Template
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
+from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 
@@ -24,6 +25,7 @@ import mainapp.tools as tools
 import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 from mainapp.views.photopager import *
+from mainapp.tools import photoflow
 
 
 log = logging.getLogger(__name__)
@@ -234,19 +236,35 @@ def set_photos(request, set_slug):
 
 
 def ajax_photo_more(request):
-    pager = ThumbnailPager.from_request(request)
-    pager.load_page(photos_per_page=settings.PHOTOGRID_ITEMS_PERPAGE)
+    is_flow_mode = request.REQUEST.get("type") == "flow"
+    if is_flow_mode:
+        flow = photoflow.FlowManager()
+        page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
+        n = flow.get_items_per_block(page)
 
-    # Prepare return json
-    ret = {
-        "photos": [],
-        "has_more": pager.has_more,
-        "last_hash": pager.last_hash,
-    }
+        print "Ajax flow more: Loading block #%s, %s images" % (page, n)
+        pager = ThumbnailPager.from_request(request)
+        pager.load_page(photos_per_page=n)
+        ret = {
+            "html": flow.get_html(pager.photos, block_offset=page),
+            "has_more": pager.has_more,
+            "last_hash": pager.last_hash,
+        }
 
-    griditem_template = get_template('mainapp/photogrid_item.html')
-    for photo in pager.photos:
-        ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
+    else:
+        n = settings.PHOTOGRID_ITEMS_PERPAGE
+        pager = ThumbnailPager.from_request(request)
+        pager.load_page(photos_per_page=n)
+
+        ret = {
+            "photos": [],
+            "has_more": pager.has_more,
+            "last_hash": pager.last_hash,
+        }
+
+        griditem_template = get_template('mainapp/photogrid_item.html')
+        for photo in pager.photos:
+            ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
 
     return HttpResponse(json.dumps(ret))
 
@@ -357,3 +375,17 @@ def get_handout(request, handout_hash=None):
         return render(request, 'mainapp/handout_notyetonline.html', {"id": handout_hash, "contact": contact_subscribed})
 
 
+@login_required
+def view_flow(request):
+    """Show initial flow page"""
+    _layout_ids = request.GET.get("l")
+    layout_ids = [int(id) for id in _layout_ids.split(",")] if _layout_ids else None
+    flow = photoflow.FlowManager(layout_ids=layout_ids)
+
+    photo_count = 0
+    for i in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL):
+        photo_count += flow.get_items_per_block(i)
+    pager = ThumbnailPager(Filters(featured_only=True))
+    pager.load_page(photos_per_page=photo_count)
+    flow_html = flow.get_html(pager.photos)
+    return render(request, 'mainapp/flow.html', {'page': pager, "flow_html": flow_html })

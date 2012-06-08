@@ -30,3 +30,4 @@ admin.site.register(models.Location, MP_Location_Admin)
 
 admin.site.register(models.Handout)
 admin.site.register(models.HandoutContact)
+admin.site.register(models.AdminValue)

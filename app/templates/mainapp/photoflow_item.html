@@ -1,0 +1,37 @@
+{% load thumbnail %}
+{% load extras %}
+
+<!--<table class="photoflow">-->
+    <!--{% for row in rows %}-->
+        <!--<tr>-->
+            <!--{% for item in row %}-->
+                <!--<td colspan="{{ item.w }}" rowspan="{{ item.h }}" valign="top" width="{{ item.td_w }}" height="{{ item.td_h }}" style="text-align: left;">-->
+                    <!--{% thumbnail item.photo.url item.size crop="center" as im %}-->
+                        <!--<a href="/photo/{{ item.photo.slug }}{% if photo_link_attr %}?{{ photo_link_attr }}={{ photo_link_val }}{% endif %}" class="a-no-underline">-->
+                            <!--<img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}" width="{{ im.width }}" height="{{ im.height }}" class="frame">-->
+                        <!--</a>-->
+                    <!--{% endthumbnail %}-->
+                <!--</td>-->
+            <!--{% endfor %}-->
+        <!--</tr>-->
+    <!--{% endfor %}-->
+<!--</table>-->
+
+{% for col in cols %}
+    <div style="float:left; max-width:{{ col.w_px }}px; max-height:{{ col.h_px }}px;">
+        {% for item in col.items %}
+            <div class="photoflow-item" style="margin-right: {{ item.MARGIN_RIGHT }}px; margin-bottom: {{ item.MARGIN_BOTTOM }}px;">
+                {% thumbnail item.photo.url item.size crop="center" as im %}
+                    <a href="/photo/{{ item.photo.slug }}{% if photo_link_attr %}?{{ photo_link_attr }}={{ photo_link_val }}{% endif %}" class="a-no-underline">
+                        <img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}" class="frame-dynamic">
+                        <div class="photo-caption">
+                            <div class="title">
+                                {{ item.photo.title }}
+                            </div>
+                        </div>
+                    </a>
+                {% endthumbnail %}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
