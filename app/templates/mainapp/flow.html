@@ -9,8 +9,10 @@
 {% block body %}
 <div class="row">
     <div class="span12">
-        {{ flow_html|safe }}
-        <div id="end-of-flow"></div>
+        <div class="photoflow-wrapper">
+            {{ flow_html|safe }}
+            <div id="end-of-flow"></div>
+        </div>
     </div>
 
     <div class="span12">
