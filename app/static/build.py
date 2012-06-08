@@ -23,10 +23,11 @@ def show_help():
 
         $ %(cmd)s boostrap
         $ %(cmd)s css
+        $ %(cmd)s minify
         $ %(cmd)s gzip
 
-        $ %(cmd)s all (all of these three, in this order)
-    """ % { "cmd": sys.argv[0] }
+        $ %(cmd)s all (all of them, in this order)
+    """ % {"cmd": sys.argv[0]}
 
 
 def build_bootstrap():
@@ -53,11 +54,30 @@ def build_css():
             if file.endswith("less"):
                 fn = os.path.join(path, file)
                 fn_to = "%s.css" % os.path.join(path_dest, file)[:-5]
-                cmd = "%s --compile %s > %s" % (CMD_RECESS, fn, fn_to)
+                fn_to_min = "%s.min.css" % os.path.join(path_dest, file)[:-5]
+
                 print "- %s" % fn
-                os.system(cmd)
+                cmd1 = "%s --compile %s > %s" % (CMD_RECESS, fn, fn_to)
+                cmd2 = "%s --compress %s > %s" % (CMD_RECESS, fn, fn_to_min)
+                os.system(cmd1)
+                os.system(cmd2)
 
     print "Finished building css files."
+
+
+def minify_js():
+    """Minifies js files. css files are already minified on compilation"""
+    print "Minify js files"
+    d = os.path.join(CUR_PATH, "js")
+    for (path, dirs, files) in os.walk(d):
+        for file in files:
+            if file.endswith("js"):
+                fn = os.path.join(path, file)
+                fn_to = "%s.min.js" % fn[:-3]
+
+                print "- %s" % fn
+                cmd = "uglifyjs -nc %s > %s" % (fn, fn_to)
+                os.system(cmd)
 
 
 def build_gzip():
@@ -74,8 +94,32 @@ def build_gzip():
                     continue
                 fn = os.path.join(path, file)
                 print "- %s" % fn
-                cmd = "gzip -c %(file)s > %(file)s.gz" % { "file": fn }
+                cmd = "gzip -c %(file)s > %(file)s.gz" % {"file": fn}
                 os.system(cmd)
+
+
+def run(cmds):
+    if "-h" in cmds or "--help" in cmds:
+        show_help()
+        return
+
+    if "bootstrap" in cmds:
+        build_bootstrap()
+
+    if "css" in cmds:
+        build_css()
+
+    if "minify" in cmds:
+        minify_js()
+
+    if "gzip" in cmds:
+        build_gzip()
+
+    if "all" in cmds:
+        build_bootstrap()
+        build_css()
+        minify_js()
+        build_gzip()
 
 
 if __name__ == "__main__":
@@ -83,21 +127,4 @@ if __name__ == "__main__":
         show_help()
 
     else:
-        cmd = sys.argv[1]
-        if cmd == "bootstrap":
-            build_bootstrap()
-
-        elif cmd == "css":
-            build_css()
-
-        elif cmd == "gzip":
-            build_gzip()
-
-        elif cmd == "all":
-            build_bootstrap()
-            build_css()
-            build_gzip()
-
-        else:
-            show_help()
-
+        run(sys.argv[1:])
