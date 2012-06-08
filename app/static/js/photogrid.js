@@ -1,11 +1,17 @@
-COOKIE_NAME_GRIDPAGE = "lastGridPage";
+/**
+ * Helper for photo-grid and photo-flow.
+ *
+ * - Ajax load more pages
+ * - Set image hover handler
+ */
+
+//COOKIE_NAME_GRIDPAGE = "lastGridPage";
 
 var el_win = $(window);
 var el_doc = $(document);
 
 // var scroll_load_more_enabled ... set in photogrid.html
-var scroll_enabled = true; // to disable temp. only works if scroll_load_more_enabled is true.
-
+var scroll_enabled = true; // to disable temporarily. only works if scroll_load_more_enabled is true.
 
 $(document).ready(function(){
     // Set hover handler
@@ -29,6 +35,17 @@ $(document).ready(function(){
 //    setCookie(COOKIE_NAME_GRIDPAGE, "", 30);
 });
 
+
+// Scroll helper
+function check_scroll_bottom() {
+    if (scroll_enabled) {
+        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 180) {
+            load_photos();
+        }
+    }
+}
+
+// Photo hover handler
 function set_photo_hover_handler(el) {
     // Update hover mechanism for all photos (at start and after loading another page)
     el.hover(function() {
@@ -59,47 +76,102 @@ function load_photos() {
 
     // Toggle loading ui state
     is_loading = true;
+
     $("#photo-container-more .default").hide();
     $("#photo-container-more .loading").show();
 
+    if (mode_flow) {
+        load_photos_flow();
+    } else {
+        load_photos_grid();
+    }
+}
+
+function load_photos_grid() {
     // Make ajax request
-    $.get("/ajax/photo/more", photogrid_info, function(data) {
+    $.get("/ajax/photo/more/", photogrid_info, function(data) {
         d = JSON.parse(data);
         photogrid_info["last_hash"] = d.last_hash;
 
-//        console.log("200. has more: " + d.has_more);
+        // Add the hidden photos to the DOM
         for (var i=0; i<d.photos.length; i++) {
-            photos_to_add.push($(d.photos[i]));
+            var photo = $(d.photos[i]);
+            photo.hide();
+            photo.insertBefore("#photo-container-more");
+            photos_to_add.push(photo);
         }
 
         // Show new photos (fade in)
         $("#photo-container-more").fadeOut("normal", function() {
+            // When container is faded out, start showing images
             $("#photo-container-more .default").show();
             $("#photo-container-more .loading").hide();
             show_new_photos();
         });
 
+        // If not more, hide 'more' element
         if (!d.has_more) {
             $("#photo-container-more").fadeOut();
         }
 
+        // If callbacks are registered, call now
         if (window.onMorePhotosLoaded) {
             window.onMorePhotosLoaded();
         }
 
         page++;
-//        setCookie(COOKIE_NAME_GRIDPAGE, page, 30);
-
         last_response = d;
+
+//        setCookie(COOKIE_NAME_GRIDPAGE, page, 30);
     })
 }
 
+function load_photos_flow() {
+    args = photogrid_info;
+    args["type"] = "flow";
+    args["page"] = page;
+
+    // Make ajax request
+    $.get("/ajax/photo/more/", args, function(data) {
+        d = JSON.parse(data);
+        photogrid_info["last_hash"] = d.last_hash;
+
+        page++;
+        last_response = d;
+
+        // Build the HTML block, hide all images and add them to the fade-in array
+        block = $(d.html);
+        block.find("img").each(function() {
+            $(this).hide();
+            photos_to_add.push($(this));
+        });
+
+        // Fade out more-container and start show-image sequence
+        $("#photo-container-more").fadeOut("normal", function() {
+            // When container is faded out, start showing images
+            block.insertBefore("#end-of-flow");
+            $("#photo-container-more .default").show();
+            $("#photo-container-more .loading").hide();
+            show_new_photos();
+        });
+
+        // Hide more-container if no more images
+        if (!last_response.has_more) {
+            $("#photo-container-more").fadeOut();
+        }
+
+        // If callbacks are registered, call now
+        if (window.onMorePhotosLoaded) {
+            window.onMorePhotosLoaded();
+        }
+    });
+}
+
 function show_new_photos() {
-    photo = photos_to_add.pop();
+    // Fade in one photo after another
+    photo = photos_to_add.shift();
     if (photo) {
-        photo.hide();
         set_photo_hover_handler(photo);
-        photo.insertBefore("#photo-container-more");
         photo.fadeIn("normal", function() {
             show_new_photos();
         });
@@ -108,15 +180,6 @@ function show_new_photos() {
         if (last_response && last_response.has_more) {
             $("#photo-container-more").fadeIn();
             el_win.scroll();
-        }
-    }
-}
-
-// Scroll helper
-function check_scroll_bottom() {
-    if (scroll_enabled) {
-        if (el_win.scrollTop() >= el_doc.height() - el_win.height() - 180) {
-            load_photos();
         }
     }
 }

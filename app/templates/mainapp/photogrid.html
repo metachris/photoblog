@@ -23,6 +23,7 @@
 
 {% if filters %}
 <script type="text/javascript">
+    var mode_flow = false;
     var scroll_load_more_enabled = {% if scroll_load_more_disabled %}false{% else %}true{% endif %};
     var photogrid_info = {
         {% for k, v in filters.to_html_dict.items %}"{{ k }}": "{{ v }}", {% endfor %}

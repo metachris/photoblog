@@ -235,21 +235,35 @@ def set_photos(request, set_slug):
 
 
 def ajax_photo_more(request):
-    n = settings.PHOTOFLOW_BLOCKS_PERPAGE * 8 if request.GET.get("t") == "flow" else settings.PHOTOGRID_ITEMS_PERPAGE
-    print "ajax more. n=", n
-    pager = ThumbnailPager.from_request(request)
-    pager.load_page(photos_per_page=n)
+    is_flow_mode = request.REQUEST.get("type") == "flow"
+    if is_flow_mode:
+        flow = photoflow.FlowManager()
+        page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
+        n = flow.get_items_per_block(page)
 
-    # Prepare return json
-    ret = {
-        "photos": [],
-        "has_more": pager.has_more,
-        "last_hash": pager.last_hash,
-    }
+        print "Ajax flow more: Loading block #%s, %s images" % (page, n)
+        pager = ThumbnailPager.from_request(request)
+        pager.load_page(photos_per_page=n)
+        ret = {
+            "html": flow.get_html(pager.photos, block_offset=page),
+            "has_more": pager.has_more,
+            "last_hash": pager.last_hash,
+        }
 
-    griditem_template = get_template('mainapp/photogrid_item.html')
-    for photo in pager.photos:
-        ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
+    else:
+        n = settings.PHOTOGRID_ITEMS_PERPAGE
+        pager = ThumbnailPager.from_request(request)
+        pager.load_page(photos_per_page=n)
+
+        ret = {
+            "photos": [],
+            "has_more": pager.has_more,
+            "last_hash": pager.last_hash,
+        }
+
+        griditem_template = get_template('mainapp/photogrid_item.html')
+        for photo in pager.photos:
+            ret["photos"].append(griditem_template.render(Context({ "photo": photo })))
 
     return HttpResponse(json.dumps(ret))
 
@@ -361,8 +375,9 @@ def get_handout(request, handout_hash=None):
 
 
 def view_flow(request):
+    """Show initial flow page"""
     flow = photoflow.FlowManager()
-    photo_count = flow.get_items_per_block(1) + flow.get_items_per_block(2)
+    photo_count = flow.get_items_per_block(0) + flow.get_items_per_block(1)
     pager = ThumbnailPager(Filters(featured_only=True))
     pager.load_page(photos_per_page=photo_count)
     flow_html = flow.get_html(pager.photos)

@@ -10,7 +10,6 @@ from django.template.context import Context
 from django.template.loader import get_template
 from mainapp import models
 
-from django.conf import settings
 from django.core.cache import cache
 
 
@@ -100,10 +99,7 @@ class Item:
 
 class Renderer(object):
     """
-    Builds a list of columns based on the supplied photos and chosen layouts. Example usage:
-
-        cols = photoflow.Renderer(layouts=[0, 1]).build_cols(photos[:7])
-
+    Builds a list of columns based on the supplied photos and chosen layouts.
     """
     # Counters
     cur_col = 0
@@ -125,7 +121,10 @@ class Renderer(object):
     photo_count = 0
 
     def __init__(self, layout_ids, max_blocks=None):
-        """layout_ids is a LIST of FLOW_LAYOUTS indexes"""
+        """
+        layout_ids is a list of FLOW_LAYOUTS indexes. If max_blocks is
+        supplied, self.build_cols will return at most that number of blocks.
+        """
         if not isinstance(layout_ids, list):
             raise ValueError("Renderer requires a list of layout_ids. Got: '%s'" % repr(layout_ids))
         self.max_blocks = max_blocks
@@ -133,9 +132,12 @@ class Renderer(object):
         for id in layout_ids:
             self.layout += FLOW_LAYOUTS[id]
 
-    def build_cols(self, photos):
-        """Build the columns with the supplied photos. Returns the columns list"""
-        self.cur_col = 0
+    def build_cols(self, photos, col_offset=0):
+        """
+        Build the columns with the supplied photos. Layout starts at col_offset.
+        Returns the list of columns.
+        """
+        self.cur_col = col_offset % len(self.layout)
         self.cur_item = 0
         self.cols = []
         self.items_tmp = []
@@ -150,7 +152,8 @@ class Renderer(object):
     def add_item(self, photo):
         """
         Add a single photo into the current div-column. Returns True if
-        max-blocks has been reached and the current columns can be directly returned.
+        max-blocks has been reached and the current columns can be directly
+        returned.
         """
         # Get the current column's schema definition
         cur_col = self.layout[self.cur_col]
@@ -194,7 +197,9 @@ class Renderer(object):
             self.cols.append(Col(self.items_tmp, int(col_w), int(col_h)))
 
 class FlowManager(object):
+    """Helps with managing flow pages"""
     def __init__(self):
+        """Sets the current layout"""
         try:
             # This 'db' query is cached, so no need to really worry about performance issues
             self.layout_ids = [int(id) for id in models.AdminValue.objects.get(key="photoflow_layouts_test").val.split(",")]
@@ -205,15 +210,25 @@ class FlowManager(object):
         for id in self.layout_ids:
             self.layout.append(FLOW_LAYOUTS[id])
 
-    def get_items_per_block(self, n):
-        """Number of photos for block n"""
-        n_actual = n % len(self.layout)
+    def get_cols_per_block(self, block_index):
+        """Get the number of columns for a specific block (0..n)"""
+        n_actual = block_index % len(self.layout)
+        return len(self.layout[n_actual])
+
+    def get_items_per_block(self, block_index):
+        """Get the number of photos for a specific block (0..n)"""
+        n_actual = block_index % len(self.layout)
         count = 0
         for el in self.layout[n_actual]:
             count += 1 if "item" in el else len(el["items"])
         return count
 
-    def get_html(self, photos, max_blocks=None):
+    def get_html(self, photos, max_blocks=None, block_offset=0):
+        """
+        Get the flow-html for the supplied photos. If max_blocks is
+        supplied get_html will return at most that number of blocks.
+        If block_offset is specified, the layout starts at that block.
+        """
     #    print layouts
     #    cache_key = "photo_flow:%s" % hashlib.sha256("%s%s" % (repr(layouts), photos.query)).hexdigest()
     #    print "Cache key:", cache_key
@@ -224,9 +239,18 @@ class FlowManager(object):
         #        return cached
 
 
-        flow_renderer = Renderer(layout_ids=self.layout_ids, max_blocks=max_blocks)
-        cols = flow_renderer.build_cols(photos)
+        # Compute col_offset based on block_offset
+        col_offset = 0
+        if block_offset:
+            for i in xrange(block_offset):
+                col_offset += self.get_cols_per_block(i)
+        #print "block offset: %s (= col_offset: %s)" % (block_offset, col_offset)
 
+        # Get the photos and build the flow
+        flow_renderer = Renderer(layout_ids=self.layout_ids, max_blocks=max_blocks)
+        cols = flow_renderer.build_cols(photos, col_offset=col_offset)
+
+        # Render the flow into the template
         flow_template = get_template('mainapp/photoflow_item.html')
         html = flow_template.render(Context({ "cols": cols }))
     #    cache.set(cache_key, res, 60)

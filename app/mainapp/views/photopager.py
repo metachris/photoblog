@@ -119,16 +119,13 @@ class ThumbnailPager(object):
 
     @staticmethod
     def from_request(request):
-        if request.method == 'GET':
-            return ThumbnailPager(Filters.from_dict(request.GET))
-        elif request.method == 'POST':
-            return ThumbnailPager(Filters.from_dict(request.POST))
+        return ThumbnailPager(Filters.from_dict(request.REQUEST))
 
     @staticmethod
     def from_dict(vars):
         return ThumbnailPager(Filters.from_dict(vars))
 
-    def load_page(self, photos_per_page):
+    def load_page(self, photos_per_page=None):
         """
         Get one page of thumbnails for this set of filters.
         If last_hash is given, use all photos with order_id < that one
