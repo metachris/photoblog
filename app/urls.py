@@ -36,6 +36,7 @@ urlpatterns = patterns('',
     url(r'^adminx/cache_clear/$', 'mainapp.views.admin_cache_clear'),
     url(r'^adminx/tmp/$', 'mainapp.views.admin_tmp'),
     url(r'^adminx/mover/$', 'mainapp.views.admin_photo_mover'),
+    url(r'^adminx/rebuild_flow_thumbs/$', 'mainapp.views.admin_flow_rebuild_thumbs'),
 
     # Login and logout url's
     (r'^login/$', 'django.contrib.auth.views.login',

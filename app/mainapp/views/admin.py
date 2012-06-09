@@ -181,13 +181,20 @@ def admin_cache_clear(request):
 def admin_tmp(request):
     """ Temporary action: EXIF update for all photos """
     log.info("Admin Action: tmp. Authorization: %s [%s]" % (request.user.username, request.user.id))
+#    # Build order_ids
+#    for photo in models.Photo.objects.all():
+#        photo.order_id = photo.pk
+#        photo.save()
+#
+#    return HttpResponse("200")
 
-    # Build order_ids
-    for photo in models.Photo.objects.all():
-        photo.order_id = photo.pk
-        photo.save()
 
-    return HttpResponse("200")
+@login_required
+def admin_flow_rebuild_thumbs(request):
+    """ Temporary action: EXIF update for all photos """
+    log.info("Admin Action: Flow Rebuild. Authorization: %s [%s]" % (request.user.username, request.user.id))
+    bgjobs.RebuildFlowFrontpage().start()
+    return HttpResponse("rebuilding in the background")
 
 
 @login_required
