@@ -57,9 +57,6 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
-# If set to True, don't cache pages for logged in users (incl. admin)
-CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -75,6 +72,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.gzip.GZipMiddleware',
 )
+
+# If set to True, don't cache pages for logged in users (incl. admin)
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
 if DEBUG:
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)

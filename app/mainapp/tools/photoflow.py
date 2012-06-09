@@ -214,8 +214,8 @@ class FlowManager(object):
             self.layout.append(FLOW_LAYOUTS[id])
 
     def get_layout_ids(self):
-        lid_str = adminvalues.get(adminvalues.PHOTOFLOW_LAYOUTS_TEST \
-                if self.is_test_layouts else adminvalues.PHOTOFLOW_LAYOUTS)
+        lid_str = adminvalues.PHOTOFLOW_LAYOUTS_TEST.get() if self.is_test_layouts else \
+                adminvalues.PHOTOFLOW_LAYOUTS.get()
         lids = [int(id) for id in lid_str.split(",")]
         return lids
 

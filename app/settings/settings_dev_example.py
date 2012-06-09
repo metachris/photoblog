@@ -2,6 +2,7 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 IS_TESTENV = True
+THUMBNAIL_DEBUG = True  # Used by SORL thumbnails
 
 ADMINS = (
     # ('Your Name', 'name@example.com'),
@@ -44,10 +45,8 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': '192.168.1.11:6379',
-        "KEY_PREFIX": 'sportlog_',
+        "KEY_PREFIX": 'yourprefix_',
         'OPTIONS': {
-            'DB': 1,
-            'PASSWORD': 'yadayada',
             'PARSER_CLASS': 'redis.connection.HiredisParser'
         },
     },
