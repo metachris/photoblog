@@ -214,13 +214,10 @@ class FlowManager(object):
             self.layout.append(FLOW_LAYOUTS[id])
 
     def get_layout_ids(self):
-        try:
-            # This 'db' query is cached, so no need to worry about performance issues
-            key = adminvalues.PHOTOFLOW_LAYOUTS_TEST if self.is_test_layouts else adminvalues.PHOTOFLOW_LAYOUTS
-            layout_ids = [int(id) for id in models.AdminValue.objects.get(key=key).val.split(",")]
-        except models.AdminValue.DoesNotExist:
-            layout_ids = [0]
-        return layout_ids
+        lid_str = adminvalues.get(adminvalues.PHOTOFLOW_LAYOUTS_TEST \
+                if self.is_test_layouts else adminvalues.PHOTOFLOW_LAYOUTS)
+        lids = [int(id) for id in lid_str.split(",")]
+        return lids
 
     def get_cols_per_block(self, block_index):
         """Get the number of columns for a specific block (0..n)"""

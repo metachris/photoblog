@@ -1,3 +1,4 @@
+import time
 import os
 import datetime
 import json
@@ -26,7 +27,8 @@ import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 from mainapp.views.photopager import *
 from mainapp.tools import photoflow
-
+from mainapp import bgjobs
+from mainapp import adminvalues
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +41,8 @@ def home(request):
     flow = photoflow.FlowManager()
 
     # Calculate the number of photos for the initial blocks
-    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+    blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(blocks_initial))
 
     # Get the photos for the current page
     pager = ThumbnailPager(Filters(featured_only=True))
@@ -248,24 +251,30 @@ def set_photos(request, set_slug):
     return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
 
+@cache_page(60 * 15)
 def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
-        flow = photoflow.FlowManager()
-        page = int(request.REQUEST.get("page")) + settings.PHOTOFLOW_BLOCKS_INITIAL
-        n = flow.get_items_per_block(page)
+        blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
+        blocks_perpage = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_PERPAGE)
 
-        #print "Ajax flow more: Loading block #%s, %s images" % (page, n)
+        ajax_page_count = int(request.REQUEST.get("page"))  # 0-indexed
+        cur_block = blocks_initial + (ajax_page_count * blocks_perpage)  # 0-indexed
+
+        # Count the photos for the currently requested blocks
+        flow = photoflow.FlowManager()
+        photo_count = sum(flow.get_items_per_block(n) for n in xrange(cur_block, cur_block+blocks_perpage))
+
         pager = ThumbnailPager.from_request(request)
-        pager.load_page(photos_per_page=n)
+        pager.load_page(photos_per_page=photo_count)
         ret = {
-            "html": flow.get_html(pager.photos, block_offset=page),
+            "html": flow.get_html(pager.photos, block_offset=cur_block),
             "has_more": pager.has_more,
             "last_hash": pager.last_hash,
         }
 
     else:
-        n = settings.PHOTOGRID_ITEMS_PERPAGE
+        n = adminvalues.get_int(adminvalues.PHOTOGRID_ITEMS_PERPAGE)
         pager = ThumbnailPager.from_request(request)
         pager.load_page(photos_per_page=n)
 
@@ -292,13 +301,18 @@ def ajax_contact(request):
             if photo_ref:
                 photo = models.Photo.objects.get(hash=photo_ref)
 
-            # Send email
+            # Prepare email
             email_template = get_template('mainapp/email/contact.html')
             msg = email_template.render(Context({
                     "form": form.cleaned_data,
                     "photo": photo
             }))
-            sendmail.gmail("chris@metachris.org", "Photoblog Contact", msg)
+
+            # Send the email in the background
+            bgjobs.SendMail("chris@metachris.org", "Photoblog Contact", msg).start()
+
+            # Add an artificial delay for the user to get the feeling something is happening
+            time.sleep(1)
 
             # If requested, subscribe to newsletter
             if request.POST.get("add_to_list") != "false":
@@ -364,13 +378,15 @@ def get_handout(request, handout_hash=None):
         log.debug("Handout: added contact %s to handout %s" % (handout_contact, handout))
         contact_subscribed = request.session[SESSION_KEY_HAS_SUBSCRIBED] = handout_contact
 
-        # Send email
+        # Prepare email
         email_template = get_template('mainapp/email/contact_handout.html')
         msg = email_template.render(Context({
             "id": handout_hash, "name": name, "email": email, "phone": phone,
             "msg": msg, "add_to_list": add_to_list
         }))
-        sendmail.gmail("chris@metachris.org", "Photoblog Handout Contact", msg)
+
+        # Send Email
+        bgjobs.SendMail("chris@metachris.org", "Photoblog Handout Contact", msg).start()
 
         # If requested, subscribe to newsletter
         if add_to_list and email:
@@ -399,7 +415,7 @@ def view_flow(request):
     flow = photoflow.FlowManager(layout_ids=layout_ids, is_test_layouts=True)
 
     # Calculate the number of photos for the initial blocks
-    photo_count = sum(flow.get_items_per_block(n) for n in xrange(settings.PHOTOFLOW_BLOCKS_INITIAL))
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)))
 
     # Get the current page from the pager
     pager = ThumbnailPager(Filters(featured_only=True))
