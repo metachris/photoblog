@@ -119,27 +119,27 @@ INSTALLED_APPS = (
 if DEBUG:
     INSTALLED_APPS += ('debug_toolbar',)
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
+# Logging configuration. See http://docs.djangoproject.com/en/dev/topics/logging
+# for more details.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
 
     'formatters': {
-        'default' : {
-            'format' : '%(asctime)s %(levelname)-8s %(name)s \t%(message)s'
+        'default': {
+            'format': '%(levelname)-8s %(asctime)s %(name)s \t%(message)s'
         },
     },
 
+    # Handlers do something with log messages (eg. write to file, send email)
     'handlers': {
+        # Handler for emailing admins on errors
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
         },
 
+        # Handler for logging to a file
         'file':{
             'level':'INFO',
             'class':'logging.FileHandler',
@@ -147,6 +147,7 @@ LOGGING = {
             'filename': os.path.join(APP_ROOT, "logs", "django-%s.log" % DATE_STR),
         },
 
+        # Handler for logging queries to a separate file
         'querylog':{
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -155,16 +156,32 @@ LOGGING = {
             'maxBytes': 1024 * 1024,
             'filename': os.path.join(APP_ROOT, "logs", "django-%s-queries.log" % DATE_STR),
             'delay': True,
-        }
+        },
+
+        # Handler for console output
+        'console':{
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+            'formatter': 'default'
+        },
+
+        # Handler for /dev/null
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
     },
 
+    # What to log and where to
     'loggers': {
+        # Mail admins on errors in request
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
         },
 
+        # Log db-backend messages
         'django.db.backends': {
             'handlers': ['querylog'],
             'level': 'DEBUG',
@@ -172,6 +189,7 @@ LOGGING = {
         },
     },
 
+    # This catches all python scripts logging messages
     'root': {
         'handlers': ['file'],
         'level': 'INFO',

@@ -72,9 +72,6 @@ class RebuildFlowFrontpage(BGTask):
     previous layout is still cached. This way the first user already gets the pre-rendered
     thumbnails.
     """
-    def __init__(self):
-        BGTask.__init__(self)
-
     def __str__(self):
         return "<BGTask: RebuildFlowFrontpage()>"
 

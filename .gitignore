@@ -4,6 +4,8 @@
 *.log
 .idea
 
+log.txt
+
 env
 logs/
 
