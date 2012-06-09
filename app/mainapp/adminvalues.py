@@ -18,8 +18,8 @@ class AdminValue(object):
 
 
 # AdminValue declarations. Add any fields that you want here.
-PHOTOFLOW_LAYOUTS = AdminValue("photoflow_layouts", [0])
-PHOTOFLOW_LAYOUTS_TEST = AdminValue("photoflow_layouts_test", [0])
+PHOTOFLOW_LAYOUTS = AdminValue("photoflow_layouts", "0")
+PHOTOFLOW_LAYOUTS_TEST = AdminValue("photoflow_layouts_test", "0")
 
 PHOTOGRID_ITEMS_INITIAL = AdminValue("photogrid_items_initial", settings.PHOTOGRID_ITEMS_INITIAL)
 PHOTOGRID_ITEMS_PERPAGE = AdminValue("photogrid_items_perpage", settings.PHOTOGRID_ITEMS_PERPAGE)
@@ -36,11 +36,11 @@ def get(av):
     Example usage: adminvalues.get(adminvalues.PHOTOFLOW_LAYOUTS)
     """
     try:
-        ret = models.AdminValue.objects.get(key=av.db_key).val
+        ret = models.AdminValue.objects.get(key=av.db_key, enabled=True).val
     except models.AdminValue.DoesNotExist:
         ret = av.default
 
-    #print "AdminValues: '%s' = '%s'" % (av.db_key, ret)
+    # print "AdminValues: '%s' = '%s'" % (av.db_key, ret)
     return ret
 
 

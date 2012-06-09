@@ -54,6 +54,7 @@ class AdminValue(caching.base.CachingMixin, models.Model):
 
     key = models.CharField(max_length=50)
     val = models.TextField()
+    enabled = models.BooleanField(default=True)
 
     def __unicode__(self):
         return "<AdminValue(%s='%s')>" % (self.key, self.val)
