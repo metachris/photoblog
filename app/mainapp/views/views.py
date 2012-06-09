@@ -41,7 +41,7 @@ def home(request):
     flow = photoflow.FlowManager()
 
     # Calculate the number of photos for the initial blocks
-    blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
+    blocks_initial = adminvalues.PHOTOFLOW_BLOCKS_INITIAL.get_int()
     photo_count = sum(flow.get_items_per_block(n) for n in xrange(blocks_initial))
 
     # Get the photos for the current page
@@ -230,7 +230,11 @@ def sets_list(request):
 @cache_page(60 * 15)
 def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
-    tag = models.Tag.objects.get(slug=tag_slug)
+    try:
+        tag = models.Tag.objects.get(slug=tag_slug)
+    except models.Tag.DoesNotExist:
+        raise Http404()
+
     page = ThumbnailPager(Filters(tags=[tag_slug])).load_page()
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'page': page})
 
@@ -238,7 +242,10 @@ def tag_photos(request, tag_slug):
 @cache_page(60 * 15)
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
-    location = models.Location.objects.get(slug=location_slug)
+    try:
+        location = models.Location.objects.get(slug=location_slug)
+    except models.Location.DoesNotExist:
+        raise Http404()
     page = ThumbnailPager(Filters(location=location_slug)).load_page()
     return render(request, 'mainapp/location_photos.html', {'location': location, 'page': page})
 
@@ -246,7 +253,11 @@ def location_photos(request, location_slug):
 @cache_page(60 * 15)
 def set_photos(request, set_slug):
     """ Show photos in a set """
-    set = models.Set.objects.get(slug=set_slug)
+    try:
+        set = models.Set.objects.get(slug=set_slug)
+    except models.Set.DoesNotExist:
+        raise Http404()
+
     page = ThumbnailPager(Filters(sets=[set_slug])).load_page()
     return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
@@ -255,8 +266,8 @@ def set_photos(request, set_slug):
 def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
-        blocks_initial = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)
-        blocks_perpage = adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_PERPAGE)
+        blocks_initial = adminvalues.PHOTOFLOW_BLOCKS_INITIAL.get_int()
+        blocks_perpage = adminvalues.PHOTOFLOW_BLOCKS_PERPAGE.get_int()
 
         ajax_page_count = int(request.REQUEST.get("page"))  # 0-indexed
         cur_block = blocks_initial + (ajax_page_count * blocks_perpage)  # 0-indexed
@@ -274,7 +285,7 @@ def ajax_photo_more(request):
         }
 
     else:
-        n = adminvalues.get_int(adminvalues.PHOTOGRID_ITEMS_PERPAGE)
+        n = adminvalues.PHOTOGRID_ITEMS_PERPAGE.get_int()
         pager = ThumbnailPager.from_request(request)
         pager.load_page(photos_per_page=n)
 
@@ -415,7 +426,7 @@ def view_flow(request):
     flow = photoflow.FlowManager(layout_ids=layout_ids, is_test_layouts=True)
 
     # Calculate the number of photos for the initial blocks
-    photo_count = sum(flow.get_items_per_block(n) for n in xrange(adminvalues.get_int(adminvalues.PHOTOFLOW_BLOCKS_INITIAL)))
+    photo_count = sum(flow.get_items_per_block(n) for n in xrange(adminvalues.PHOTOFLOW_BLOCKS_INITIAL.get_int()))
 
     # Get the current page from the pager
     pager = ThumbnailPager(Filters(featured_only=True))

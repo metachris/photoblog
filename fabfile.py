@@ -184,11 +184,12 @@ def deploy():
         # Update repo to current master HEAD
         run("git pull")
 
+        # Upload stuff and build all the statics
+        upload_files_notingit()
+
         # Update db schema if needed
         run("source env/bin/activate && cd app && python manage.py migrate mainapp")
 
-    # Upload stuff and build all the statics
-    upload_files_notingit()
     _make_static()
 
     # !!!!!!!!!!!!!!!!!!!!!!!!!

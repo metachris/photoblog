@@ -24,7 +24,8 @@ class PhotoAdmin(admin.ModelAdmin):
 
 
 class AdminValueAdmin(admin.ModelAdmin):
-    list_display = ["key", "val", "id"]
+    list_display = ["key", "val", "enabled", "id"]
+    list_filter = ("enabled",)
 
 
 class HandoutContactAdmin(admin.ModelAdmin):

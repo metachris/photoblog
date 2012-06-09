@@ -137,7 +137,7 @@ class ThumbnailPager(object):
         If last_hash is given, use all photos with order_id < that one
         """
         if not photos_per_page:
-            photos_per_page = adminvalues.get(adminvalues.PHOTOGRID_ITEMS_INITIAL)
+            photos_per_page = adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int()
             limit = photos_per_page + 1
         elif photos_per_page == "all":
             limit = None

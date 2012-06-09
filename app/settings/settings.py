@@ -73,6 +73,9 @@ MIDDLEWARE_CLASSES = (
     #'django.middleware.gzip.GZipMiddleware',
 )
 
+# If set to True, don't cache pages for logged in users (incl. admin)
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
 if DEBUG:
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
