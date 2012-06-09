@@ -6,7 +6,7 @@ import logging
 import time
 from django.shortcuts import render
 
-from mainapp.tools import photoflow
+from mainapp.tools import photoflow, email
 from mainapp.views.photopager import ThumbnailPager, Filters
 
 
@@ -62,8 +62,7 @@ class SendMail(BGTask):
         return "<BGTask: SendMail(to=%s,subject=%s,text=%s)>" % (self.to, self.subject, self.msg_text)
 
     def execute(self):
-        from mainapp.tools.sendmail import gmail
-        gmail(self.to, self.subject, self.msg_text, self.msg_html)
+        email(self.to, self.subject, self.msg_text, self.msg_html)
 
 
 class RebuildFlowFrontpage(BGTask):

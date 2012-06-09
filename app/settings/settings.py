@@ -4,9 +4,6 @@
 # | (depending on whether the current host's network name is in the         |
 # | HOSTS_PRODUCTION list in hosts.py                                       |
 #  -------------------------------------------------------------------------
-
-# First step: Import dev or prod specific settings
-# ------------------------------------------------
 import platform
 import hosts
 import os
@@ -34,6 +31,13 @@ else:
 # Helper for later
 NOW = datetime.datetime.now()
 DATE_STR = NOW.strftime("%Y-%m-%d")
+
+# Email setup
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = EMAIL_USER  # comes from settings_dev or _production
+EMAIL_HOST_PASSWORD = EMAIL_PASS
+EMAIL_USE_TLS = True
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

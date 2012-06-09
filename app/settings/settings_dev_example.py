@@ -12,10 +12,11 @@ MANAGERS = ADMINS
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'MAKE_THIS_UNIQUE'
 
-# To send email via GMail with tools.sendmail.gmail(), set the credentials here
-SENDMAIL_GMAIL_USER = ""
-SENDMAIL_GMAIL_PASS = ""
-SENDMAIL_SENDER_NAME = "Your Name"
+# Email SMTP and default settings (eg. gmail)
+EMAIL_USER = "you@example.at"
+EMAIL_PASS = "your_smtp_pwd"
+EMAIL_FROM_DEFAULT = "Sender Name <%s>" % EMAIL_USER
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Mailchimp auto-subscription settings
 MAILCHIMP_API_KEY = ""

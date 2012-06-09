@@ -1,10 +1,11 @@
 import os
-import re
-import unicodedata
 import string
 import random
 import logging
 
+from django.conf import settings
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 
 log = logging.getLogger(__name__)
 
@@ -28,3 +29,19 @@ def which(program):
                 return exe_file
 
     return None
+
+def email(to, subject, text, html=None):
+    """
+    Super light wrapper for djangos send_email
+
+    `to` can either be a single email string or a list of email strings
+    """
+    if isinstance(to, str) or isinstance(to, unicode):
+        to = [to]
+
+    if html:
+        msg = EmailMultiAlternatives(subject, text, settings.EMAIL_FROM_DEFAULT, to)
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    else:
+        send_mail(subject, text, settings.EMAIL_FROM_DEFAULT, to)
