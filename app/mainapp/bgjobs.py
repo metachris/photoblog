@@ -25,13 +25,13 @@ class BGTask(threading.Thread):
     def run(self):
         log.info("%s started" % str(self))
 
-        # Execute and wrap in timer
         try:
+            # Execute wrapped in timer
             t1 = time.time()
             self.execute()
             t2 = time.time()
 
-            # Log time needed for execution
+            # Log success and time needed for execution
             td = float(int(t2*10) - int(t1*10))/10
             log.info("%s finished in %s seconds" % (str(self), td))
 
