@@ -137,7 +137,7 @@ LOGGING = {
         },
 
         'file':{
-            'level':'DEBUG',
+            'level':'INFO',
             'class':'logging.FileHandler',
             'formatter': 'default',
             'filename': os.path.join(APP_ROOT, "logs", "django-%s.log" % DATE_STR),
@@ -170,7 +170,7 @@ LOGGING = {
 
     'root': {
         'handlers': ['file'],
-        'level': 'DEBUG',
+        'level': 'INFO',
     }
 }
 

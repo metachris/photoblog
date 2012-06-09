@@ -36,6 +36,7 @@ class BGTask(threading.Thread):
             log.info("%s finished in %s seconds" % (str(self), td))
 
         except Exception as e:
+            log.error("Exception in %s:" % str(self))
             log.exception(e)
 
     def execute(self):
