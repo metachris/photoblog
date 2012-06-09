@@ -38,7 +38,7 @@ def get(key):
     except models.AdminValue.DoesNotExist:
         ret = default
 
-    #print "AdminValues: '%s' = '%s'" % (key, ret)
+#    print "AdminValues: '%s' = '%s'" % (key, ret)
     return ret
 
 

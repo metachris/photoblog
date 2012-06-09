@@ -249,6 +249,7 @@ def set_photos(request, set_slug):
     return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
 
+@cache_page(60 * 15)
 def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
