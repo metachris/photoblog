@@ -21,10 +21,8 @@ from django.conf import settings
 import mainapp.models as models
 import mainapp.forms as forms
 import mainapp.tools as tools
-import mainapp.tools.sendmail as sendmail
-import mainapp.tools.mailchimp as mailchimp
-import mainapp.tools.photo_upload as photo_upload
-import mainapp.tools.exif as exif
+
+from mainapp  import bgjobs
 from mainapp.views.photopager import ThumbnailPager, Filters
 
 
@@ -62,6 +60,7 @@ def handout_notify_contacts(request):
         email_msg_text = email_text_template.render(Context({"handout": handout}))
         email_msg_html = email_html_template.render(Context({"handout": handout, "photos": handout.photos.all().order_by("-id")[:5]}))
         sms_msg = sms_template.render(Context({"handout": handout}))
+        subject = "Photos online at chrishager.at/p/%s" % handout.hash
 
         # Notify contacts
         for contact in handout.contacts.all():
@@ -72,7 +71,7 @@ def handout_notify_contacts(request):
             if contact.email:
                 count_email += 1
                 log.info("-- via email to %s" % contact.email)
-                tools.sendmail.gmail(contact.email, "Photos online at chrishager.at/p/%s" % handout.hash, email_msg_text, email_msg_html)
+                bgjobs.SendMail(contact.email, subject, email_msg_text, email_msg_html).start()
 
             # Via SMS
             if contact.tel:

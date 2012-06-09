@@ -1,3 +1,4 @@
+import time
 import os
 import datetime
 import json
@@ -26,6 +27,7 @@ import mainapp.tools.sendmail as sendmail
 import mainapp.tools.mailchimp as mailchimp
 from mainapp.views.photopager import *
 from mainapp.tools import photoflow
+from mainapp import bgjobs
 from mainapp import adminvalues
 
 log = logging.getLogger(__name__)
@@ -299,13 +301,18 @@ def ajax_contact(request):
             if photo_ref:
                 photo = models.Photo.objects.get(hash=photo_ref)
 
-            # Send email
+            # Prepare email
             email_template = get_template('mainapp/email/contact.html')
             msg = email_template.render(Context({
                     "form": form.cleaned_data,
                     "photo": photo
             }))
-            sendmail.gmail("chris@metachris.org", "Photoblog Contact", msg)
+
+            # Send the email in the background
+            bgjobs.SendMail("chris@metachris.org", "Photoblog Contact", msg).start()
+
+            # Add an artificial delay for the user to get the feeling something is happening
+            time.sleep(1)
 
             # If requested, subscribe to newsletter
             if request.POST.get("add_to_list") != "false":
@@ -371,13 +378,15 @@ def get_handout(request, handout_hash=None):
         log.debug("Handout: added contact %s to handout %s" % (handout_contact, handout))
         contact_subscribed = request.session[SESSION_KEY_HAS_SUBSCRIBED] = handout_contact
 
-        # Send email
+        # Prepare email
         email_template = get_template('mainapp/email/contact_handout.html')
         msg = email_template.render(Context({
             "id": handout_hash, "name": name, "email": email, "phone": phone,
             "msg": msg, "add_to_list": add_to_list
         }))
-        sendmail.gmail("chris@metachris.org", "Photoblog Handout Contact", msg)
+
+        # Send Email
+        bgjobs.SendMail("chris@metachris.org", "Photoblog Handout Contact", msg).start()
 
         # If requested, subscribe to newsletter
         if add_to_list and email:
