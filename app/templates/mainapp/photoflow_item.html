@@ -18,12 +18,12 @@
 <!--</table>-->
 
 {% for col in cols %}
-    <div style="float:left; max-width:{{ col.w_px }}px; max-height:{{ col.h_px }}px;">
+    <div style="float:left; width:{{ col.w_px }}px; height:{{ col.h_px }}px;">
         {% for item in col.items %}
             <div class="photoflow-item frame-dynamic" style="margin-right: {{ item.MARGIN_RIGHT }}px; margin-bottom: {{ item.MARGIN_BOTTOM }}px;">
                 {% thumbnail item.photo.url item.size crop="center" as im %}
                     <a href="/photo/{{ item.photo.slug }}{% if photo_link_attr %}?{{ photo_link_attr }}={{ photo_link_val }}{% endif %}" class="a-no-underline">
-                        <img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}">
+                        <img src="{{ im.url }}" alt="{{ item.photo|photo_alt }}" width="{{ im.width }}" height="{{ im.height }}">
                         <div class="photo-caption">
                             <div class="title">
                                 {{ item.photo.title }}

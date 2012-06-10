@@ -1,4 +1,5 @@
 import time
+from django.core.exceptions import ObjectDoesNotExist
 import os
 import datetime
 import json
@@ -33,10 +34,11 @@ from mainapp import adminvalues
 log = logging.getLogger(__name__)
 
 
-@cache_page(60 * 15)
+CACHE_TIME = 60 * 15  # 15 Minutes
+
+
+@cache_page(CACHE_TIME)
 def home(request):
-#    page = ThumbnailPager(Filters(featured_only=True)).load_page()
-#    return render(request, 'index.html', {'page': page})
     # Create a flow manager
     flow = photoflow.FlowManager()
 
@@ -53,7 +55,7 @@ def home(request):
     return render(request, 'index.html', {'page': pager, "flow_html": flow_html })
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def sitemap(request):
     sets = models.Set.objects.filter(published=True).order_by("-id")
     tags = models.Tag.objects.all().order_by("-id")
@@ -62,9 +64,10 @@ def sitemap(request):
     return render(request, 'sitemap.xml', {'photos': photos, "sets": sets, "locations": locations, "tags": tags})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def photo(request, photo_slug):
-    photo = models.Photo.objects.get(slug=photo_slug)
+    photo = get_object_or_404(models.Photo, slug=photo_slug)
+
     tag_slug = request.GET.get("tag")
     set_slug = request.GET.get("set")
     location_slug = request.GET.get("location")
@@ -74,21 +77,21 @@ def photo(request, photo_slug):
     q_prev = models.Photo.objects.filter(order_id__lt=photo.order_id, published=True).order_by("-order_id")
     linkvars = ""
     if tag_slug:
-        tag = models.Tag.objects.get(slug=tag_slug)
+        tag = get_object_or_404(models.Tag, slug=tag_slug)
         tags = [tag]
         tags += tag.get_descendants()
         q_next = q_next.filter(tags__in=tags)
         q_prev = q_prev.filter(tags__in=tags)
         linkvars = "tag=%s" % tag_slug
     elif location_slug:
-        location = models.Location.objects.get(slug=location_slug)
+        location = get_object_or_404(models.Location, slug=location_slug)
         locations = [location]
         locations += location.get_descendants()
         q_next = q_next.filter(location__in=locations)
         q_prev = q_prev.filter(location__in=locations)
         linkvars = "location=%s" % location_slug
     elif set_slug:
-        cur_set = models.Set.objects.get(slug=set_slug)
+        cur_set = get_object_or_404(models.Set, slug=set_slug)
         q_next = q_next.filter(sets=cur_set)
         q_prev = q_prev.filter(sets=cur_set)
         linkvars = "set=%s" % set_slug
@@ -98,33 +101,12 @@ def photo(request, photo_slug):
     return render(request, 'mainapp/photo.html', {'photo': photo, "linkvars": linkvars, "next": next, "prev": prev})
 
 
-#def register(request):
-#    if request.method == 'POST':
-#        form = forms.RegisterForm(request.POST)
-#
-#        if form.is_valid():
-#            user = User.objects.create_user(
-#                form.cleaned_data["username"],
-#                form.cleaned_data["email"],
-#                form.cleaned_data["password"])
-#            models.UserProfile.objects.create(user=user)
-#            user_authenticated = auth.authenticate(
-#                username=form.cleaned_data["username"],
-#                password=form.cleaned_data["password"])
-#            auth.login(request, user_authenticated)
-#            return HttpResponseRedirect('/')
-#    else:
-#        form = forms.RegisterForm()
-#
-#    return render(request, 'register.html', {'form': form})
-#
-
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def tags_list(request):
     """ Show a list of tags """
     class CountAwareTagTree(object):
@@ -171,7 +153,7 @@ def tags_list(request):
     return render(request, 'mainapp/tags.html', {'tags': tags, "photo_count": photo_count, "tag_count": tag_count})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def locations_list(request):
     """ Show a list of locations """
     class CountAwareLocationTree(object):
@@ -218,7 +200,7 @@ def locations_list(request):
     return render(request, 'mainapp/locations.html', {'locations': locations, "photo_count": photo_count, "location_count": location_count})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def sets_list(request):
     """ Show a sets of tags """
     sets = models.Set.objects.filter(published=True)
@@ -227,42 +209,31 @@ def sets_list(request):
     return render(request, 'mainapp/sets.html', {'sets': sets, "photo_count": photo_count, "sets_count": sets_count})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
-    try:
-        tag = models.Tag.objects.get(slug=tag_slug)
-    except models.Tag.DoesNotExist:
-        raise Http404()
-
+    tag = get_object_or_404(models.Tag, slug=tag_slug)
     page = ThumbnailPager(Filters(tags=[tag_slug])).load_page()
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'page': page})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
-    try:
-        location = models.Location.objects.get(slug=location_slug)
-    except models.Location.DoesNotExist:
-        raise Http404()
+    location = get_object_or_404(models.Location, slug=location_slug)
     page = ThumbnailPager(Filters(location=location_slug)).load_page()
     return render(request, 'mainapp/location_photos.html', {'location': location, 'page': page})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def set_photos(request, set_slug):
     """ Show photos in a set """
-    try:
-        set = models.Set.objects.get(slug=set_slug)
-    except models.Set.DoesNotExist:
-        raise Http404()
-
+    set = get_object_or_404(models.Set, slug=set_slug)
     page = ThumbnailPager(Filters(sets=[set_slug])).load_page()
     return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
 
-@cache_page(60 * 15)
+@cache_page(CACHE_TIME)
 def ajax_photo_more(request):
     is_flow_mode = request.REQUEST.get("type") == "flow"
     if is_flow_mode:
@@ -380,7 +351,7 @@ def get_handout(request, handout_hash=None):
         # Create Handout if not exists, else add contact
         try:
             handout = models.Handout.objects.get(hash=handout_hash)
-        except exceptions.ObjectDoesNotExist:
+        except ObjectDoesNotExist:
             handout = models.Handout(hash=handout_hash)
             handout.save()
         handout.contacts.add(handout_contact)

@@ -1,1 +1,13 @@
-404 (lame I know, but it's coming!)
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="span12">
+        <div style="float:right;">
+            <img src="{{ STATIC_URL }}img/404.png" class="frame" />
+        </div>
+        <h2>404 - Not Found</h2>
+        Ooops, something went wrong!
+    </div>
+</div>
+{% endblock %}

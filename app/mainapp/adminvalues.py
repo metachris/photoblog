@@ -12,9 +12,6 @@ from django.conf import settings
 
 
 class AdminValue(object):
-    value = None
-    has_updated = False
-
     def __init__(self, db_key, default=None):
         self.db_key = db_key
         self.default = default
@@ -22,16 +19,15 @@ class AdminValue(object):
     def get(self):
         """
         Returns the value of the models.AdminValue object if it exists, else
-        returns the default value.
+        returns the default value. AdminValue objects are cached, therefore we
+        can safely call the db multiple times and do not hit the db every time.
         """
-        if not self.has_updated:
-            try:
-                self.value = models.AdminValue.objects.get(key=self.db_key, enabled=True).val
-            except models.AdminValue.DoesNotExist:
-                self.value = self.default
-            self.has_updated = True
-        #print "AdminValue '%s': '%s'" % (self.db_key, self.value)
-        return self.value
+        try:
+            value = models.AdminValue.objects.get(key=self.db_key, enabled=True).val
+        except models.AdminValue.DoesNotExist:
+            value = self.default
+        #print "AdminValue '%s': '%s'" % (self.db_key, value)
+        return value
 
     def get_int(self):
         """
