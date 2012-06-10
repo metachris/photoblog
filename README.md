@@ -1,18 +1,47 @@
-Server requirement:
+Django backend for the photo website [chrishager.at](http://www.chrishager.at).
 
-* python-dev
-* Node.js for npm/bootstrap/recess
+This project is not yet in a release state, but it should be fairly straightforward to
+configure and get running. It's not a lot of code and I've tried to keep things modular,
+but since this is just a fun hacking side project for me, some parts of the code are
+'experimental' and may need refactoring.
+
+The code is dual licensed under the [GPLv3](http://www.gnu.org/copyleft/gpl.html) and a commercial license. Under the GPL you can freely use this project to build your own photo-blog as long as you share your modifications. Please create your own theme with custom styles instead of using the included styles.
+
+
+Server Requirements
+-------------------
+
+* Python 2.7, python-dev
+* Node.js for npm (-> bootstrap/recess/uglifyjs)
 * Bootstrap/Less dependencies: `npm install recess uglify-js jshint -g`
-* Python module dependencies
+* [ExifTool](http://www.sno.phy.queensu.ca/~phil/exiftool/) for exif operations
+* Python module dependencies:
+ * See [dependencies.txt](https://github.com/metachris/photoblog/blob/master/dependencies.txt)
  * Virtualenv in `app/env/`
- * `source env/bin/activate && pip install -r dependencies.txt`
- * Postgres installed by default; remove dependency if you want another data store
- * PIL and sorl need libjpeg-dev installed on the system to work with jpegs!
- * I needed Python 2.7 to compile hiredis
+ * Before building PIL and sorl, install `libjpeg-dev` to make them like jpegs
+ * Postgres is used default; remove dependency if you want another data store
  * [itsdangerous](http://packages.python.org/itsdangerous/) module for cryptographic signing
-* [exiftool](http://www.sno.phy.queensu.ca/~phil/exiftool/)
 
 
+
+What's Inside
+-------------
+
+* Django Debug Toolbar
+* DB migrations with South
+* Heavy caching with Redis by default
+* Model caching with django-cache-machine
+* Model hierarchies with django-treebeard
+* Dynamic thumbnails with sorl-thumbnail
+* nginx & uwsgi config files
+* Markdown image descriptions
+* Public models all use slugs
+* Image upload with EXIF preservation and pre-processing
+* ...
+
+
+Various
+-------
 
 Important `manage.py` commands
 

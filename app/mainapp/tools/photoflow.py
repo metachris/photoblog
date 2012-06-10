@@ -2,8 +2,6 @@
 Helper to build photo flows.
 
 Html uses container divs for all columns and places image divs inside.
-
-Todo: Cache based on photo-query-hash + layouts-used
 """
 import hashlib
 from django.template.context import Context

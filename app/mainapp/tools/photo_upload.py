@@ -1,11 +1,8 @@
 import os
 import shutil
 import logging
-import commands
-from pprint import pprint
 
 import Image
-from PIL.ExifTags import TAGS
 
 from django.conf import settings
 
@@ -17,14 +14,11 @@ from app.mainapp.tools.exif import ExifToolHolder
 log = logging.getLogger(__name__)
 
 
-DIR_UPLOAD_FULL = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD)
-DIR_PHOTOS_FULL = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS)
-
+# Target resolution
 RES_HD_1080 = (1920, 1080)
 #RES_XXL_1440 = (2560, 1440)
 
-# Whether pre-processed (scaled, etc) photos should always be stored as jpeg
-# or as their native format.
+# Whether processed photos should always be stored as jpeg or in their native format.
 ALWAYS_OUTPUT_JPEG = True
 
 # 90: 21mb->6mb
@@ -39,6 +33,10 @@ EXIF_TAGS_COPY = ['ApertureValue', 'Caption-Abstract', 'Copyright',
 
 # Jpeg file comment
 EXIF_COMMENT = "Photo ID: {photo_id}. Copyright (c) %s. You can find this photo online at http://www.chrishager.at" % settings.EXIF_COPYRIGHT_TAG
+
+# Internal shortcuts
+DIR_UPLOAD_FULL = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD)
+DIR_PHOTOS_FULL = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS)
 
 
 class PhotoUploader(object):

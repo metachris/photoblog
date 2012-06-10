@@ -40,11 +40,11 @@ class ExifToolHolder(object):
 
 
 if __name__ == "__main__":
-    # Monkey patch to stdout logging
-    log = logging
-
     # Do some exif testing
-#    exif = ExifHolder(Image.open("/opt/photosite/media/upload/789wqx.jpeg"))
-#    exif.get("DateTimeOriginal")
-    exif = ExifToolHolder("/opt/photosite/media/upload/789wqx.jpeg")
-    pprint(exif.values)
+    pass
+
+    #exif = ExifHolder(Image.open("/opt/photosite/media/upload/789wqx.jpeg"))
+    #exif.get("DateTimeOriginal")
+
+    #exif = ExifToolHolder("/opt/photosite/media/upload/789wqx.jpeg")
+    #pprint(exif.values)
