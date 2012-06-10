@@ -30,9 +30,24 @@ ALWAYS_OUTPUT_JPEG = True
 # 90: 21mb->6mb
 PHOTO_QUALITY_VALUE = 80
 
+# Exif tags to copy from the uploaded onto the preprocessed image (if set)
+EXIF_TAGS_COPY = ['ApertureValue', 'Caption-Abstract', 'Copyright',
+        'CreateDate', 'DateTimeOriginal', 'Exposure', 'ExposureTime',
+        'FNumber', 'Flash', 'FocalLength', 'FocalLengthIn35mmFormat',
+        'ISO', 'ImageDescription', 'Lens', 'LensInfo', 'LensModel', 'Make',
+        'Model', 'ShutterSpeedValue']
+
+# Jpeg file comment
+EXIF_COMMENT = "Photo ID: {photo_id}. Copyright (c) %s. You can find this photo online at http://www.chrishager.at" % settings.EXIF_COPYRIGHT_TAG
+
+
 class PhotoUploader(object):
     """
-    Photo uploader, preprocessor (with PIL) and info collector
+    Photo uploader, preprocessor (with PIL) and info collector.
+
+    All exif info from the uploaded file will be stored in self.exif;
+    the preprocessed jpeg file will only posess the specified subset of
+    exif tags.
     """
     # All these values will be added during the upload process
     hash = None    # Unique hash for this photo
@@ -56,10 +71,14 @@ class PhotoUploader(object):
     photo_width = None
     photo_height = None
 
-    def __init__(self, file_upload):
-        """file_upload parameter is a django FileUpload object from request.FILES"""
+    def __init__(self, file_upload, hash=None):
+        """
+        - file_upload parameter is a django FileUpload object from request.FILES
+        - if hash is given, use that for filenames instead of a newly created one
+        """
         log.info("Photo upload: %s" % file_upload)
         self.f = file_upload
+        self.hash = hash
         self.fn_form = str(file_upload)
         self.fn_tmp = "/tmp/%s" % app.mainapp.tools.id_generator(16)
 
@@ -96,9 +115,10 @@ class PhotoUploader(object):
         self.ext = "jpeg" if ALWAYS_OUTPUT_JPEG else self.format.lower()
 
     def process_verified_image(self):
-        self.hash = app.mainapp.models.Photo._mk_hash()
+        if not self.hash:
+            self.hash = app.mainapp.models.Photo._mk_hash()
 
-        # Move original to /media/upload/<filename>.<ext-orig.
+        # Move original to /media/upload/<filename>.<ext-orig>
         self.fn_upload = "%s.%s" % (self.hash, self.format.lower())
         self.fn_upload_full = os.path.join(DIR_UPLOAD_FULL, self.fn_upload)
         shutil.move(self.fn_tmp, self.fn_upload_full)
@@ -118,23 +138,9 @@ class PhotoUploader(object):
         if self.upload_height > self.upload_width:
             self.target_width, self.target_height = self.target_height, self.target_width
 
+        # Resize
         log.info("- want: resizing from orig(%s) to target(%s, %s)" % (str(im.size), self.target_width, self.target_height))
-
-        # Manual resizing for better quality!
-        #
-        # Algorithm:
-        #   1. don't increase
-        #   2. if target_width < image_width then set image_width to target_width
-        #      and adjust image_height accordingly
-#        ratio = float(self.target_width) / self.upload_width
-#        log.info("-- ratio: %s" % ratio)
-#        if ratio < 0.0:
-#            photo_width = int(abs(self.upload_width * ratio))
-#            photo_height = int(abs(self.upload_height * ratio))
-#            log.info("-   do: resizing from orig(%s) to target(%s, %s)" % (str(im.size), photo_width, photo_height))
-#            im.resize((photo_width, photo_height), Image.ANTIALIAS)
         im.thumbnail((self.target_width, self.target_height), Image.ANTIALIAS)
-
         self.photo_width, self.photo_height = im.size
         log.info("- resized. final photo size: %s" % str(im.size))
 
@@ -145,8 +151,9 @@ class PhotoUploader(object):
         im.save(self.fn_photo_full, quality=PHOTO_QUALITY_VALUE)
         log.info("- saved. copying exif tags...")
 
-        # - Copy exif tags
-        os.system("""exiftool -overwrite_original -tagsFromFile %s %s""" % (self.fn_upload_full, self.fn_photo_full))
+        # - Copy specified exif tags
+        comment = EXIF_COMMENT.format(photo_id=self.hash)
+        tags = ' '.join(['"-EXIF:%s=%s"' % (tag, self.exif.get(tag)) for tag in EXIF_TAGS_COPY if self.exif.get(tag)])
+        cmd = """exiftool -overwrite_original "-Comment=%s" %s %s""" % (comment, tags, self.fn_photo_full)
+        os.system(cmd)
         log.info("- all done")
-
-        # Cleanup after `exiftool`

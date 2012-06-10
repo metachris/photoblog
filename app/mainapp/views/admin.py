@@ -18,10 +18,9 @@ from django.core.cache import cache
 
 from django.conf import settings
 
-import mainapp.models as models
-import mainapp.forms as forms
-import mainapp.tools as tools
-
+from mainapp import models
+from mainapp import forms
+from mainapp.tools import photo_upload, sms
 from mainapp  import bgjobs
 from mainapp.views.photopager import ThumbnailPager, Filters
 
@@ -77,7 +76,7 @@ def handout_notify_contacts(request):
             if contact.tel:
                 count_sms += 1
                 log.info("-- via sms to %s" % contact.tel)
-                tools.sms.send_sms(contact.tel, sms_msg)
+                sms.send_sms(contact.tel, sms_msg)
 
         # Finally, update handout
         handout.has_notified_contacts = True
@@ -85,7 +84,7 @@ def handout_notify_contacts(request):
         handout.save()
 
     return render(request, 'mainapp/admin/handout_notify.html', {"counts": True,
-                                                                 "count_contacts": count_contacts, "count_sms": count_sms, "count_email": count_email})
+            "count_contacts": count_contacts, "count_sms": count_sms, "count_email": count_email})
 
 
 @login_required
@@ -94,7 +93,7 @@ def upload_photo(request):
         form = forms.PhotoUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                uploader = tools.photo_upload.PhotoUploader(request.FILES["file"])
+                uploader = photo_upload.PhotoUploader(request.FILES["file"])
                 uploader.upload()
             except TypeError as e:
                 # Not an image file (most likely)
@@ -114,13 +113,12 @@ def upload_photo(request):
                 user=request.user,
                 photographer=models.UserProfile.get_or_create(request.user),
                 hash=uploader.hash,
+                fn_ext=uploader.ext,
                 is_original=True,
-                local_filename=uploader.fn_photo,
                 upload_filename=uploader.fn_upload,
                 upload_filename_from=uploader.fn_form,
                 upload_filesize=os.path.getsize(uploader.fn_upload_full),
                 filesize=os.path.getsize(uploader.fn_photo_full),
-                date_captured=date_captured,
                 resolution_width=uploader.photo_width,
                 resolution_height=uploader.photo_height,
                 upload_resolution_width=uploader.upload_width,
@@ -130,19 +128,21 @@ def upload_photo(request):
                 description_md=exif.get("Description"),
                 exif_camera="%s %s" % (exif.get("Make"), exif.get("Model")),
                 exif_lens=exif.get("Lens") or exif.get("LensModel") or exif.get("LensInfo"),
-                exif_exposuretime=exif.get("ExposureTime"),
+                exif_exposuretime=exif.get("ExposureTime") or exif.get("ShutterSpeedValue"),
                 exif_aperture=exif.get("Aperture") or exif.get("FNumber") or exif.get("ApertureValue"),
                 exif_iso=exif.get("ISO"),
                 exif_focallength=exif.get("FocalLength"),
-                exif_flash=exif.get("FlashFired")
+                exif_flash=exif.get("Flash")
             )
+            if date_captured:
+                photo.date_captured = date_captured
             photo.save()
 
+            # After saving the first time, we can copy the db-id as order_id
             photo.order_id = photo.id
             photo.save()
 
             log.info("- created")
-
             return render(request, 'mainapp/admin/upload.html', {"photo": photo})
 
     else:
@@ -248,3 +248,65 @@ def ajax_admin_photo_move(request):
         hash_next = arr[1]
         move_photo_in_front_of(hash_photo, hash_next)
     return HttpResponse("200")
+
+
+@login_required
+def admin_photo_update(request, photo_slug):
+    photo = get_object_or_404(models.Photo, slug=photo_slug)
+
+    if request.method == 'POST':
+        form = forms.PhotoUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                rev = photo.revisions + 1
+                fn = "%s-%s" % (photo.hash, rev)
+                uploader = photo_upload.PhotoUploader(request.FILES["file"], hash=fn)
+                uploader.upload()
+            except TypeError as e:
+                # Not an image file (most likely)
+                log.exception(e)
+                return HttpResponse("Not an image file")
+
+            exif = uploader.exif
+
+            date_captured = ""
+            datetime_captured = exif.get("DateTimeOriginal") or exif.get("CreateDate") or exif.get("DateTime")
+            if datetime_captured and " " in datetime_captured:
+                date_captured = datetime_captured.split(" ")[0]
+                date_captured = date_captured.replace(":", "-")  # some cameras use :
+
+            log.info("- updating photo object")
+
+            # Update revision info and set photo to new revision
+            photo.revisions += 1
+            photo.revision_set = photo.revisions
+
+            # Update info about upload
+            photo.upload_filename = uploader.fn_upload
+            photo.upload_filename_from = uploader.fn_form
+            photo.upload_filesize = os.path.getsize(uploader.fn_upload_full)
+            photo.filesize = os.path.getsize(uploader.fn_photo_full)
+            photo.resolution_width = uploader.photo_width
+            photo.resolution_height = uploader.photo_height
+            photo.upload_resolution_width = uploader.upload_width
+            photo.upload_resolution_height = uploader.upload_height
+
+            # Update exif info
+            photo.exif = json.dumps(exif.values)
+            photo.exif_camera = "%s %s" % (exif.get("Make"), exif.get("Model"))
+            photo.exif_lens = exif.get("Lens") or exif.get("LensModel") or exif.get("LensInfo")
+            photo.exif_exposuretime = exif.get("ExposureTime")
+            photo.exif_aperture = exif.get("Aperture") or exif.get("FNumber") or exif.get("ApertureValue")
+            photo.exif_iso = exif.get("ISO")
+            photo.exif_focallength = exif.get("FocalLength")
+            photo.exif_flash = exif.get("FlashFired")
+
+            # Save and finish
+            photo.save()
+            log.info("- updated")
+            return render(request, 'mainapp/admin/upload.html', {"photo": photo})
+
+    else:
+        form = forms.PhotoUploadForm()
+
+    return render(request, 'mainapp/admin/photo_update.html', {'photo': photo, "form": form })

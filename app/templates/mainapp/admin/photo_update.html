@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title-left %}Photo Date - {% endblock %}
+
+{% block body %}
+<h1>Photo Update</h1>
+
+<p>Photo <a href="/photo/{{ photo.slug }}">{{ photo.title }}</a></p>
+
+<p><img src="{{ photo.url }}" /> </p>
+
+<h3>New file</h3>
+
+
+<form action="/photo/{{ photo.slug }}/update/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Upload Photo</button>
+</form>
+{% endblock %}
+
+{% block js_bottom %}
+{% endblock %}

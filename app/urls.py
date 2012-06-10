@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^p/notify/$', 'mainapp.views.handout_notify_contacts'),
     url(r'^p/(?P<handout_hash>.*)/$', 'mainapp.views.get_handout'),
 
+    url(r'^photo/(?P<photo_slug>.*)/update/$', 'mainapp.views.admin_photo_update'),
     url(r'^photo/(?P<photo_slug>.*)/$', 'mainapp.views.photo'),
 
     url(r'^locations/$', 'mainapp.views.locations_list'),

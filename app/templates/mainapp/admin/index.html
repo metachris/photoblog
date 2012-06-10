@@ -10,8 +10,9 @@
 <div class="row">
     <div class="span4">
         <ul>
-            <li><a href="/upload/">Photo Upload</a></li>
             <li><a href="/adminx/mover/">Photo Mover</a></li>
+            <li><a href="/upload/">Photo Upload</a></li>
+            <li><a href="javascript:help_update()">Photo Update (Upload new Rev)</a></li>
         </ul>
     </div>
     <div class="span4">
@@ -25,4 +26,9 @@
 {% endblock %}
 
 {% block js_bottom %}
+<script type="text/javascript">
+    function help_update() {
+        alert("Visit /photo/<SLUG>/update");
+    }
+</script>
 {% endblock %}

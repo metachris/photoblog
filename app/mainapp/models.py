@@ -103,50 +103,57 @@ class Set(caching.base.CachingMixin, models.Model):
 
 
 class Photo(caching.base.CachingMixin, models.Model):
-    """
-    """
     objects = caching.base.CachingManager()
     date_created = models.DateTimeField('date created', auto_now_add=True)
+
+    # Photos can be updated with new revisions. New revisions overwrite
+    # existing image meta info (eg. upload filename, resolution, exif,
+    # etc). The first upload is stored as <hash>.jpeg, the next one as
+    # `<hash>-2.jpeg`, etc.
+    revisions = models.IntegerField(default=1)  # Number of updates this photo has received
+    revision_set = models.IntegerField(default=1)  # Current
+
+    # Order id provides an easy way to rearrange the photos
     order_id = models.IntegerField(default=0)
 
-    # Who uploaded the photo
+    # Django user which uploaded the photo
     user = models.ForeignKey(User)
 
     # Who captured this photo
     photographer = models.ForeignKey(UserProfile, blank=True, null=True)
 
-    # If the uploaded image is an original
+    # If the uploaded image is an original (not yet used; meaning undefined)
     is_original = models.BooleanField(default=False)
 
-    # Use only one of either filename or an external url
-    local_filename = models.CharField(max_length=512, blank=True, null=True)
-    external_url = models.CharField(max_length=2048, blank=True)  # deprecated
+    # Hash, revision and extension build the filename (eg. `abc.jpeg` or `abc-2.jpeg`)
+    hash = models.CharField(max_length=32, unique=True)
+    fn_ext = models.CharField(default="jpeg", max_length=32)
 
-    # URL to use for displaying the primary image. Auto-computed based on
-    # whether the original is available, or an external url.
-    # eg. <MEDIA_URL>/photo/123123.png or http://500px.com/...
+    # Full URL of the pre-processed image file. Auto computed based on hash and
+    # current revision.
     url = models.URLField()
 
-    # Title, slug and hash
+    # Title and Slug (see Photo._mk_slug())
     title = models.CharField(max_length=100, blank=True, null=True)
-    slug = models.CharField(max_length=100, blank=True, null=True, unique=True)  # can be auto-generated with Photo._mk_slug
-    hash = models.CharField(max_length=32)
+    slug = models.CharField(max_length=100, blank=True, null=True, unique=True)
 
-    # Image info
+    # Image description
     description_md = models.TextField(blank=True, null=True)  # markdown
     description_html = models.TextField(blank=True, null=True)  # converted to html
 
+    # Connections to other findable classes (Tags, Locations, etc)
     sets = models.ManyToManyField(Set, blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     location = models.ForeignKey(Location, blank=True, null=True)
-
-    date_captured = models.DateField('captured', blank=True, null=True)  # from exif
 
     # Whether this photo is publicly accessible
     published = models.BooleanField(default=False)
 
     # Whether this photo should be featured on the front page, etc.
     featured = models.BooleanField(default=False)
+
+    # Image meta info
+    date_captured = models.DateField('captured', blank=True, null=True)  # from exif
 
     # Photo Infos...
     filesize = models.IntegerField(null=True, blank=True)  # bytes
@@ -200,13 +207,12 @@ class Photo(caching.base.CachingMixin, models.Model):
     def __unicode__(self):
         return "<Photo(%s, %s)>" % (self.pk, self.title)
 
+    def get_filename(self):
+        rev = "-%s" % (self.revision_set) if self.revision_set > 1 else ""
+        return "%s%s.%s" % (self.hash, rev, self.fn_ext)
+
     def update_url(self):
-        if self.local_filename:
-            self.url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, self.local_filename)
-        elif self.external_url:
-            self.url = self.external_url
-        else:
-            raise TypeError("Could not build an url for photo %s (local_filename=%s)" % (self, self.local_filename))
+        self.url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, self.get_filename())
 
     @property
     def is_portrait(self):
@@ -214,32 +220,32 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     @staticmethod
     def post_delete_handler(sender, **kwargs):
-        """Called when an image is deleted. Remove the image files."""
+        """Called when an image is deleted. Remove the image files for all revisions."""
         photo = kwargs["instance"]
-        log.info("Photo post delete handler: removing image files '%s'" % photo.local_filename)
-        if photo.local_filename:
-            # Delete photos
-            fn_upload = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD, photo.local_filename)
-            fn_photo = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS, photo.local_filename)
+        log.info("Photo post delete handler: removing image files '%s'" % photo.get_filename())
+
+        files = ["%s.%s" % (photo.hash, photo.fn_ext)]
+        files += ["%s-%s.%s" % (photo.hash, i+1, photo.fn_ext) for i in xrange(1, photo.revisions)]
+        for f in files:
+            fn_upload = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_UPLOAD, f)
+            fn_photo = os.path.join(settings.MEDIA_ROOT, settings.MEDIA_DIR_PHOTOS, f)
             if os.path.isfile(fn_upload):
                 os.remove(fn_upload)
             if os.path.isfile(fn_photo):
                 os.remove(fn_photo)
-        else:
-            log.info("- no local filename")
 
     @staticmethod
     def pre_save_handler(sender, **kwargs):
         """Before saving update hash, slug, url and description_html"""
         photo = kwargs["instance"]
-        if not photo.hash:
-            photo.hash = Photo._mk_hash()
-        if not photo.slug:
+        #if not photo.hash:
+        #    photo.hash = Photo._mk_hash()
+        photo.update_url()
+        if not photo.slug and photo.title:
             photo.slug = Photo._mk_slug(photo.title)
         if photo.description_md:
             md = markdown.Markdown(safe_mode="escape")
             photo.description_html = md.convert(photo.description_md)
-        photo.update_url()
 
 
 # Registering Signals. using `connect()` prevents receiving signals twice (as happens with @receiver)

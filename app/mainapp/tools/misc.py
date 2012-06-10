@@ -30,9 +30,11 @@ def which(program):
 
     return None
 
+
 def email(to, subject, text, html=None):
     """
-    Super light wrapper for djangos send_email
+    Super light wrapper for djangos send_email, which uses a standard sender
+    from settings.py.
 
     `to` can either be a single email string or a list of email strings
     """
@@ -40,7 +42,8 @@ def email(to, subject, text, html=None):
         to = [to]
 
     if html:
-        msg = EmailMultiAlternatives(subject, text, settings.EMAIL_FROM_DEFAULT, to)
+        msg = EmailMultiAlternatives(subject, text,
+                settings.EMAIL_FROM_DEFAULT, to)
         msg.attach_alternative(html, "text/html")
         msg.send()
     else:

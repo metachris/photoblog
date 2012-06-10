@@ -18,9 +18,32 @@ class PhotoModelForm( forms.ModelForm ):
 
 
 class PhotoAdmin(admin.ModelAdmin):
-    list_display = ["title", "id", "order_id", "published", "slug", "hash", "url"]
-    exclude = ["description_html", "external_url", "url"]
+    list_display = ["id", "title", "order_id", "published", "slug", "hash", "fn_ext", "url"]
     list_filter = ("published",)
+
+    fieldsets = (
+        (None, {
+            "fields": ("hash", "fn_ext", "revisions", "revision_set", "url", "order_id")
+
+        }),
+        ("Image Information", {
+            "fields": ("user", "photographer", "title", "slug", "description_md", "sets", "tags", "location", "published", "featured")
+        }),
+
+        ("Image Meta Information", {
+            "fields": ("date_captured", "filesize", "resolution_width", "resolution_height",
+                       "upload_resolution_width", "upload_resolution_height", "upload_filename", "upload_filename_from",
+                       "upload_filesize")
+        }),
+        ("Exif Information", {
+            #'classes': ('collapse',),
+            "fields": ("exif", "exif_camera", "exif_lens", "exif_exposuretime", "exif_aperture", "exif_iso", "exif_focallength", "exif_flash")
+        }),
+    )
+
+    readonly_fields = ["revisions", "order_id", "url", "hash", "fn_ext", "filesize", "resolution_width", "resolution_height",
+                       "upload_resolution_width", "upload_resolution_height", "upload_filename", "upload_filesize", "upload_filename_from"]
+    exclude = ["description_html", "is_original"]
 
 
 class AdminValueAdmin(admin.ModelAdmin):

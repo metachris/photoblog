@@ -9,6 +9,7 @@ Server requirement:
  * Postgres installed by default; remove dependency if you want another data store
  * PIL and sorl need libjpeg-dev installed on the system to work with jpegs!
  * I needed Python 2.7 to compile hiredis
+ * [itsdangerous](http://packages.python.org/itsdangerous/) module for cryptographic signing
 * [exiftool](http://www.sno.phy.queensu.ca/~phil/exiftool/)
 
 
