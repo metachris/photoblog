@@ -41,7 +41,7 @@ class PhotoAdmin(admin.ModelAdmin):
         }),
     )
 
-    readonly_fields = ["revisions", "order_id", "url", "hash", "fn_ext", "filesize", "resolution_width", "resolution_height",
+    readonly_fields = ["revisions", "slug", "order_id", "url", "hash", "fn_ext", "filesize", "resolution_width", "resolution_height",
                        "upload_resolution_width", "upload_resolution_height", "upload_filename", "upload_filesize", "upload_filename_from"]
     exclude = ["description_html", "is_original"]
 
@@ -56,9 +56,10 @@ class HandoutContactAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.UserProfile)
-admin.site.register(models.Tag, MP_Tag_Admin)
 admin.site.register(models.Photo, PhotoAdmin)
+admin.site.register(models.PhotoSlugHistory)
 admin.site.register(models.Set)
+admin.site.register(models.Tag, MP_Tag_Admin)
 admin.site.register(models.Location, MP_Location_Admin)
 
 admin.site.register(models.Handout)

@@ -8,7 +8,7 @@ import logging
 import urllib
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
 from django.contrib.auth.models import User
 from django.contrib import auth
@@ -66,7 +66,12 @@ def sitemap(request):
 
 @cache_page(CACHE_TIME)
 def photo(request, photo_slug):
-    photo = get_object_or_404(models.Photo, slug=photo_slug)
+    try:
+        photo = models.Photo.objects.get(slug=photo_slug)
+    except ObjectDoesNotExist:
+        # Check if its an old slug and we should redirect
+        slug_deprecated = get_object_or_404(models.PhotoSlugHistory, slug=photo_slug)
+        return redirect("/photo/%s/" % slug_deprecated.photo.slug, permanent=True)
 
     tag_slug = request.GET.get("tag")
     set_slug = request.GET.get("set")

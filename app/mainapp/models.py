@@ -186,26 +186,40 @@ class Photo(caching.base.CachingMixin, models.Model):
     exif_focallength = models.CharField(max_length=512, blank=True, null=True)
     exif_flash = models.CharField(max_length=512, blank=True, null=True)
 
+    @property
+    def is_portrait(self):
+        return self.resolution_height > self.resolution_width
+
     @staticmethod
     def _mk_hash():
+        """Used by PhotoUploader to generate a filename"""
         hash = None
         while not hash or Photo.objects.filter(hash=hash).count():
             hash = tools.id_generator(size=6)
         return hash
 
     @staticmethod
-    def _mk_slug(title):
+    def _mk_slug(title, photo=None):
+        """
+        Build a slug out of the supplied title.
+
+        If photo is supplied, it's possible to re-use a slug from the history if it's
+        from the same photo (eg. renaming a photo back to it's old title+slug).
+        """
         slug = slug_orig = slugify(title)
         if not slug:
-            return
+            raise TypeError("Could not create a slug of title '%s'" % title)
+
         count = 1
-        while not slug or Photo.objects.filter(slug=slug).count():
+        while Photo.objects.filter(slug=slug).count() or \
+              PhotoSlugHistory.objects.filter(slug=slug).exclude(photo=photo).count():
             count += 1
             slug = slug_orig + str(count)
+
         return slug
 
     def __unicode__(self):
-        return "<Photo(%s, %s)>" % (self.pk, self.title)
+        return "<Photo(%s, %s)>" % (self.pk, self.slug)
 
     def get_filename(self):
         rev = "-%s" % (self.revision_set) if self.revision_set > 1 else ""
@@ -213,10 +227,6 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     def update_url(self):
         self.url = os.path.join(settings.MEDIA_URL, settings.MEDIA_DIR_PHOTOS, self.get_filename())
-
-    @property
-    def is_portrait(self):
-        return self.resolution_height > self.resolution_width
 
     @staticmethod
     def post_delete_handler(sender, **kwargs):
@@ -237,15 +247,26 @@ class Photo(caching.base.CachingMixin, models.Model):
     @staticmethod
     def pre_save_handler(sender, **kwargs):
         """Before saving update hash, slug, url and description_html"""
-        photo = kwargs["instance"]
-        #if not photo.hash:
-        #    photo.hash = Photo._mk_hash()
-        photo.update_url()
-        if not photo.slug and photo.title:
-            photo.slug = Photo._mk_slug(photo.title)
-        if photo.description_md:
+        photo_new = kwargs["instance"]
+        photo_orig = Photo.objects.get(pk=photo_new.pk) if photo_new.pk else None
+
+        # Always update the url to the image file
+        photo_new.update_url()
+
+        # Always convert description markdown if available
+        if photo_new.description_md:
             md = markdown.Markdown(safe_mode="escape")
-            photo.description_html = md.convert(photo.description_md)
+            photo_new.description_html = md.convert(photo_new.description_md)
+
+        # Always update slug if not exists but title does
+        if not photo_new.slug and photo_new.title:
+            photo_new.slug = Photo._mk_slug(photo_new.title)
+
+        elif photo_orig and photo_new.title and photo_new.title != photo_orig.title:
+            # Title changed - Add old slug to history and create the new slug
+            history_entry = PhotoSlugHistory(photo=photo_new, slug=photo_new.slug)
+            history_entry.save()
+            photo_new.slug = Photo._mk_slug(photo_new.title, photo=photo_new)
 
 
 # Registering Signals. using `connect()` prevents receiving signals twice (as happens with @receiver)
@@ -253,8 +274,23 @@ post_delete.connect(Photo.post_delete_handler, Photo, dispatch_uid="mainapp.mode
 pre_save.connect(Photo.pre_save_handler, Photo, dispatch_uid="mainapp.models")
 
 
+class PhotoSlugHistory(caching.base.CachingMixin, models.Model):
+    """
+    Slugs are added here after changing a photo's title (and slug) in order for
+    the old slugs to redirect to the correct photo url.
+    """
+    objects = caching.base.CachingManager()
+    date_created = models.DateTimeField('date created', auto_now_add=True)
+
+    photo = models.ForeignKey(Photo)
+    slug = models.CharField(max_length=200, unique=True)
+
+    def __unicode__(self):
+        return '<PhotoSlugHistoryEntry(%s, %s)>' % (self.slug, self.photo)
+
+
 """
-    Models for hand-outs (id's handed to people, who can use it to get their photos
+Models for hand-outs (id's handed to people, who can use it to get their photos
 """
 class HandoutContact(models.Model):
     date_created = models.DateTimeField('date created', auto_now_add=True)
