@@ -21,16 +21,29 @@ CUR_PATH = os.path.abspath(os.path.dirname(__file__))
 def show_help():
     print """Available commands:
 
-        $ %(cmd)s boostrap
-        $ %(cmd)s css
-        $ %(cmd)s minify
-        $ %(cmd)s gzip
+        $ %(cmd)s reset_boostrap ... Resets bootstrap submodule and applies patch
+        $ %(cmd)s build_boostrap ... Builds the current bootstrap code
+        $ %(cmd)s css .............. Compile all less files to css and minify
+        $ %(cmd)s minify_js ........ Minifies all js files
+        $ %(cmd)s gzip ............. Pre-gzip static content (css, js)
 
         $ %(cmd)s all (all of them, in this order)
     """ % {"cmd": sys.argv[0]}
 
 
+def reset_bootstrap():
+    """
+    Resets the bootstrap submodule and applies the current patch.
+    """
+    print "Resetting bootstrap..."
+    fn_bootstrap_patch = os.path.join(CUR_PATH, "twitter-bootstrap.patch")
+    dir_bootstrap = os.path.join(CUR_PATH, "twitter-bootstrap/")
+    cmd = "cd %s && git reset --hard && patch -f -p0 < %s" % (dir_bootstrap, fn_bootstrap_patch)
+    os.system(cmd)
+
+
 def build_bootstrap():
+    """Build the current twitter bootstrap"""
     print "Building Bootstrap..."
     path = os.path.join(CUR_PATH, "twitter-bootstrap")
     os.system("cd %s && rm -rf bootstrap && make bootstrap" % path)
@@ -103,19 +116,23 @@ def run(cmds):
         show_help()
         return
 
-    if "bootstrap" in cmds:
+    if "reset_bootstrap" in cmds:
+        reset_bootstrap()
+
+    if "build_bootstrap" in cmds:
         build_bootstrap()
 
     if "css" in cmds:
         build_css()
 
-    if "minify" in cmds:
+    if "minify_js" in cmds:
         minify_js()
 
     if "gzip" in cmds:
         build_gzip()
 
     if "all" in cmds:
+        reset_bootstrap()
         build_bootstrap()
         build_css()
         minify_js()

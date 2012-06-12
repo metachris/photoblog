@@ -50,4 +50,7 @@ urlpatterns = patterns('',
     # Admin Url's
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^i18n/$', 'mainapp.views.i18n_setlang'),
+    (r'^i18n/', include('django.conf.urls.i18n')),
 )

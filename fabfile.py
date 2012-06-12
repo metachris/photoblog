@@ -1,13 +1,16 @@
 """
 Fabric deployment script.
 
+
 Usage:
 
     fab <target> <command1> <command2> ...
 
+
 Targets:
 
     production ... Production target
+
 
 Commands:
 
@@ -21,18 +24,20 @@ Commands:
                               settings). Also runs `upload_settings`.
 
 
-    make_bootstrap .... Builds twitter bootstrap.
-    make_static ....... Converts /static/css/*.less files to css, and pre-gzips certain files.
+    make_static ...... Makes bootstrap, converts /static/css/*.less files to css, and
+                       pre-gzips js and css files.
 
 
     reload_uwsgi ..... Reload uwsgi for this app by sending TERM signal to uwsgi master process.
     deploy ........... Updates the server to git master HEAD and run `reload_uwsgi`.
     rollback:<hash> .. Sets server git repo to commit identified by <hash> and runs `reload_uwsgi`.
+                       (Not yet fully functional: does not do a db/settings rollback)
+
 
 Examples:
 
     # Server setup
-    $ fab production init_server make_bootstrap make_static
+    $ fab production init_server make_static
 
     # Deployment & Rollback
     $ fab production deploy
@@ -59,8 +64,10 @@ GIT_ORIGIN = "git://github.com/metachris/photoblog.git"
 # Deployments log file (in same path as fabfile)
 HISTFILE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "deployments.log")
 
+# Helper for later
 NOW = datetime.datetime.now()
 NOW_DATE_STR = NOW.strftime("%Y-%m-%d")
+
 
 # Environments
 
@@ -73,6 +80,7 @@ def production():
     env.dir_local  = settings_dev.APP_ROOT
     env.db_info = settings_production.DATABASES["default"]
     env.file_settings = "app/settings/settings_production.py"
+
 
 # Tasks
 
@@ -142,16 +150,18 @@ def upload_files_notingit():
 
 def _make_static():
     """
-    Prepare static dir for collection for deployment:
+    Prepare static assets
 
     1. Make Bootstrap
     2. Make Less files
     3. Pre-Gzip all static files for nginx
+    4. Have django's manage.py collect all the static files
     """
+    # Build
     with cd(os.path.join(env.dir_remote, "app/static/")):
         run("./build.py all")
 
-    # 3. collect final static files into separate dir outside of project
+    # Collect
     with cd(env.dir_remote):
         run("source env/bin/activate && cd app && python manage.py collectstatic --noinput")
 
@@ -171,7 +181,13 @@ def _get_cur_hash():
 
 
 def deploy():
-    """Initiate full deployment (server update to git master HEAD)"""
+    """
+    Initiate full deployment (server update to git master HEAD), db migration,
+    static asset building and uwsgi restart.
+
+    Does not clear cache; admin must do that manually. Not sure whether to add
+    this here; leaving it out for the moment.
+    """
     if not getattr(env, "dir_local", None):
         print "Error: No target. Run $ fab production deploy"
         return
@@ -190,11 +206,8 @@ def deploy():
         # Update db schema if needed
         run("source env/bin/activate && cd app && python manage.py migrate mainapp")
 
+    # Build static assets
     _make_static()
-
-    # !!!!!!!!!!!!!!!!!!!!!!!!!
-    # TODO: Clear Cache!!!!!!!!
-    # !!!!!!!!!!!!!!!!!!!!!!!!!
 
     # Finally reload uwsgi
     reload_uwsgi()
@@ -213,8 +226,7 @@ def deploy():
 def rollback(hash):
     """
     Rollback git repositories to specified hash.
-    Usage:
-    fab rollback:hash=etcetc123
+    Usage: `fab rollback:hash=etcetc123`
     """
     print "Rolling back to %s" % hash
     hash_before = _get_cur_hash()
@@ -238,18 +250,8 @@ def _log(info, id="deployment"):
     f.write("%s | %s | %s\n" % (id, datetime.datetime.now(), info))
 
 
-def _update_bootstrap():
-    """Requires a previous up-to-date deployment for the current bootstrap patch file"""
-    fn_bootstrap_patch = os.path.join(env.dir_remote, "app/static/twitter-bootstrap.patch")
-    dir_bootstrap = os.path.join(env.dir_remote, "app/static/twitter-bootstrap")
-    with cd(dir_bootstrap):
-        run("git reset --hard")
-        run("patch -f -p0 < %s" % fn_bootstrap_patch)
-        run("rm -rf bootstrap")
-        run("make bootstrap")
-
-
 def backup_db():
+    # Demo DB Backup
     with cd("/tmp/"):
         fn = "/tmp/dbdump_photoblog-%s.sql" % NOW_DATE_STR
         cmd1 = 'export PGPASSWORD="%(PASSWORD)s"' % env.db_info

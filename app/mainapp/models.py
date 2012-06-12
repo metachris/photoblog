@@ -230,10 +230,14 @@ class Photo(caching.base.CachingMixin, models.Model):
 
     @staticmethod
     def post_delete_handler(sender, **kwargs):
-        """Called when an image is deleted. Remove the image files for all revisions."""
+        """
+        Called when an image is deleted. Remove the image files for all revisions and the
+        slug history entries.
+        """
         photo = kwargs["instance"]
         log.info("Photo post delete handler: removing image files '%s'" % photo.get_filename())
 
+        # Remove Image Files
         files = ["%s.%s" % (photo.hash, photo.fn_ext)]
         files += ["%s-%s.%s" % (photo.hash, i+1, photo.fn_ext) for i in xrange(1, photo.revisions)]
         for f in files:
@@ -243,6 +247,11 @@ class Photo(caching.base.CachingMixin, models.Model):
                 os.remove(fn_upload)
             if os.path.isfile(fn_photo):
                 os.remove(fn_photo)
+
+        # Remove slug history entries
+        for ps in PhotoSlugHistory.objects.filter(photo=photo):
+            ps.delete()
+
 
     @staticmethod
     def pre_save_handler(sender, **kwargs):

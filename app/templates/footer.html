@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load extras %}
 
 <div style="margin-top:40px;">
@@ -10,10 +11,8 @@
     </div>
     <div class="modal-body">
         <p>
-            You can leave me a message right here, send a mail to photo@chrishager.at or call at +43 680 2425352.
-            I'm currently available for shootings.
+            {% blocktrans %}You can leave me a message right here, send a mail to photo@chrishager.at or call at +43 680 2425352. I'm currently available for shootings.{% endblocktrans %}
             <!--{% if photo %}This photo is called <i>{{ photo.title }}</i>.{% endif %}-->
-
         </p>
         <br />
 

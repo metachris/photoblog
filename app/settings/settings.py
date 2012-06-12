@@ -10,12 +10,14 @@ import os
 import datetime
 
 
-# Number of photos to show in the grid initially and on more pages
+# Number of photos to show in the grid initially and on more pages.
+# These values may be overwritten with AdminValue objects.
 PHOTOGRID_ITEMS_INITIAL = 11
 PHOTOGRID_ITEMS_PERPAGE = 6
 
-# Number of flow containers to show in the photo-flow,
-# One block is a 4x2 container with up to 4 cols
+# Number of flow containers to show in the photo-flow. One block is a 4x2
+# container with up to 4 cols These values may be overwritten with AdminValue
+# objects.
 PHOTOFLOW_BLOCKS_INITIAL = 3
 PHOTOFLOW_BLOCKS_PERPAGE = 2
 
@@ -28,7 +30,7 @@ else:
     print "Loading dev settings"
     from settings_dev import *
 
-# Helper for later
+# Helper for later (log files, etc)
 NOW = datetime.datetime.now()
 DATE_STR = NOW.strftime("%Y-%m-%d")
 
@@ -38,6 +40,9 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = EMAIL_USER  # comes from settings_dev or _production
 EMAIL_HOST_PASSWORD = EMAIL_PASS
 EMAIL_USE_TLS = True
+
+# Count cache duration (see http://jbalogh.me/projects/cache-machine/)
+CACHE_COUNT_TIMEOUT = 60  # seconds, not too long.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -57,6 +62,11 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
+LANGUAGES = (
+    ('de', 'German'),
+    ('en', 'English'),
+)
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -67,6 +77,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

@@ -81,7 +81,7 @@ class RebuildFlowFrontpage(BGTask):
 
         # Get the current page from the pager
         pager = ThumbnailPager(Filters(featured_only=True))
-        pager.load_page(photos_per_page="all")
+        pager.load_page(limit=None)
 
         # Get the flow html and render to response
         flow_html = flow.get_html(pager.photos)

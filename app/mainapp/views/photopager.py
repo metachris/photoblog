@@ -115,10 +115,13 @@ class ThumbnailPager(object):
     Helper to move between pages
     """
     filters = None
-    last_hash = None
-
-    has_more = False
     photos = None
+
+    last_hash = None
+    has_more = False
+
+    count_photos_all = 0
+    count_photos_limit = 0
 
     def __init__(self, filters):
         self.filters = filters
@@ -131,37 +134,31 @@ class ThumbnailPager(object):
     def from_dict(vars):
         return ThumbnailPager(Filters.from_dict(vars))
 
-    def load_page(self, photos_per_page=None):
+    def load_page(self, limit=None):
         """
-        Get one page of thumbnails for this set of filters.
-        If last_hash is given, use all photos with order_id < that one
-        """
-        if not photos_per_page:
-            photos_per_page = adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int()
-            limit = photos_per_page + 1
-        elif photos_per_page == "all":
-            limit = None
-        else:
-            limit = photos_per_page + 1
+        Get one page of thumbnails for this set of filters. If last_hash is
+        part of the filters, use only photos with a lower order_id.
 
+        Get all photos by setting `limit=None`
+        """
         log.info("ThumbailPager: load page with filters: %s" % str(self.filters))
 
         # Get the db query for these filters
-        self.photo_query = filters_to_query(self.filters, limit=limit)
+        self.photo_query = filters_to_query(self.filters)
+        self.photos = self.photo_query[:limit] if limit else self.photo_query
 
-        count = self.photo_query.count()
+        # Save the counts
+        self.count_photos_all = self.photo_query.count()
+        self.count_photos_limit = self.photos.count()
 
-        # Poor mans has-more: get 1 more than requested
-        self.has_more = count > photos_per_page
+        # Save the last hash
+        if self.count_photos_limit:
+            self.last_hash = self.filters.last_hash = self.photos[self.count_photos_limit-1].hash
+        else:
+            self.last_hash = self.filters.last_hash = None
 
-        # Save photos (trim the extra item if needed)
-        self.photos = self.photo_query[:photos_per_page] if limit else self.photo_query
-        self.photos_count = count if count < photos_per_page else count-1
+        # Save whether there are more
+        self.has_more = self.count_photos_all > self.count_photos_limit
 
-        # Save last photos hash
-        if self.photos_count:
-            self.last_hash = self.filters.last_hash = self.photos[self.photos_count-1].hash
-
+        # All done
         return self
-
-

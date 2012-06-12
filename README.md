@@ -29,6 +29,7 @@ What's Inside
 
 * Django Debug Toolbar
 * DB migrations with South
+* Twitter Bootstrap as submodule
 * Heavy caching with Redis by default
 * Model caching with django-cache-machine
 * Model hierarchies with django-treebeard
@@ -49,3 +50,10 @@ Important `manage.py` commands
  * `python manage.py thumbnail cleanup` cleans up the Key Value Store from stale cache. It removes references to images that do not exist and thumbnail references and their actual files for images that do not exist. It removes thumbnails for unknown images.
  * `python manage.py thumbnail clear`  totally empties the Key Value Store from all keys that start with the settings.THUMBNAIL_KEY_PREFIX. It does not delete any files. It is generally safe to run this if you do not reference the generated thumbnails by name somewhere else in your code. The Key Value store will update when you hit the template tags, and if the thumbnails still exist they will be used and not overwritten.
 
+
+
+Ideas
+-----
+
+* Replace `exiftool` with [pyexiv2](http://tilloy.net/dev/pyexiv2/developers.html) (?)
+* Use Twitter Bootstrap's image carousel?

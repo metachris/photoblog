@@ -2,6 +2,7 @@
 *.pyo
 *.pot
 *.log
+*.mo
 .idea
 
 log.txt

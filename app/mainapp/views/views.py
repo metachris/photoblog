@@ -48,7 +48,7 @@ def home(request):
 
     # Get the photos for the current page
     pager = ThumbnailPager(Filters(featured_only=True))
-    pager.load_page(photos_per_page=photo_count)
+    pager.load_page(limit=photo_count)
 
     # Build the flow-html and render to response
     flow_html = flow.get_html(pager.photos)
@@ -218,7 +218,7 @@ def sets_list(request):
 def tag_photos(request, tag_slug):
     """ Show photos with a specific tag """
     tag = get_object_or_404(models.Tag, slug=tag_slug)
-    page = ThumbnailPager(Filters(tags=[tag_slug])).load_page()
+    page = ThumbnailPager(Filters(tags=[tag_slug])).load_page(adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int())
     return render(request, 'mainapp/tag_photos.html', {'tag': tag, 'page': page})
 
 
@@ -226,7 +226,7 @@ def tag_photos(request, tag_slug):
 def location_photos(request, location_slug):
     """ Show photos with a specific tag """
     location = get_object_or_404(models.Location, slug=location_slug)
-    page = ThumbnailPager(Filters(location=location_slug)).load_page()
+    page = ThumbnailPager(Filters(location=location_slug)).load_page(adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int())
     return render(request, 'mainapp/location_photos.html', {'location': location, 'page': page})
 
 
@@ -234,7 +234,7 @@ def location_photos(request, location_slug):
 def set_photos(request, set_slug):
     """ Show photos in a set """
     set = get_object_or_404(models.Set, slug=set_slug)
-    page = ThumbnailPager(Filters(sets=[set_slug])).load_page()
+    page = ThumbnailPager(Filters(sets=[set_slug])).load_page(adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int())
     return render(request, 'mainapp/set_photos.html', {'set': set, 'page': page})
 
 
@@ -253,7 +253,7 @@ def ajax_photo_more(request):
         photo_count = sum(flow.get_items_per_block(n) for n in xrange(cur_block, cur_block+blocks_perpage))
 
         pager = ThumbnailPager.from_request(request)
-        pager.load_page(photos_per_page=photo_count)
+        pager.load_page(limit=photo_count)
         ret = {
             "html": flow.get_html(pager.photos, block_offset=cur_block),
             "has_more": pager.has_more,
@@ -261,9 +261,8 @@ def ajax_photo_more(request):
         }
 
     else:
-        n = adminvalues.PHOTOGRID_ITEMS_PERPAGE.get_int()
         pager = ThumbnailPager.from_request(request)
-        pager.load_page(photos_per_page=n)
+        pager.load_page(limit=adminvalues.PHOTOGRID_ITEMS_INITIAL.get_int())
 
         ret = {
             "photos": [],
@@ -406,8 +405,12 @@ def view_flow(request):
 
     # Get the current page from the pager
     pager = ThumbnailPager(Filters(featured_only=True))
-    pager.load_page(photos_per_page=photo_count)
+    pager.load_page(limit=photo_count)
 
     # Get the flow html and render to response
     flow_html = flow.get_html(pager.photos)
     return render(request, 'mainapp/flow.html', {'page': pager, "flow_html": flow_html })
+
+
+def i18n_setlang(request):
+    return render(request, 'i18n_setlang.html')
