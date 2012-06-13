@@ -18,3 +18,5 @@ media/
 app/static/*.gz
 app/static/js/*.min.js
 app/static/css
+
+app/settings/backup/

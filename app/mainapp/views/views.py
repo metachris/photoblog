@@ -412,5 +412,24 @@ def view_flow(request):
     return render(request, 'mainapp/flow.html', {'page': pager, "flow_html": flow_html })
 
 
+def view_test(request):
+    """Show initial flow page"""
+    # Allow overwriting layout-ids for testing with eg. '/flow/?l=0,3'
+    def l(s):
+        log.info("[view_test] %s" % s)
+
+    l(request)
+    return HttpResponse("test")
+
+
+@cache_page(CACHE_TIME)
+def view_test_cached(request):
+    def l(s):
+        log.info("[view_test_cached] %s" % s)
+
+    l(request)
+    return HttpResponse("test_cached")
+
+
 def i18n_setlang(request):
     return render(request, 'i18n_setlang.html')

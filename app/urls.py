@@ -8,7 +8,10 @@ urlpatterns = patterns('',
     url(r'^$', 'mainapp.views.home', name='home'),
     url(r'^sitemap.xml$', 'mainapp.views.sitemap'),
     url(r'^upload/$', 'mainapp.views.upload_photo'),
-    url(r'^flow/$', 'mainapp.views.view_flow'),
+
+    url(r'^flow/$', 'mainapp.views.view_flow'),  # flow test
+    url(r'^test/$', 'mainapp.views.view_test'),
+    url(r'^test_cached/$', 'mainapp.views.view_test_cached'),
 
     url(r'^p/$', 'mainapp.views.get_handout'),
     url(r'^p/notify/$', 'mainapp.views.handout_notify_contacts'),
