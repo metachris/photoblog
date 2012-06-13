@@ -207,7 +207,7 @@ def deploy():
         upload_files_notingit()
 
         # Build i18n db
-        run("cd app && django-admin.py compilemessages")
+        run("source env/bin/activate && cd app && django-admin.py compilemessages")
 
         # Update db schema if needed
         run("source env/bin/activate && cd app && python manage.py migrate mainapp")
