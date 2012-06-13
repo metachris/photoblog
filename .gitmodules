@@ -1,3 +1,6 @@
 [submodule "app/static/twitter-bootstrap"]
 	path = app/static/twitter-bootstrap
 	url = git://github.com/twitter/bootstrap.git
+[submodule "app/static/less"]
+	path = app/static/less
+	url = git@github.com:metachris/photoblog-styles.git
