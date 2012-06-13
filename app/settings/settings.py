@@ -44,6 +44,9 @@ EMAIL_USE_TLS = True
 # Count cache duration (see http://jbalogh.me/projects/cache-machine/)
 CACHE_COUNT_TIMEOUT = 60  # seconds, not too long.
 
+# If set to True, don't cache pages for logged in users (incl. admin)
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 TIME_ZONE = 'Europe/Vienna'
@@ -62,6 +65,12 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
+# Paths to the translations (if not app/<subapp>/locale)
+LOCALE_PATHS = (
+    os.path.join(APP_ROOT, "app/locale"),
+)
+
+# Selectable languages
 LANGUAGES = (
     ('de', 'German'),
     ('en', 'English'),
@@ -83,9 +92,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.gzip.GZipMiddleware',
 )
-
-# If set to True, don't cache pages for logged in users (incl. admin)
-CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
 if DEBUG:
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
