@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-12 12:04+0200\n"
+"POT-Creation-Date: 2012-06-13 13:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,17 +18,48 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+#: templates/footer.html:10
+msgid "Contact Me"
+msgstr "Kontakt"
+
 #: templates/footer.html:14
 msgid ""
 "You can leave me a message right here, send a mail to photo@chrishager.at or "
 "call at +43 680 2425352. I'm currently available for shootings."
 msgstr ""
+"Du kannst mir hier eine Nachricht schicken oder mich per Email an photo [at] "
+"chrishager.at sowie unter +43 680 2425352 erreichen. Ich bin derzeit für "
+"Shootings verfügbar."
+
+#: templates/footer.html:23
+msgid "Thanks. Your message has been delivered."
+msgstr "Danke, deine Nachricht wurde übermittelt."
+
+#: templates/footer.html:35 templates/mainapp/handout_notyetonline.html:34
+msgid "Your Name"
+msgstr "Dein Name"
+
+#: templates/footer.html:41 templates/mainapp/handout_notyetonline.html:40
+msgid "Email"
+msgstr "Email"
+
+#: templates/footer.html:47 templates/mainapp/handout_notyetonline.html:52
+msgid "Message"
+msgstr "Nachricht"
+
+#: templates/footer.html:53 templates/mainapp/handout_notyetonline.html:59
+msgid "Add to Email List"
+msgstr "Newsletter Abonnieren"
+
+#: templates/footer.html:64
+msgid "Send Message"
+msgstr "Abschicken"
 
 #: templates/header.html:5
 msgid "Tags"
 msgstr "Tags"
 
-#: templates/header.html:6
+#: templates/header.html:6 templates/mainapp/sets.html:13
 msgid "Collections"
 msgstr "Portfolios"
 
@@ -39,3 +70,39 @@ msgstr ""
 #: templates/header.html:9
 msgid "Contact"
 msgstr "Kontakt"
+
+#: templates/mainapp/handout_notyetonline.html:11
+msgid "Your contact has been saved"
+msgstr "Deine Kontaktinformationen wurden gespeichert"
+
+#: templates/mainapp/handout_notyetonline.html:11
+msgid "and you'll get notified as soon as the photos are ready!"
+msgstr "und du wirst benachrichtigt sobald die photos online sind!"
+
+#: templates/mainapp/handout_notyetonline.html:21
+msgid ""
+"The photos are not yet online! Please leave your email and/or phone number "
+"and you'll get  notified when they are available."
+msgstr ""
+"Die Photos sind noch nicht online! Wenn du deine Email und/oder "
+"Telefonnummer hinterlässt wirst du automatisch benachrichtigt!"
+
+#: templates/mainapp/handout_notyetonline.html:46
+msgid "Phone Number"
+msgstr "Telefonnummer"
+
+#: templates/mainapp/handout_notyetonline.html:48
+msgid "receive a SMS when photos are available"
+msgstr "du erhältst eine SMS wenn die Photos online sind"
+
+#: templates/mainapp/handout_notyetonline.html:67
+msgid "Submit"
+msgstr "Abschicken"
+
+#: templates/mainapp/sets.html:6
+#, fuzzy
+msgid "All Collections"
+msgstr "Alle Portfolios"
+
+#~ msgid "Close"
+#~ msgstr "Schließen"

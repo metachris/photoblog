@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
+{% load i18n %}
 {% load thumbnail %}
 
 {% block body %}
-<div class="caption">Photos for you, via id <b>{{ id }}</b></div>
+<div class="caption">Photos via id <b>{{ id }}</b></div>
 
 {% if contact %}
     <p>
-        Your contact has been saved ({{ contact.name }}{% if email %}, email: {{ contact.email }}{% endif %}{% if contact.tel %}, tel: {{ contact.tel }}{% endif %}), and you'll get notified as soon as the photos are ready!
+        {% trans "Your contact has been saved" %} ({{ contact.name }}{% if email %}, email: {{ contact.email }}{% endif %}{% if contact.tel %}, tel: {{ contact.tel }}{% endif %}), {% trans "and you'll get notified as soon as the photos are ready!" %}
     </p>
     <br />
     <a href="/">Visit the homepage</a>
@@ -17,7 +18,7 @@
 {% else %}
 
 <p>
-    The photos are not yet online! Please leave your email and/or phone number and you'll get  notified when they are available.
+    {% blocktrans %}The photos are not yet online! Please leave your email and/or phone number and you'll get  notified when they are available.{% endblocktrans %}
 </p>
 
 {% if error %}<p><span class="label label-important">{{ error }}</span></p>{% endif %}
@@ -30,32 +31,32 @@
 
     <fieldset>
         <div class="control-group" id="ctrlgrp-name">
-            <label class="control-label" for="id_name">Your Name:</label>
+            <label class="control-label" for="id_name">{% trans "Your Name" %}:</label>
             <div class="controls">
                 <input type="text" class="input-xlarge" id="id_name" name="name" value="{{ name }}">
             </div>
         </div>
         <div class="control-group" id="ctrlgrp-email">
-            <label class="control-label" for="id_email">Email:</label>
+            <label class="control-label" for="id_email">{% trans "Email" %}:</label>
             <div class="controls">
                 <input type="text" class="input-xlarge" id="id_email" name="email" value="{{ email }}"> &nbsp;<span class="help-after">(optional)</span>
             </div>
         </div>
         <div class="control-group" id="ctrlgrp-email">
-            <label class="control-label" for="id_phone">Phone Number:</label>
+            <label class="control-label" for="id_phone">{% trans "Phone Number" %}:</label>
             <div class="controls">
-                <input type="text" class="input-xlarge" id="id_phone" name="phone" value="{{ phone }}" placeholder="eg. +43 680 12312312"> &nbsp;<span class="help-after">(receive a SMS when photos are available. optional)</span>
+                <input type="text" class="input-xlarge" id="id_phone" name="phone" value="{{ phone }}" placeholder="eg. +43 680 12312312"> &nbsp;<span class="help-after">({% trans "receive a SMS when photos are available" %}. optional)</span>
             </div>
         </div>
         <div class="control-group" id="ctrlgrp-message">
-            <label class="control-label" for="id_message">Message:</label>
+            <label class="control-label" for="id_message">{% trans "Message" %}:</label>
             <div class="controls">
                 <textarea class="input-xlarge" id="id_message" rows="10" cols="40" name="message">{{ msg }}</textarea>
                 &nbsp;<span class="help-after">(optional)</span>
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="id_add_to_list">Add to Email List:</label>
+            <label class="control-label" for="id_add_to_list">{% trans "Add to Email List" %}:</label>
             <div class="controls">
                 <input class="input-xlarge" type="checkbox" {% if add_to_list %}checked="checked" {% endif %}name="add_to_list" id="id_add_to_list">
             </div>
@@ -63,7 +64,7 @@
         <div class="control-group">
             <label class="control-label" for="id_add_to_list"></label>
             <div class="controls">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
             </div>
         </div>
     </fieldset>

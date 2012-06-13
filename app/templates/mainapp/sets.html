@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
+{% load i18n %}
 {% load thumbnail %}
 
-{% block title-left %}All Collections - {% endblock %}
+{% block title-left %}{% trans "All Collections" %} - {% endblock %}
 
 {% block meta %}
 <meta name="description" content="{{ photo_count }} stunning sport, climbing and nature photographs in {{ sets_count }} collections.">
 {% endblock %}
 
 {% block body %}
-<div class="caption">Collections</div>
+<div class="caption">{% trans "Collections" %}</div>
 
 <div class="row-fluid">
 

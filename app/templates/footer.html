@@ -7,21 +7,20 @@
 <div class="modal fade" id="contactModal" style="display: none;">
     <div class="modal-header">
         <button class="close" data-dismiss="modal">×</button>
-        <h3>Contact Me</h3>
+        <h3>{% trans "Contact Me" %}</h3>
     </div>
     <div class="modal-body">
         <p>
             {% blocktrans %}You can leave me a message right here, send a mail to photo@chrishager.at or call at +43 680 2425352. I'm currently available for shootings.{% endblocktrans %}
             <!--{% if photo %}This photo is called <i>{{ photo.title }}</i>.{% endif %}-->
         </p>
-        <br />
 
         <div id="contactModal-loading" style="text-align: center; display: none; margin-top: 120px; margin-bottom: 120px;">
             <img src="{{ STATIC_URL }}img/ajax-loader.gif" />
         </div>
 
         <div id="contactModal-success" style="text-align: center; display: none; margin-top: 120px; margin-bottom: 120px;">
-            Thanks. Your message has been delivered.
+            {% trans "Thanks. Your message has been delivered." %}
         </div>
 
         <form action="/contact/" method="post" class="form-horizontal" id="contactModal-form">
@@ -33,25 +32,25 @@
 
             <fieldset>
                 <div class="control-group" id="ctrlgrp-name">
-                    <label class="control-label" for="id_name">Your Name:</label>
+                    <label class="control-label" for="id_name">{% trans "Your Name" %}:</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="id_name" name="name">
                     </div>
                 </div>
                 <div class="control-group" id="ctrlgrp-email">
-                    <label class="control-label" for="id_email">Your Email:</label>
+                    <label class="control-label" for="id_email">{% trans "Email" %}:</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="id_email" name="email">
                     </div>
                 </div>
                 <div class="control-group" id="ctrlgrp-message">
-                    <label class="control-label" for="id_message">Message:</label>
+                    <label class="control-label" for="id_message">{% trans "Message" %}:</label>
                     <div class="controls">
                         <textarea class="input-xlarge" id="id_message" rows="10" cols="40" name="message"></textarea>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="id_add_to_list">Add to Email List:</label>
+                    <label class="control-label" for="id_add_to_list">{% trans "Add to Email List" %}:</label>
                     <div class="controls">
                         <input class="input-xlarge" type="checkbox" name="add_to_list" id="id_add_to_list">
                     </div>
@@ -62,7 +61,7 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:hide_contact_modal()" class="btn">Close</a>
-        <a href="javascript:send_message()" class="btn btn-primary" id="contactModal-btn-submit">Send Message</a>
+        <a href="javascript:send_message()" class="btn btn-primary" id="contactModal-btn-submit">{% trans "Send Message" %}</a>
     </div>
 </div>
 

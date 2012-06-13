@@ -200,11 +200,21 @@ def deploy():
         # Update repo to current master HEAD
         run("git pull")
 
-        # Upload stuff and build all the statics
+        # Update submodules to currently set revision
+        run("git submodule update")
+
+        # Upload files that are not in git (eg. analytics_snippet.html)
         upload_files_notingit()
+
+        # Build i18n db
+        run("cd app && django-admin.py compilemessages")
 
         # Update db schema if needed
         run("source env/bin/activate && cd app && python manage.py migrate mainapp")
+
+    # Update less files submodule
+    #with cd(os.path.join(env.dir_remote, "app/static/less")):
+    #    run("git pull")
 
     # Build static assets
     _make_static()
